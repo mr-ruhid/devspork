@@ -77,3 +77,51 @@ textools.dart
 seotools.dart
 
 bcryptgen.dart
+
+API Request Builder (Mini Postman)  
+
+JSON → Code Generator    
+
+JWT Generator + Editor     
+
+JSON Schema Generator
+
+===================================
+
+JSON Schema Validator
+
+Cron Builder (Vizual)
+
+.env Manager
+
+TOTP Generator
+
+Timezone Meeting Planner
+
+Regex Builder (Vizual)
+
+Color Palette Generator
+
+CSV ↔ JSON Table Viewer
+
+Gitignore / Dockerfile / compose / CI-CD Generator
+
+SQL DDL / Query Builder
+
+Code Formatter
+
+Git Command Generator
+
+Markdown Table Builder
+
+CSS Flexbox / Grid Generator
+
+SVG Path Viewer
+
+Advanced Password Strength
+
+HMAC Generator, AES, SRI, OAuth 
+
+SEO paketi (Sitemap, Redirect, Meta, JSON-LD)
+
+Şəbəkə (DNS, IP, Status, WS)

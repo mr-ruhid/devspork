@@ -2,6 +2,7 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import '../core/localization/app_localization.dart';
 
+import '../tools/apibuilder/main.dart';
 import '../tools/asciiart.dart';
 import '../tools/b64img.dart';
 import '../tools/b64urlend.dart';
@@ -18,9 +19,12 @@ import '../tools/diffcheck.dart';
 import '../tools/excel2table.dart';
 import '../tools/hashgen.dart';
 import '../tools/htmlent.dart';
+import '../tools/jsoncodegen/main.dart';
 import '../tools/jsonfmt.dart';
+import '../tools/jsonschemagen/main.dart';
 import '../tools/jsonsuite.dart';
 import '../tools/jwtdec.dart';
+import '../tools/jwtgen/main.dart';
 import '../tools/listconv.dart';
 import '../tools/loccompare.dart';
 import '../tools/loremgen.dart';
@@ -155,6 +159,20 @@ class _HomeState extends State<Home> {
       builder: () => const JsonSuite(),
     ),
     _ToolItem(
+      id: 'jsonschemagen',
+      category: 'data',
+      icon: Icons.rule_folder_outlined,
+      gradient: <Color>[Color(0xFF11998E), Color(0xFF00E5FF)],
+      builder: () => const JsonSchemaGen(),
+    ),
+    _ToolItem(
+      id: 'jsoncodegen',
+      category: 'data',
+      icon: Icons.code_rounded,
+      gradient: <Color>[Color(0xFF4A00E0), Color(0xFF8E2DE2)],
+      builder: () => const JsonCodeGen(),
+    ),
+    _ToolItem(
       id: 'codefilecon',
       category: 'convert',
       icon: Icons.transform,
@@ -226,6 +244,13 @@ class _HomeState extends State<Home> {
       builder: () => const JwtDec(),
     ),
     _ToolItem(
+      id: 'jwtgen',
+      category: 'security',
+      icon: Icons.key_rounded,
+      gradient: <Color>[Color(0xFF11998E), Color(0xFF00E5FF)],
+      builder: () => const JwtGen(),
+    ),
+    _ToolItem(
       id: 'rsagen',
       category: 'security',
       icon: Icons.enhanced_encryption,
@@ -274,6 +299,13 @@ class _HomeState extends State<Home> {
       icon: Icons.link_outlined,
       gradient: <Color>[Color(0xFF396AFC), Color(0xFF2948FF)],
       builder: () => const UrlParse(),
+    ),
+    _ToolItem(
+      id: 'apibuilder',
+      category: 'web',
+      icon: Icons.api_rounded,
+      gradient: <Color>[Color(0xFF7C4DFF), Color(0xFF00E5FF)],
+      builder: () => const ApiBuilder(),
     ),
     _ToolItem(
       id: 'sociallinks',
