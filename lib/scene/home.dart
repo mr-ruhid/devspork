@@ -11,17 +11,24 @@ import '../tools/bcryptgen.dart';
 import '../tools/binview.dart';
 import '../tools/caseconv.dart';
 import '../tools/codefilecon.dart';
+import '../tools/codefmt/main.dart';
 import '../tools/colorconv.dart';
+import '../tools/colorpalette.dart';
+import '../tools/cronbuilder/main.dart';
 import '../tools/cronparse.dart';
 import '../tools/csstools.dart';
 import '../tools/devcalc.dart';
+import '../tools/devopsgen/main.dart';
 import '../tools/diffcheck.dart';
+import '../tools/envmanager/main.dart';
 import '../tools/excel2table.dart';
+import '../tools/gitgen/main.dart';
 import '../tools/hashgen.dart';
 import '../tools/htmlent.dart';
 import '../tools/jsoncodegen/main.dart';
 import '../tools/jsonfmt.dart';
 import '../tools/jsonschemagen/main.dart';
+import '../tools/jsonschemavalidator/main.dart';
 import '../tools/jsonsuite.dart';
 import '../tools/jwtdec.dart';
 import '../tools/jwtgen/main.dart';
@@ -34,15 +41,20 @@ import '../tools/mimelist.dart';
 import '../tools/mockgen.dart';
 import '../tools/passgen.dart';
 import '../tools/qrgen.dart';
+import '../tools/regexbuilder/main.dart';
 import '../tools/regextest.dart';
 import '../tools/rsagen.dart';
 import '../tools/seotools.dart';
 import '../tools/sluggen.dart';
 import '../tools/sociallinks.dart';
+import '../tools/sqlbuilder/main.dart';
 import '../tools/sqlfmt.dart';
+import '../tools/tableviewer/main.dart';
 import '../tools/textmasker.dart';
 import '../tools/textools.dart';
 import '../tools/textstats.dart';
+import '../tools/timezoneplanner/main.dart';
+import '../tools/totpgen/main.dart';
 import '../tools/tsconv.dart';
 import '../tools/uaparse.dart';
 import '../tools/urlparse.dart';
@@ -69,10 +81,12 @@ class _HomeState extends State<Home> {
     'web',
     'convert',
     'media',
+    'dev',
     'other',
   ];
 
   late final List<_ToolItem> _tools = <_ToolItem>[
+    // ===================== TEXT =====================
     _ToolItem(
       id: 'caseconv',
       category: 'text',
@@ -143,7 +157,15 @@ class _HomeState extends State<Home> {
       gradient: <Color>[Color(0xFF0F9B0F), Color(0xFF8FD800)],
       builder: () => const Excel2Table(),
     ),
+    _ToolItem(
+      id: 'codefmt',
+      category: 'text',
+      icon: Icons.auto_fix_high_rounded,
+      gradient: <Color>[Color(0xFF1FA2FF), Color(0xFF12D8FA)],
+      builder: () => const CodeFmt(),
+    ),
 
+    // ===================== DATA =====================
     _ToolItem(
       id: 'jsonfmt',
       category: 'data',
@@ -166,6 +188,13 @@ class _HomeState extends State<Home> {
       builder: () => const JsonSchemaGen(),
     ),
     _ToolItem(
+      id: 'jsonschemavalidator',
+      category: 'data',
+      icon: Icons.verified_rounded,
+      gradient: <Color>[Color(0xFF11998E), Color(0xFF00E5FF)],
+      builder: () => const JsonSchemaValidatorPage(),
+    ),
+    _ToolItem(
       id: 'jsoncodegen',
       category: 'data',
       icon: Icons.code_rounded,
@@ -173,39 +202,18 @@ class _HomeState extends State<Home> {
       builder: () => const JsonCodeGen(),
     ),
     _ToolItem(
-      id: 'codefilecon',
-      category: 'convert',
-      icon: Icons.transform,
-      gradient: <Color>[Color(0xFF00C6FF), Color(0xFF0072FF)],
-      builder: () => const CodeFileCon(),
-    ),
-    _ToolItem(
-      id: 'yamljson',
-      category: 'convert',
-      icon: Icons.sync_alt,
-      gradient: <Color>[Color(0xFFB621FE), Color(0xFF1FD1F9)],
-      builder: () => const YamlJson(),
-    ),
-    _ToolItem(
-      id: 'listconv',
-      category: 'convert',
-      icon: Icons.format_list_bulleted,
-      gradient: <Color>[Color(0xFFFC5C7D), Color(0xFF6A82FB)],
-      builder: () => const ListConv(),
-    ),
-    _ToolItem(
-      id: 'baseconv',
-      category: 'convert',
-      icon: Icons.numbers,
-      gradient: <Color>[Color(0xFF00B09B), Color(0xFF96C93D)],
-      builder: () => const BaseConv(),
-    ),
-    _ToolItem(
       id: 'sqlfmt',
       category: 'data',
       icon: Icons.storage,
       gradient: <Color>[Color(0xFF8E2DE2), Color(0xFF4A00E0)],
       builder: () => const SqlFmt(),
+    ),
+    _ToolItem(
+      id: 'sqlbuilder',
+      category: 'data',
+      icon: Icons.storage_rounded,
+      gradient: <Color>[Color(0xFF396AFC), Color(0xFF00C9FF)],
+      builder: () => const SqlBuilder(),
     ),
     _ToolItem(
       id: 'mockgen',
@@ -221,7 +229,50 @@ class _HomeState extends State<Home> {
       gradient: <Color>[Color(0xFF00C9FF), Color(0xFF92FE9D)],
       builder: () => const LocCompare(),
     ),
+    _ToolItem(
+      id: 'binview',
+      category: 'data',
+      icon: Icons.memory,
+      gradient: <Color>[Color(0xFF141E30), Color(0xFF243B55)],
+      builder: () => const BinView(),
+    ),
+    _ToolItem(
+      id: 'cronparse',
+      category: 'data',
+      icon: Icons.schedule_send,
+      gradient: <Color>[Color(0xFF5F2C82), Color(0xFF49A09D)],
+      builder: () => const CronParse(),
+    ),
+    _ToolItem(
+      id: 'cronbuilder',
+      category: 'data',
+      icon: Icons.schedule_rounded,
+      gradient: <Color>[Color(0xFF5F2C82), Color(0xFF49A09D)],
+      builder: () => const CronBuilder(),
+    ),
+    _ToolItem(
+      id: 'regextest',
+      category: 'data',
+      icon: Icons.search,
+      gradient: <Color>[Color(0xFFFF8008), Color(0xFFFFC837)],
+      builder: () => const RegexTest(),
+    ),
+    _ToolItem(
+      id: 'regexbuilder',
+      category: 'data',
+      icon: Icons.rule_rounded,
+      gradient: <Color>[Color(0xFFFF8008), Color(0xFFFFC837)],
+      builder: () => const RegexBuilder(),
+    ),
+    _ToolItem(
+      id: 'tableviewer',
+      category: 'data',
+      icon: Icons.table_view_rounded,
+      gradient: <Color>[Color(0xFF2193B0), Color(0xFF6DD5ED)],
+      builder: () => const TableViewer(),
+    ),
 
+    // ===================== SECURITY =====================
     _ToolItem(
       id: 'hashgen',
       category: 'security',
@@ -272,18 +323,18 @@ class _HomeState extends State<Home> {
       builder: () => const PassGen(),
     ),
     _ToolItem(
+      id: 'totpgen',
+      category: 'security',
+      icon: Icons.timer_rounded,
+      gradient: <Color>[Color(0xFFB92B27), Color(0xFF1565C0)],
+      builder: () => const TotpGen(),
+    ),
+    _ToolItem(
       id: 'b64urlend',
       category: 'security',
       icon: Icons.code,
       gradient: <Color>[Color(0xFFFDC830), Color(0xFFF37335)],
       builder: () => const B64UrlEnd(),
-    ),
-    _ToolItem(
-      id: 'b64img',
-      category: 'media',
-      icon: Icons.image_outlined,
-      gradient: <Color>[Color(0xFFDA22FF), Color(0xFF9733EE)],
-      builder: () => const B64Img(),
     ),
     _ToolItem(
       id: 'htmlent',
@@ -293,6 +344,7 @@ class _HomeState extends State<Home> {
       builder: () => const HtmlEnt(),
     ),
 
+    // ===================== WEB =====================
     _ToolItem(
       id: 'urlparse',
       category: 'web',
@@ -335,7 +387,43 @@ class _HomeState extends State<Home> {
       gradient: <Color>[Color(0xFF1D976C), Color(0xFF93F9B9)],
       builder: () => const MimeList(),
     ),
+    _ToolItem(
+      id: 'csstools',
+      category: 'web',
+      icon: Icons.brush,
+      gradient: <Color>[Color(0xFF396AFC), Color(0xFF00C9FF)],
+      builder: () => const CssTools(),
+    ),
 
+    // ===================== CONVERT =====================
+    _ToolItem(
+      id: 'codefilecon',
+      category: 'convert',
+      icon: Icons.transform,
+      gradient: <Color>[Color(0xFF00C6FF), Color(0xFF0072FF)],
+      builder: () => const CodeFileCon(),
+    ),
+    _ToolItem(
+      id: 'yamljson',
+      category: 'convert',
+      icon: Icons.sync_alt,
+      gradient: <Color>[Color(0xFFB621FE), Color(0xFF1FD1F9)],
+      builder: () => const YamlJson(),
+    ),
+    _ToolItem(
+      id: 'listconv',
+      category: 'convert',
+      icon: Icons.format_list_bulleted,
+      gradient: <Color>[Color(0xFFFC5C7D), Color(0xFF6A82FB)],
+      builder: () => const ListConv(),
+    ),
+    _ToolItem(
+      id: 'baseconv',
+      category: 'convert',
+      icon: Icons.numbers,
+      gradient: <Color>[Color(0xFF00B09B), Color(0xFF96C93D)],
+      builder: () => const BaseConv(),
+    ),
     _ToolItem(
       id: 'colorconv',
       category: 'convert',
@@ -358,32 +446,20 @@ class _HomeState extends State<Home> {
       builder: () => const DevCalc(),
     ),
     _ToolItem(
-      id: 'csstools',
-      category: 'web',
-      icon: Icons.brush,
-      gradient: <Color>[Color(0xFF396AFC), Color(0xFF00C9FF)],
-      builder: () => const CssTools(),
+      id: 'envmanager',
+      category: 'convert',
+      icon: Icons.settings_suggest_rounded,
+      gradient: <Color>[Color(0xFF134E5E), Color(0xFF71B280)],
+      builder: () => const EnvManager(),
     ),
+
+    // ===================== MEDIA =====================
     _ToolItem(
-      id: 'binview',
-      category: 'data',
-      icon: Icons.memory,
-      gradient: <Color>[Color(0xFF141E30), Color(0xFF243B55)],
-      builder: () => const BinView(),
-    ),
-    _ToolItem(
-      id: 'cronparse',
-      category: 'data',
-      icon: Icons.schedule_send,
-      gradient: <Color>[Color(0xFF5F2C82), Color(0xFF49A09D)],
-      builder: () => const CronParse(),
-    ),
-    _ToolItem(
-      id: 'regextest',
-      category: 'data',
-      icon: Icons.search,
-      gradient: <Color>[Color(0xFFFF8008), Color(0xFFFFC837)],
-      builder: () => const RegexTest(),
+      id: 'b64img',
+      category: 'media',
+      icon: Icons.image_outlined,
+      gradient: <Color>[Color(0xFFDA22FF), Color(0xFF9733EE)],
+      builder: () => const B64Img(),
     ),
     _ToolItem(
       id: 'qrgen',
@@ -398,6 +474,38 @@ class _HomeState extends State<Home> {
       icon: Icons.text_format,
       gradient: <Color>[Color(0xFFff00cc), Color(0xFF333399)],
       builder: () => const AsciiArt(),
+    ),
+    _ToolItem(
+      id: 'colorpalette',
+      category: 'media',
+      icon: Icons.palette_rounded,
+      gradient: <Color>[Color(0xFFEC008C), Color(0xFFFC6767)],
+      builder: () => const ColorPalette(),
+    ),
+
+    // ===================== DEV =====================
+    _ToolItem(
+      id: 'gitgen',
+      category: 'dev',
+      icon: Icons.account_tree_rounded,
+      gradient: <Color>[Color(0xFFFF512F), Color(0xFFDD2476)],
+      builder: () => const GitGen(),
+    ),
+    _ToolItem(
+      id: 'devopsgen',
+      category: 'dev',
+      icon: Icons.terminal_rounded,
+      gradient: <Color>[Color(0xFF8E2DE2), Color(0xFF4A00E0)],
+      builder: () => const DevOpsGen(),
+    ),
+
+    // ===================== OTHER =====================
+    _ToolItem(
+      id: 'timezoneplanner',
+      category: 'other',
+      icon: Icons.public_rounded,
+      gradient: <Color>[Color(0xFF43CEA2), Color(0xFF185A9D)],
+      builder: () => const TimezonePlanner(),
     ),
   ];
 

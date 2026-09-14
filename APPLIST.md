@@ -112,6 +112,8 @@ Code Formatter
 
 Git Command Generator
 
+================================================
+
 Markdown Table Builder
 
 CSS Flexbox / Grid Generator
