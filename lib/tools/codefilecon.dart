@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:ui' as ui;
 
@@ -39,10 +40,13 @@ class _CodeFileConState extends State<CodeFileCon> {
   ConvFormat _from = ConvFormat.json;
   ConvFormat _to = ConvFormat.xml;
   bool _pretty = true;
+  bool _justCopied = false;
 
   String _output = '';
   String? _errorKey;
   String? _errorDetail;
+
+  Timer? _debounce;
 
   static const List<ConvFormat> _all = ConvFormat.values;
 
@@ -55,12 +59,34 @@ class _CodeFileConState extends State<CodeFileCon> {
     {"id": 2, "name": "Veli", "email": "veli@example.com"}
   ]
 }''';
+    _inputController.addListener(_onInputChanged);
+    // Convert the seeded example immediately so the screen isn't empty.
+    WidgetsBinding.instance.addPostFrameCallback((_) => _convert());
   }
 
   @override
   void dispose() {
+    _debounce?.cancel();
+    _inputController.removeListener(_onInputChanged);
     _inputController.dispose();
     super.dispose();
+  }
+
+  void _onInputChanged() {
+    _debounce?.cancel();
+    _debounce = Timer(const Duration(milliseconds: 350), () {
+      if (_inputController.text.trim().isEmpty) {
+        if (_output.isNotEmpty || _errorKey != null) {
+          setState(() {
+            _output = '';
+            _errorKey = null;
+            _errorDetail = null;
+          });
+        }
+        return;
+      }
+      _convert();
+    });
   }
 
   String _fmtName(ConvFormat f) {
@@ -101,6 +127,7 @@ class _CodeFileConState extends State<CodeFileCon> {
   }
 
   void _clear() {
+    HapticFeedback.selectionClick();
     setState(() {
       _inputController.clear();
       _output = '';
@@ -111,6 +138,7 @@ class _CodeFileConState extends State<CodeFileCon> {
 
   void _swap() {
     if (_output.isEmpty) return;
+    HapticFeedback.mediumImpact();
     final String tmp = _inputController.text;
     setState(() {
       _inputController.text = _output;
@@ -125,25 +153,25 @@ class _CodeFileConState extends State<CodeFileCon> {
 
   Future<void> _paste() async {
     final ClipboardData? data = await Clipboard.getData(Clipboard.kTextPlain);
-    if (data == null || data.text == null) return;
+    if (data == null || data.text == null || data.text!.isEmpty) return;
+    HapticFeedback.selectionClick();
     _inputController.text = data.text!;
     setState(() {
       _errorKey = null;
       _errorDetail = null;
     });
+    _convert();
   }
 
   Future<void> _copy() async {
     if (_output.isEmpty) return;
     await Clipboard.setData(ClipboardData(text: _output));
+    HapticFeedback.lightImpact();
     if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        behavior: SnackBarBehavior.floating,
-        backgroundColor: Colors.black.withOpacity(0.75),
-        content: Text(context.t('codefilecon_copied')),
-      ),
-    );
+    setState(() => _justCopied = true);
+    Future<void>.delayed(const Duration(milliseconds: 1200), () {
+      if (mounted) setState(() => _justCopied = false);
+    });
   }
 
   dynamic _parseInput(String input, ConvFormat format) {
@@ -184,8 +212,7 @@ class _CodeFileConState extends State<CodeFileCon> {
     }
     final List<XmlNode> children = element.children
         .where((XmlNode n) =>
-    n is XmlElement ||
-        (n is XmlText && n.value.trim().isNotEmpty))
+    n is XmlElement || (n is XmlText && n.value.trim().isNotEmpty))
         .toList();
     if (children.isEmpty) {
       final String text = element.innerText.trim();
@@ -443,7 +470,7 @@ class _CodeFileConState extends State<CodeFileCon> {
       builder.element(
         'root',
         nest: () {
-          (data as Map).forEach((dynamic k, dynamic v) {
+          data.forEach((dynamic k, dynamic v) {
             _buildXmlNode(builder, k.toString(), v);
           });
         },
@@ -545,26 +572,52 @@ class _CodeFileConState extends State<CodeFileCon> {
     return s;
   }
 
+  /// Serializes to INI using the same flatten strategy as [_toProperties],
+  /// then groups by top-level key into `[section]` blocks. Unlike the
+  /// previous implementation this never silently drops list values or
+  /// data nested more than one level deep — every leaf value is written
+  /// somewhere, using `key.sub = value` / `key.0 = value` dotted paths
+  /// inside a section when the structure is deeper than INI natively
+  /// supports.
   String _toIni(dynamic data) {
     if (data is! Map) {
       throw Exception('INI requires an object at root');
     }
+    final Map<String, dynamic> flat = <String, dynamic>{};
+    _flatten(data, '', flat);
+
+    final Map<String, dynamic> globals = <String, dynamic>{};
+    final Map<String, Map<String, dynamic>> sections =
+    <String, Map<String, dynamic>>{};
+    // Preserve top-level key order using the original map's key order.
+    final List<String> topOrder =
+    data.keys.map((dynamic k) => k.toString()).toList();
+
+    flat.forEach((String key, dynamic value) {
+      final int dot = key.indexOf('.');
+      if (dot == -1) {
+        globals[key] = value;
+      } else {
+        final String section = key.substring(0, dot);
+        final String rest = key.substring(dot + 1);
+        sections.putIfAbsent(section, () => <String, dynamic>{})[rest] =
+            value;
+      }
+    });
+
     final StringBuffer buffer = StringBuffer();
-    final Map<String, dynamic> root = Map<String, dynamic>.from(data);
-    root.forEach((String k, dynamic v) {
-      if (v is! Map && v is! List) {
+    for (final String k in globals.keys) {
+      buffer.writeln('$k = ${globals[k]}');
+    }
+    for (final String section in topOrder) {
+      final Map<String, dynamic>? entries = sections[section];
+      if (entries == null) continue;
+      if (buffer.isNotEmpty) buffer.writeln();
+      buffer.writeln('[$section]');
+      entries.forEach((String k, dynamic v) {
         buffer.writeln('$k = $v');
-      }
-    });
-    root.forEach((String k, dynamic v) {
-      if (v is Map) {
-        if (buffer.isNotEmpty) buffer.writeln();
-        buffer.writeln('[$k]');
-        (v as Map).forEach((dynamic k2, dynamic v2) {
-          buffer.writeln('$k2 = $v2');
-        });
-      }
-    });
+      });
+    }
     return buffer.toString().trimRight();
   }
 
@@ -608,7 +661,7 @@ class _CodeFileConState extends State<CodeFileCon> {
       throw Exception('Query String requires an object at root');
     }
     final List<String> pairs = <String>[];
-    (data as Map).forEach((dynamic k, dynamic v) {
+    data.forEach((dynamic k, dynamic v) {
       pairs.add(
         '${Uri.encodeQueryComponent(k.toString())}='
             '${Uri.encodeQueryComponent(v.toString())}',
@@ -732,16 +785,8 @@ class _CodeFileConState extends State<CodeFileCon> {
         ),
         child: Stack(
           children: <Widget>[
-            Positioned(
-              top: -80,
-              left: -60,
-              child: _blurBlob(220, _accentA),
-            ),
-            Positioned(
-              bottom: -100,
-              right: -60,
-              child: _blurBlob(260, _accentB),
-            ),
+            Positioned(top: -80, left: -60, child: _blurBlob(220, _accentA)),
+            Positioned(bottom: -100, right: -60, child: _blurBlob(260, _accentB)),
             SafeArea(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.fromLTRB(16, 100, 16, 24),
@@ -760,9 +805,16 @@ class _CodeFileConState extends State<CodeFileCon> {
                             ),
                           ),
                           const SizedBox(width: 8),
-                          _GlassIconButton(
-                            icon: Icons.swap_horiz,
-                            onTap: _swap,
+                          AnimatedOpacity(
+                            duration: const Duration(milliseconds: 200),
+                            opacity: _output.isEmpty ? 0.35 : 1,
+                            child: IgnorePointer(
+                              ignoring: _output.isEmpty,
+                              child: _GlassIconButton(
+                                icon: Icons.swap_horiz,
+                                onTap: _swap,
+                              ),
+                            ),
                           ),
                           const SizedBox(width: 8),
                           Expanded(
@@ -791,21 +843,14 @@ class _CodeFileConState extends State<CodeFileCon> {
                                   ),
                                 ),
                               ),
-                              _GlassIconButton(
-                                icon: Icons.paste,
-                                onTap: _paste,
-                              ),
+                              _GlassIconButton(icon: Icons.paste, onTap: _paste),
                               const SizedBox(width: 8),
-                              _GlassIconButton(
-                                icon: Icons.clear,
-                                onTap: _clear,
-                              ),
+                              _GlassIconButton(icon: Icons.clear, onTap: _clear),
                             ],
                           ),
                           const SizedBox(height: 8),
                           TextField(
                             controller: _inputController,
-                            onChanged: (_) => setState(() {}),
                             maxLines: 10,
                             minLines: 6,
                             style: const TextStyle(
@@ -842,14 +887,21 @@ class _CodeFileConState extends State<CodeFileCon> {
                           const SizedBox(height: 4),
                           Align(
                             alignment: Alignment.centerRight,
-                            child: Text(
-                              '${_inputController.text.length} · '
-                                  '${_inputController.text.isEmpty ? 0 : _inputController.text.split('\n').length}'
-                                  ' ${context.t('codefilecon_lines')}',
-                              style: const TextStyle(
-                                color: Colors.white38,
-                                fontSize: 11,
-                              ),
+                            child: ValueListenableBuilder<TextEditingValue>(
+                              valueListenable: _inputController,
+                              builder: (BuildContext context,
+                                  TextEditingValue value, _) {
+                                final String text = value.text;
+                                return Text(
+                                  '${text.length} · '
+                                      '${text.isEmpty ? 0 : text.split('\n').length}'
+                                      ' ${context.t('codefilecon_lines')}',
+                                  style: const TextStyle(
+                                    color: Colors.white38,
+                                    fontSize: 11,
+                                  ),
+                                );
+                              },
                             ),
                           ),
                         ],
@@ -863,12 +915,16 @@ class _CodeFileConState extends State<CodeFileCon> {
                             child: _GlassPrimaryButton(
                               icon: Icons.sync_alt_rounded,
                               label: context.t('codefilecon_convert'),
-                              onTap: _convert,
+                              onTap: () {
+                                HapticFeedback.mediumImpact();
+                                _convert();
+                              },
                             ),
                           ),
                           const SizedBox(width: 12),
                           GestureDetector(
                             onTap: () {
+                              HapticFeedback.selectionClick();
                               setState(() => _pretty = !_pretty);
                               _reconvertIfNeeded();
                             },
@@ -897,8 +953,7 @@ class _CodeFileConState extends State<CodeFileCon> {
                                         ? Icons.check_circle
                                         : Icons.circle_outlined,
                                     size: 16,
-                                    color:
-                                    _pretty ? _accentB : Colors.white54,
+                                    color: _pretty ? _accentB : Colors.white54,
                                   ),
                                   const SizedBox(width: 6),
                                   Text(
@@ -969,8 +1024,9 @@ class _CodeFileConState extends State<CodeFileCon> {
                                 ),
                               ),
                               _GlassIconButton(
-                                icon: Icons.copy,
+                                icon: _justCopied ? Icons.check : Icons.copy,
                                 onTap: _copy,
+                                highlighted: _justCopied,
                               ),
                             ],
                           ),
@@ -989,9 +1045,8 @@ class _CodeFileConState extends State<CodeFileCon> {
                             child: _output.isEmpty
                                 ? Text(
                               context.t('codefilecon_output_empty'),
-                              style: const TextStyle(
-                                color: Colors.white38,
-                              ),
+                              style:
+                              const TextStyle(color: Colors.white38),
                             )
                                 : SelectableText(
                               _output,
@@ -1038,8 +1093,7 @@ class _CodeFileConState extends State<CodeFileCon> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: _all.map((ConvFormat f) {
-                    final bool selected =
-                    isFrom ? f == _from : f == _to;
+                    final bool selected = isFrom ? f == _from : f == _to;
                     return ListTile(
                       title: Text(
                         _fmtName(f),
@@ -1052,7 +1106,10 @@ class _CodeFileConState extends State<CodeFileCon> {
                       trailing: selected
                           ? const Icon(Icons.check, color: _accentB)
                           : null,
-                      onTap: () => Navigator.of(ctx).pop(f),
+                      onTap: () {
+                        HapticFeedback.selectionClick();
+                        Navigator.of(ctx).pop(f);
+                      },
                     );
                   }).toList(),
                 ),
@@ -1131,10 +1188,15 @@ class _GlassCard extends StatelessWidget {
 }
 
 class _GlassIconButton extends StatelessWidget {
-  const _GlassIconButton({required this.icon, required this.onTap});
+  const _GlassIconButton({
+    required this.icon,
+    required this.onTap,
+    this.highlighted = false,
+  });
 
   final IconData icon;
   final VoidCallback onTap;
+  final bool highlighted;
 
   @override
   Widget build(BuildContext context) {
@@ -1143,12 +1205,18 @@ class _GlassIconButton extends StatelessWidget {
       child: BackdropFilter(
         filter: ui.ImageFilter.blur(sigmaX: 10, sigmaY: 10),
         child: Material(
-          color: Colors.white.withOpacity(0.08),
+          color: highlighted
+              ? Colors.greenAccent.withOpacity(0.25)
+              : Colors.white.withOpacity(0.08),
           child: InkWell(
             onTap: onTap,
             child: Padding(
               padding: const EdgeInsets.all(8),
-              child: Icon(icon, size: 18, color: Colors.white),
+              child: Icon(
+                icon,
+                size: 18,
+                color: highlighted ? Colors.greenAccent : Colors.white,
+              ),
             ),
           ),
         ),

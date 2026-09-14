@@ -111,6 +111,12 @@ class _CssToolsState extends State<CssTools>
         .toUpperCase();
   }
 
+  /// İki rəngin eyni olub-olmadığını yoxlayır. Köhnə, deprecated
+  /// `Color.value` əvəzinə ARGB komponentlərini müqayisə edir.
+  bool _sameColor(Color a, Color b) {
+    return a.r == b.r && a.g == b.g && a.b == b.b && a.a == b.a;
+  }
+
   String _buildGradientCss() {
     final StringBuffer b = StringBuffer();
     final List<String> stops = <String>[];
@@ -130,7 +136,7 @@ class _CssToolsState extends State<CssTools>
     } else {
       b.write('background: conic-gradient(from 0deg, ');
     }
-    b.write('${stops.join(', ')}');
+    b.write(stops.join(', '));
     b.write(');');
     return b.toString();
   }
@@ -312,7 +318,12 @@ class _CssToolsState extends State<CssTools>
     await Clipboard.setData(ClipboardData(text: text));
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(context.t('csstools_copied'))),
+      SnackBar(
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: Colors.black.withOpacity(0.75),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+        content: Text(context.t('csstools_copied')),
+      ),
     );
   }
 
@@ -342,6 +353,12 @@ class _CssToolsState extends State<CssTools>
                 color: Colors.black.withOpacity(isDark ? 0.35 : 0.08),
                 blurRadius: 24,
                 offset: const Offset(0, 8),
+              ),
+              BoxShadow(
+                color: Colors.white.withOpacity(isDark ? 0.03 : 0.55),
+                blurRadius: 1,
+                spreadRadius: 0.5,
+                offset: const Offset(0, 1),
               ),
             ],
           ),
@@ -395,17 +412,14 @@ class _CssToolsState extends State<CssTools>
             height: 36,
             decoration: BoxDecoration(
               color: color,
-              borderRadius: BorderRadius.circular(6),
-              border: Border.all(color: Theme.of(context).dividerColor),
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: Colors.white.withOpacity(0.5)),
             ),
           ),
           const SizedBox(width: 8),
           Text(
             _hex(color),
-            style: const TextStyle(
-              fontFamily: 'monospace',
-              fontSize: 12,
-            ),
+            style: const TextStyle(fontFamily: 'monospace', fontSize: 12),
           ),
           if (onRemove != null)
             IconButton(
@@ -426,10 +440,11 @@ class _CssToolsState extends State<CssTools>
       spacing: 6,
       runSpacing: 6,
       children: _palette.map((Color c) {
-        final bool selected = c.value == current.value;
+        final bool selected = _sameColor(c, current);
         return GestureDetector(
           onTap: () => onSelect(c),
-          child: Container(
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 150),
             width: 30,
             height: 30,
             decoration: BoxDecoration(
@@ -438,9 +453,20 @@ class _CssToolsState extends State<CssTools>
               border: Border.all(
                 color: selected
                     ? Theme.of(context).colorScheme.primary
-                    : Theme.of(context).dividerColor,
+                    : Colors.white.withOpacity(0.5),
                 width: selected ? 3 : 1,
               ),
+              boxShadow: selected
+                  ? <BoxShadow>[
+                BoxShadow(
+                  color: Theme.of(context)
+                      .colorScheme
+                      .primary
+                      .withOpacity(0.5),
+                  blurRadius: 8,
+                ),
+              ]
+                  : null,
             ),
           ),
         );
@@ -467,7 +493,7 @@ class _CssToolsState extends State<CssTools>
           IconButton(
             visualDensity: VisualDensity.compact,
             onPressed: () => _copy(css),
-            icon: const Icon(Icons.copy, size: 18),
+            icon: const Icon(Icons.copy_rounded, size: 18),
           ),
         ],
       ),
@@ -497,10 +523,7 @@ class _CssToolsState extends State<CssTools>
               percent
                   ? '${(value * 100).toStringAsFixed(0)}%'
                   : value.toStringAsFixed(0),
-              style: const TextStyle(
-                fontFamily: 'monospace',
-                fontSize: 12,
-              ),
+              style: const TextStyle(fontFamily: 'monospace', fontSize: 12),
             ),
           ],
         ),
@@ -526,10 +549,7 @@ class _CssToolsState extends State<CssTools>
       children: <Widget>[
         SizedBox(
           width: 50,
-          child: Text(
-            label,
-            style: const TextStyle(fontSize: 12),
-          ),
+          child: Text(label, style: const TextStyle(fontSize: 12)),
         ),
         Expanded(
           child: Slider(
@@ -545,13 +565,23 @@ class _CssToolsState extends State<CssTools>
           width: 40,
           child: Text(
             value.toStringAsFixed(0),
-            style: const TextStyle(
-              fontFamily: 'monospace',
-              fontSize: 12,
-            ),
+            style: const TextStyle(fontFamily: 'monospace', fontSize: 12),
           ),
         ),
       ],
+    );
+  }
+
+  Widget _sectionLabel(String text) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Text(
+        text,
+        style: Theme.of(context)
+            .textTheme
+            .titleSmall
+            ?.copyWith(fontWeight: FontWeight.w700),
+      ),
     );
   }
 
@@ -562,12 +592,22 @@ class _CssToolsState extends State<CssTools>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          Container(
-            height: 140,
-            decoration: BoxDecoration(
-              gradient: _flutterGradient(),
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: colors.outlineVariant),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(20),
+            child: Container(
+              height: 140,
+              decoration: BoxDecoration(
+                gradient: _flutterGradient(),
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: Colors.white.withOpacity(0.5)),
+                boxShadow: <BoxShadow>[
+                  BoxShadow(
+                    color: Colors.black.withOpacity(_isDark ? 0.35 : 0.1),
+                    blurRadius: 20,
+                    offset: const Offset(0, 8),
+                  ),
+                ],
+              ),
             ),
           ),
           const SizedBox(height: 16),
@@ -575,12 +615,15 @@ class _CssToolsState extends State<CssTools>
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
-                Text(
-                  context.t('csstools_gradient_type'),
-                  style: Theme.of(context).textTheme.titleSmall,
-                ),
-                const SizedBox(height: 8),
+                _sectionLabel(context.t('csstools_gradient_type')),
                 SegmentedButton<String>(
+                  style: SegmentedButton.styleFrom(
+                    backgroundColor: Colors.white.withOpacity(0.25),
+                    selectedBackgroundColor: colors.primary.withOpacity(0.85),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
                   segments: _gradientTypes.map((String t) {
                     return ButtonSegment<String>(
                       value: t,
@@ -595,27 +638,39 @@ class _CssToolsState extends State<CssTools>
                   },
                 ),
                 if (_gradientType == 'linear') ...<Widget>[
-                  const SizedBox(height: 12),
-                  Text(
-                    context.t('csstools_gradient_direction'),
-                    style: Theme.of(context).textTheme.titleSmall,
-                  ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 16),
+                  _sectionLabel(context.t('csstools_gradient_direction')),
                   Wrap(
                     spacing: 6,
                     runSpacing: 6,
                     children: _directions.map((String d) {
-                      return ChoiceChip(
-                        label: Text(d, style: const TextStyle(fontSize: 11)),
-                        selected: _gradientDirection == d,
-                        backgroundColor: Colors.white.withOpacity(
-                          _isDark ? 0.06 : 0.4,
+                      final bool selected = _gradientDirection == d;
+                      return GestureDetector(
+                        onTap: () => setState(() => _gradientDirection = d),
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 150),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 8),
+                          decoration: BoxDecoration(
+                            color: selected
+                                ? colors.primary.withOpacity(0.85)
+                                : Colors.white.withOpacity(0.3),
+                            borderRadius: BorderRadius.circular(999),
+                            border: Border.all(
+                              color: Colors.white.withOpacity(0.5),
+                            ),
+                          ),
+                          child: Text(
+                            d,
+                            style: TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w600,
+                              color: selected
+                                  ? colors.onPrimary
+                                  : colors.onSurface,
+                            ),
+                          ),
                         ),
-                        onSelected: (_) {
-                          setState(() {
-                            _gradientDirection = d;
-                          });
-                        },
                       );
                     }).toList(),
                   ),
@@ -633,7 +688,10 @@ class _CssToolsState extends State<CssTools>
                     Expanded(
                       child: Text(
                         context.t('csstools_gradient_colors'),
-                        style: Theme.of(context).textTheme.titleSmall,
+                        style: Theme.of(context)
+                            .textTheme
+                            .titleSmall
+                            ?.copyWith(fontWeight: FontWeight.w700),
                       ),
                     ),
                     if (_gradientColors.length < 6)
@@ -703,7 +761,10 @@ class _CssToolsState extends State<CssTools>
                         },
                       ),
                       if (i < _gradientColors.length - 1)
-                        const Divider(height: 24),
+                        Divider(
+                          height: 24,
+                          color: Colors.white.withOpacity(0.25),
+                        ),
                     ],
                   ),
               ],
@@ -790,11 +851,7 @@ class _CssToolsState extends State<CssTools>
                     },
                   ),
                   const SizedBox(height: 8),
-                  Text(
-                    context.t('csstools_shadow_color'),
-                    style: Theme.of(context).textTheme.titleSmall,
-                  ),
-                  const SizedBox(height: 8),
+                  _sectionLabel(context.t('csstools_shadow_color')),
                   _colorPalette(
                     current: _shadowColor,
                     onSelect: (Color c) {
@@ -807,10 +864,11 @@ class _CssToolsState extends State<CssTools>
                       margin: const EdgeInsets.only(bottom: 8),
                       padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(
-                          _isDark ? 0.05 : 0.35,
-                        ),
+                        color: Colors.white.withOpacity(_isDark ? 0.05 : 0.35),
                         borderRadius: BorderRadius.circular(14),
+                        border: Border.all(
+                          color: Colors.white.withOpacity(0.3),
+                        ),
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -828,11 +886,13 @@ class _CssToolsState extends State<CssTools>
                               ),
                               IconButton(
                                 visualDensity: VisualDensity.compact,
-                                onPressed: () {
+                                onPressed: _shadowLayers.length > 1
+                                    ? () {
                                   setState(() {
                                     _shadowLayers.removeAt(i);
                                   });
-                                },
+                                }
+                                    : null,
                                 icon: const Icon(
                                   Icons.remove_circle_outline,
                                   size: 18,
@@ -840,47 +900,35 @@ class _CssToolsState extends State<CssTools>
                               ),
                             ],
                           ),
+                          _sliderRowCompact('X', _shadowLayers[i].x, -50, 50,
+                                  (double v) {
+                                setState(() => _shadowLayers[i].x = v);
+                              }),
+                          _sliderRowCompact('Y', _shadowLayers[i].y, -50, 50,
+                                  (double v) {
+                                setState(() => _shadowLayers[i].y = v);
+                              }),
                           _sliderRowCompact(
-                            'X',
-                            _shadowLayers[i].x,
-                            -50,
-                            50,
-                                (double v) {
-                              setState(() => _shadowLayers[i].x = v);
-                            },
-                          ),
+                              'Blur', _shadowLayers[i].blur, 0, 100,
+                                  (double v) {
+                                setState(() => _shadowLayers[i].blur = v);
+                              }),
                           _sliderRowCompact(
-                            'Y',
-                            _shadowLayers[i].y,
-                            -50,
-                            50,
-                                (double v) {
-                              setState(() => _shadowLayers[i].y = v);
-                            },
-                          ),
-                          _sliderRowCompact(
-                            'Blur',
-                            _shadowLayers[i].blur,
-                            0,
-                            100,
-                                (double v) {
-                              setState(() => _shadowLayers[i].blur = v);
-                            },
-                          ),
-                          _sliderRowCompact(
-                            'Spread',
-                            _shadowLayers[i].spread,
-                            -50,
-                            50,
-                                (double v) {
-                              setState(() => _shadowLayers[i].spread = v);
-                            },
-                          ),
+                              'Spread', _shadowLayers[i].spread, -50, 50,
+                                  (double v) {
+                                setState(() => _shadowLayers[i].spread = v);
+                              }),
                         ],
                       ),
                     ),
                   if (_shadowLayers.length < 5)
                     OutlinedButton.icon(
+                      style: OutlinedButton.styleFrom(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        side: BorderSide(color: Colors.white.withOpacity(0.5)),
+                      ),
                       onPressed: () {
                         setState(() {
                           _shadowLayers.add(_ShadowLayer(
@@ -923,36 +971,34 @@ class _CssToolsState extends State<CssTools>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          Container(
-            height: 140,
-            decoration: BoxDecoration(
-              color: _contrastBg,
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(
-                color: Theme.of(context).dividerColor,
+          ClipRRect(
+            borderRadius: BorderRadius.circular(20),
+            child: Container(
+              height: 140,
+              decoration: BoxDecoration(
+                color: _contrastBg,
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: Colors.white.withOpacity(0.5)),
               ),
-            ),
-            alignment: Alignment.center,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Text(
-                  context.t('csstools_contrast_sample_large'),
-                  style: TextStyle(
-                    color: _contrastFg,
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
+              alignment: Alignment.center,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Text(
+                    context.t('csstools_contrast_sample_large'),
+                    style: TextStyle(
+                      color: _contrastFg,
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  context.t('csstools_contrast_sample_normal'),
-                  style: TextStyle(
-                    color: _contrastFg,
-                    fontSize: 15,
+                  const SizedBox(height: 8),
+                  Text(
+                    context.t('csstools_contrast_sample_normal'),
+                    style: TextStyle(color: _contrastFg, fontSize: 15),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
           const SizedBox(height: 16),
@@ -1001,11 +1047,7 @@ class _CssToolsState extends State<CssTools>
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
-                Text(
-                  context.t('csstools_contrast_foreground'),
-                  style: Theme.of(context).textTheme.titleSmall,
-                ),
-                const SizedBox(height: 8),
+                _sectionLabel(context.t('csstools_contrast_foreground')),
                 _colorPalette(
                   current: _contrastFg,
                   onSelect: (Color c) {
@@ -1013,11 +1055,7 @@ class _CssToolsState extends State<CssTools>
                   },
                 ),
                 const SizedBox(height: 16),
-                Text(
-                  context.t('csstools_contrast_background'),
-                  style: Theme.of(context).textTheme.titleSmall,
-                ),
-                const SizedBox(height: 8),
+                _sectionLabel(context.t('csstools_contrast_background')),
                 _colorPalette(
                   current: _contrastBg,
                   onSelect: (Color c) {
@@ -1032,11 +1070,7 @@ class _CssToolsState extends State<CssTools>
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                Text(
-                  context.t('csstools_contrast_info'),
-                  style: Theme.of(context).textTheme.titleSmall,
-                ),
-                const SizedBox(height: 8),
+                _sectionLabel(context.t('csstools_contrast_info')),
                 const Text(
                   'AA  normal text:  4.5:1\n'
                       'AA  large text:   3.0:1\n'
@@ -1066,14 +1100,12 @@ class _CssToolsState extends State<CssTools>
       padding: const EdgeInsets.symmetric(vertical: 10),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.15),
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
       ),
       child: Column(
         children: <Widget>[
-          Text(
-            label,
-            style: const TextStyle(fontSize: 11),
-          ),
+          Text(label, style: const TextStyle(fontSize: 11)),
           const SizedBox(height: 2),
           Text(
             level,
@@ -1091,51 +1123,118 @@ class _CssToolsState extends State<CssTools>
   @override
   Widget build(BuildContext context) {
     final bool isDark = _isDark;
+    final ColorScheme colors = Theme.of(context).colorScheme;
 
     return Scaffold(
       extendBodyBehindAppBar: true,
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
-        title: Text(context.t('csstools_title')),
+        title: Text(
+          context.t('csstools_title'),
+          style: const TextStyle(fontWeight: FontWeight.w700),
+        ),
         backgroundColor: Colors.transparent,
         elevation: 0,
-        bottom: TabBar(
-          controller: _tabController,
-          tabs: <Widget>[
-            Tab(text: context.t('csstools_tab_gradient')),
-            Tab(text: context.t('csstools_tab_shadow')),
-            Tab(text: context.t('csstools_tab_contrast')),
-          ],
-        ),
-      ),
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: isDark
-                ? <Color>[
-              const Color(0xFF1B1035),
-              const Color(0xFF0F1C3F),
-              const Color(0xFF091626),
-            ]
-                : <Color>[
-              const Color(0xFFDCE9FF),
-              const Color(0xFFE9E2FF),
-              const Color(0xFFF3F6FF),
-            ],
+        scrolledUnderElevation: 0,
+        flexibleSpace: ClipRect(
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+            child: Container(color: colors.surface.withOpacity(0.35)),
           ),
         ),
-        child: SafeArea(
-          child: TabBarView(
-            controller: _tabController,
-            children: <Widget>[
-              _buildGradient(),
-              _buildShadow(),
-              _buildContrast(),
-            ],
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(52),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 10),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(999),
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+                child: Container(
+                  height: 42,
+                  padding: const EdgeInsets.all(4),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(isDark ? 0.08 : 0.4),
+                    borderRadius: BorderRadius.circular(999),
+                    border:
+                    Border.all(color: Colors.white.withOpacity(0.4)),
+                  ),
+                  child: TabBar(
+                    controller: _tabController,
+                    dividerColor: Colors.transparent,
+                    indicatorSize: TabBarIndicatorSize.tab,
+                    indicator: BoxDecoration(
+                      color: colors.primary.withOpacity(0.85),
+                      borderRadius: BorderRadius.circular(999),
+                    ),
+                    labelColor: colors.onPrimary,
+                    unselectedLabelColor: colors.onSurface,
+                    labelStyle: const TextStyle(
+                        fontSize: 12, fontWeight: FontWeight.w600),
+                    tabs: <Widget>[
+                      Tab(text: context.t('csstools_tab_gradient')),
+                      Tab(text: context.t('csstools_tab_shadow')),
+                      Tab(text: context.t('csstools_tab_contrast')),
+                    ],
+                  ),
+                ),
+              ),
+            ),
           ),
         ),
       ),
+      body: Stack(
+        fit: StackFit.expand,
+        children: <Widget>[
+          DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: isDark
+                    ? <Color>[
+                  const Color(0xFF1B1035),
+                  const Color(0xFF0F1C3F),
+                  const Color(0xFF091626),
+                ]
+                    : <Color>[
+                  const Color(0xFFDCE9FF),
+                  const Color(0xFFE9E2FF),
+                  const Color(0xFFF3F6FF),
+                ],
+              ),
+            ),
+          ),
+          Positioned(
+            top: -100,
+            left: -80,
+            child: _blob(colors.primary.withOpacity(0.28), 240),
+          ),
+          Positioned(
+            bottom: -90,
+            right: -60,
+            child: _blob(colors.tertiary.withOpacity(0.24), 220),
+          ),
+          SafeArea(
+            child: TabBarView(
+              controller: _tabController,
+              children: <Widget>[
+                _buildGradient(),
+                _buildShadow(),
+                _buildContrast(),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _blob(Color color, double size) {
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(shape: BoxShape.circle, color: color),
     );
   }
 }

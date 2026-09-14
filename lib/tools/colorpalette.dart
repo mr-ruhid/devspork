@@ -8,7 +8,6 @@ import '../core/localization/app_localization.dart';
 
 const Color _accentA = Color(0xFF7C4DFF);
 const Color _accentB = Color(0xFF00E5FF);
-const Color _danger = Color(0xFFFF5C5C);
 const Color _success = Color(0xFF4BD68B);
 const Color _bgTop = Color(0xFF1B1035);
 const Color _bgMid = Color(0xFF2A1550);
@@ -72,9 +71,9 @@ class HslColor {
   const HslColor(this.h, this.s, this.l);
 
   static HslColor fromColor(Color color) {
-    final double r = (color.r * 255.0) / 255.0;
-    final double g = (color.g * 255.0) / 255.0;
-    final double b = (color.b * 255.0) / 255.0;
+    final double r = color.r;
+    final double g = color.g;
+    final double b = color.b;
 
     final double maxC = math.max(r, math.max(g, b));
     final double minC = math.min(r, math.min(g, b));
@@ -270,16 +269,26 @@ class _ColorPaletteState extends State<ColorPalette> {
 
   final TextEditingController _hexCtrl =
   TextEditingController(text: '7C4DFF');
+  final FocusNode _hexFocus = FocusNode();
+
+  /// Identifies which copy-able chip/cell most recently had its content
+  /// copied, so it can show a brief inline checkmark instead of a
+  /// SnackBar (keeps the eye where the action happened).
+  String? _justCopiedKey;
 
   @override
   void initState() {
     super.initState();
     _regenerate();
+    _hexFocus.addListener(() {
+      if (!_hexFocus.hasFocus) _finalizeHex(_hexCtrl.text);
+    });
   }
 
   @override
   void dispose() {
     _hexCtrl.dispose();
+    _hexFocus.dispose();
     super.dispose();
   }
 
@@ -296,15 +305,17 @@ class _ColorPaletteState extends State<ColorPalette> {
   }
 
   void _setHarmony(HarmonyType h) {
+    HapticFeedback.selectionClick();
     setState(() {
       _harmony = h;
       _regenerate();
     });
   }
 
+  /// Live preview while typing: only applies once a full 6-digit hex is
+  /// entered, so a color isn't guessed mid-keystroke.
   void _onHexChanged(String raw) {
-    final String cleaned =
-    raw.replaceAll('#', '').replaceAll(RegExp(r'[^0-9a-fA-F]'), '');
+    final String cleaned = raw.replaceAll(RegExp(r'[^0-9a-fA-F]'), '');
     if (cleaned.length != 6) return;
     final int? value = int.tryParse(cleaned, radix: 16);
     if (value == null) return;
@@ -314,7 +325,36 @@ class _ColorPaletteState extends State<ColorPalette> {
     });
   }
 
+  /// Called when the hex field loses focus or is submitted. Expands a
+  /// 3-digit shorthand ("F0A" -> "FF00AA") and normalizes the displayed
+  /// text to the resolved 6-digit uppercase value.
+  void _finalizeHex(String raw) {
+    String cleaned = raw.replaceAll(RegExp(r'[^0-9a-fA-F]'), '');
+    if (cleaned.length == 3) {
+      cleaned = cleaned.split('').map((String c) => '$c$c').join();
+    }
+    if (cleaned.length != 6) {
+      // Invalid/incomplete input: snap the field back to the current
+      // base color instead of leaving stale or partial text behind.
+      _hexCtrl.text = _toHex(_base).substring(1);
+      return;
+    }
+    final int? value = int.tryParse(cleaned, radix: 16);
+    if (value == null) {
+      _hexCtrl.text = _toHex(_base).substring(1);
+      return;
+    }
+    setState(() {
+      _base = Color(0xFF000000 | value);
+      _hexCtrl.text = cleaned.toUpperCase();
+      _hexCtrl.selection =
+          TextSelection.collapsed(offset: _hexCtrl.text.length);
+      _regenerate();
+    });
+  }
+
   void _randomBase() {
+    HapticFeedback.mediumImpact();
     final math.Random rng = math.Random();
     final int r = rng.nextInt(256);
     final int g = rng.nextInt(256);
@@ -351,10 +391,17 @@ class _ColorPaletteState extends State<ColorPalette> {
   Color _contrastText(Color bg) =>
       _luminance(bg) > 0.5 ? Colors.black87 : Colors.white;
 
-  Future<void> _copy(String text) async {
+  Future<void> _copy(String text, String key) async {
+    if (text.isEmpty) return;
     await Clipboard.setData(ClipboardData(text: text));
+    HapticFeedback.lightImpact();
     if (!mounted) return;
-    _showSnack(context.t('colorpalette_copied'));
+    setState(() => _justCopiedKey = key);
+    Future<void>.delayed(const Duration(milliseconds: 1100), () {
+      if (mounted && _justCopiedKey == key) {
+        setState(() => _justCopiedKey = null);
+      }
+    });
   }
 
   Future<void> _copyAll() async {
@@ -366,19 +413,7 @@ class _ColorPaletteState extends State<ColorPalette> {
             '${_toHsl(_palette[i])}',
       );
     }
-    await Clipboard.setData(ClipboardData(text: sb.toString().trimRight()));
-    if (!mounted) return;
-    _showSnack(context.t('colorpalette_copied_all'));
-  }
-
-  void _showSnack(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        behavior: SnackBarBehavior.floating,
-        backgroundColor: Colors.black.withOpacity(0.75),
-        content: Text(message),
-      ),
-    );
+    await _copy(sb.toString().trimRight(), 'copy_all');
   }
 
   @override
@@ -396,9 +431,12 @@ class _ColorPaletteState extends State<ColorPalette> {
             onTap: _randomBase,
           ),
           _glassIconButton(
-            icon: Icons.copy_all_rounded,
+            icon: _justCopiedKey == 'copy_all'
+                ? Icons.check_rounded
+                : Icons.copy_all_rounded,
             tooltip: context.t('colorpalette_copy_all'),
             onTap: _copyAll,
+            highlighted: _justCopiedKey == 'copy_all',
           ),
           const SizedBox(width: 8),
         ],
@@ -467,31 +505,53 @@ class _ColorPaletteState extends State<ColorPalette> {
           const SizedBox(height: 14),
           Row(
             children: <Widget>[
-              Container(
-                width: 60,
-                height: 60,
-                decoration: BoxDecoration(
-                  color: _base,
-                  borderRadius: BorderRadius.circular(14),
-                  border: Border.all(
-                    color: Colors.white.withOpacity(0.3),
-                    width: 1.5,
-                  ),
-                  boxShadow: <BoxShadow>[
-                    BoxShadow(
-                      color: _base.withOpacity(0.5),
-                      blurRadius: 16,
-                      offset: const Offset(0, 6),
+              GestureDetector(
+                onTap: () => _copy(_toHex(_base), 'base_swatch'),
+                child: Container(
+                  width: 60,
+                  height: 60,
+                  decoration: BoxDecoration(
+                    color: _base,
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(
+                      color: Colors.white.withOpacity(0.3),
+                      width: 1.5,
                     ),
-                  ],
+                    boxShadow: <BoxShadow>[
+                      BoxShadow(
+                        color: _base.withOpacity(0.5),
+                        blurRadius: 16,
+                        offset: const Offset(0, 6),
+                      ),
+                    ],
+                  ),
+                  alignment: Alignment.center,
+                  child: AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 150),
+                    child: _justCopiedKey == 'base_swatch'
+                        ? Icon(
+                      Icons.check_rounded,
+                      key: const ValueKey<String>('check'),
+                      color: _contrastText(_base),
+                    )
+                        : const SizedBox.shrink(
+                      key: ValueKey<String>('empty'),
+                    ),
+                  ),
                 ),
               ),
               const SizedBox(width: 14),
               Expanded(
                 child: TextField(
                   controller: _hexCtrl,
+                  focusNode: _hexFocus,
                   onChanged: _onHexChanged,
+                  onSubmitted: _finalizeHex,
+                  textInputAction: TextInputAction.done,
                   maxLength: 6,
+                  inputFormatters: <TextInputFormatter>[
+                    FilteringTextInputFormatter.allow(RegExp(r'[0-9a-fA-F]')),
+                  ],
                   style: const TextStyle(
                     color: Colors.white,
                     fontFamily: 'monospace',
@@ -553,7 +613,8 @@ class _ColorPaletteState extends State<ColorPalette> {
                 child: _colorCodeChip(
                   label: 'HEX',
                   value: _toHex(_base),
-                  onCopy: () => _copy(_toHex(_base)),
+                  copyKey: 'base_hex',
+                  onCopy: () => _copy(_toHex(_base), 'base_hex'),
                 ),
               ),
               const SizedBox(width: 8),
@@ -561,7 +622,8 @@ class _ColorPaletteState extends State<ColorPalette> {
                 child: _colorCodeChip(
                   label: 'RGB',
                   value: _toRgb(_base),
-                  onCopy: () => _copy(_toRgb(_base)),
+                  copyKey: 'base_rgb',
+                  onCopy: () => _copy(_toRgb(_base), 'base_rgb'),
                 ),
               ),
             ],
@@ -570,7 +632,8 @@ class _ColorPaletteState extends State<ColorPalette> {
           _colorCodeChip(
             label: 'HSL',
             value: _toHsl(_base),
-            onCopy: () => _copy(_toHsl(_base)),
+            copyKey: 'base_hsl',
+            onCopy: () => _copy(_toHsl(_base), 'base_hsl'),
           ),
         ],
       ),
@@ -617,27 +680,40 @@ class _ColorPaletteState extends State<ColorPalette> {
             child: SizedBox(
               height: 80,
               child: Row(
-                children: _palette.map((Color c) {
+                children: List<Widget>.generate(_palette.length, (int i) {
+                  final Color c = _palette[i];
+                  final String key = 'preview_$i';
                   return Expanded(
                     child: GestureDetector(
-                      onTap: () => _copy(_toHex(c)),
+                      onTap: () => _copy(_toHex(c), key),
                       child: Container(
                         color: c,
                         alignment: Alignment.center,
-                        child: Text(
-                          _toHex(c).substring(1),
-                          style: TextStyle(
+                        child: AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 150),
+                          child: _justCopiedKey == key
+                              ? Icon(
+                            Icons.check_rounded,
+                            key: const ValueKey<String>('check'),
+                            size: 16,
                             color: _contrastText(c),
-                            fontFamily: 'monospace',
-                            fontSize: 10,
-                            fontWeight: FontWeight.w700,
-                            letterSpacing: 0.5,
+                          )
+                              : Text(
+                            _toHex(c).substring(1),
+                            key: const ValueKey<String>('hex'),
+                            style: TextStyle(
+                              color: _contrastText(c),
+                              fontFamily: 'monospace',
+                              fontSize: 10,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 0.5,
+                            ),
                           ),
                         ),
                       ),
                     ),
                   );
-                }).toList(),
+                }),
               ),
             ),
           ),
@@ -652,6 +728,7 @@ class _ColorPaletteState extends State<ColorPalette> {
   }
 
   Widget _paletteRow(int index, Color color) {
+    final String key = 'row_$index';
     return Container(
       padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
@@ -700,9 +777,10 @@ class _ColorPaletteState extends State<ColorPalette> {
             ),
           ),
           _glassIconButton(
-            icon: Icons.copy_rounded,
+            icon: _justCopiedKey == key ? Icons.check_rounded : Icons.copy_rounded,
             tooltip: context.t('colorpalette_copy'),
-            onTap: () => _copy(_toHex(color)),
+            onTap: () => _copy(_toHex(color), key),
+            highlighted: _justCopiedKey == key,
           ),
         ],
       ),
@@ -751,9 +829,7 @@ class _ColorPaletteState extends State<ColorPalette> {
                       colors: <Color>[_accentA, _accentB],
                     )
                         : null,
-                    color: selected
-                        ? null
-                        : Colors.white.withOpacity(0.06),
+                    color: selected ? null : Colors.white.withOpacity(0.06),
                     borderRadius: BorderRadius.circular(10),
                     border: Border.all(
                       color: selected
@@ -766,9 +842,8 @@ class _ColorPaletteState extends State<ColorPalette> {
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 12,
-                      fontWeight: selected
-                          ? FontWeight.w700
-                          : FontWeight.w400,
+                      fontWeight:
+                      selected ? FontWeight.w700 : FontWeight.w400,
                     ),
                   ),
                 ),
@@ -820,27 +895,40 @@ class _ColorPaletteState extends State<ColorPalette> {
             child: SizedBox(
               height: 60,
               child: Row(
-                children: shades.map((Color c) {
+                children: List<Widget>.generate(shades.length, (int i) {
+                  final Color c = shades[i];
+                  final String key = 'shade_$i';
                   return Expanded(
                     child: GestureDetector(
-                      onTap: () => _copy(_toHex(c)),
+                      onTap: () => _copy(_toHex(c), key),
                       child: Container(
                         color: c,
                         alignment: Alignment.bottomCenter,
                         padding: const EdgeInsets.only(bottom: 4),
-                        child: Text(
-                          '${(HslColor.fromColor(c).l).round()}',
-                          style: TextStyle(
+                        child: AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 150),
+                          child: _justCopiedKey == key
+                              ? Icon(
+                            Icons.check_rounded,
+                            key: const ValueKey<String>('check'),
+                            size: 13,
                             color: _contrastText(c),
-                            fontFamily: 'monospace',
-                            fontSize: 9,
-                            fontWeight: FontWeight.w700,
+                          )
+                              : Text(
+                            '${(HslColor.fromColor(c).l).round()}',
+                            key: const ValueKey<String>('l'),
+                            style: TextStyle(
+                              color: _contrastText(c),
+                              fontFamily: 'monospace',
+                              fontSize: 9,
+                              fontWeight: FontWeight.w700,
+                            ),
                           ),
                         ),
                       ),
                     ),
                   );
-                }).toList(),
+                }),
               ),
             ),
           ),
@@ -852,16 +940,22 @@ class _ColorPaletteState extends State<ColorPalette> {
   Widget _colorCodeChip({
     required String label,
     required String value,
+    required String copyKey,
     required VoidCallback onCopy,
   }) {
+    final bool copied = _justCopiedKey == copyKey;
     return GestureDetector(
       onTap: onCopy,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.05),
+          color: copied
+              ? _success.withOpacity(0.12)
+              : Colors.white.withOpacity(0.05),
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: Colors.white.withOpacity(0.12)),
+          border: Border.all(
+            color: copied ? _success.withOpacity(0.5) : Colors.white.withOpacity(0.12),
+          ),
         ),
         child: Row(
           children: <Widget>[
@@ -896,10 +990,10 @@ class _ColorPaletteState extends State<ColorPalette> {
                 overflow: TextOverflow.ellipsis,
               ),
             ),
-            const Icon(
-              Icons.copy_rounded,
+            Icon(
+              copied ? Icons.check_rounded : Icons.copy_rounded,
               size: 12,
-              color: Colors.white38,
+              color: copied ? _success : Colors.white38,
             ),
           ],
         ),
@@ -911,6 +1005,7 @@ class _ColorPaletteState extends State<ColorPalette> {
     required IconData icon,
     required String tooltip,
     required VoidCallback onTap,
+    bool highlighted = false,
   }) {
     return Tooltip(
       message: tooltip,
@@ -919,12 +1014,18 @@ class _ColorPaletteState extends State<ColorPalette> {
         child: BackdropFilter(
           filter: ui.ImageFilter.blur(sigmaX: 10, sigmaY: 10),
           child: Material(
-            color: Colors.white.withOpacity(0.08),
+            color: highlighted
+                ? _success.withOpacity(0.25)
+                : Colors.white.withOpacity(0.08),
             child: InkWell(
               onTap: onTap,
               child: Padding(
                 padding: const EdgeInsets.all(8),
-                child: Icon(icon, size: 18, color: Colors.white),
+                child: Icon(
+                  icon,
+                  size: 18,
+                  color: highlighted ? _success : Colors.white,
+                ),
               ),
             ),
           ),

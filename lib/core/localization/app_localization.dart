@@ -9,6 +9,7 @@ class AppLocalization extends ChangeNotifier {
   static const List<Locale> supportedLocales = <Locale>[
     Locale('az'),
     Locale('en'),
+    Locale('ru'),
   ];
 
   Locale _locale = const Locale('az');

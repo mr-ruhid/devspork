@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../core/localization/app_localization.dart';
@@ -37,7 +38,6 @@ class _DevCalcState extends State<DevCalc>
   String _pxReversePx = '';
   final TextEditingController _remValue = TextEditingController(text: '1');
   final TextEditingController _remBase = TextEditingController(text: '16');
-  String _remResultPx = '';
   String? _pxError;
 
   // Chmod
@@ -106,6 +106,8 @@ class _DevCalcState extends State<DevCalc>
     _remBase.dispose();
     super.dispose();
   }
+
+  bool get _isDark => Theme.of(context).brightness == Brightness.dark;
 
   // -------- Aspect Ratio --------
 
@@ -198,7 +200,8 @@ class _DevCalcState extends State<DevCalc>
 
     final double? remIn = double.tryParse(_remValue.text);
     final double? remBaseIn = double.tryParse(_remBase.text);
-    final String reverse = (remIn != null && remBaseIn != null && remBaseIn > 0)
+    final String reverse =
+    (remIn != null && remBaseIn != null && remBaseIn > 0)
         ? '${(remIn * remBaseIn).toStringAsFixed(4)} px'
         : '';
 
@@ -230,7 +233,8 @@ class _DevCalcState extends State<DevCalc>
         '${_symbolicFor(_chmodOwnerR, _chmodOwnerW, _chmodOwnerX)}'
         '${_symbolicFor(_chmodGroupR, _chmodGroupW, _chmodGroupX)}'
         '${_symbolicFor(_chmodOtherR, _chmodOtherW, _chmodOtherX)}';
-    final String recursive = _chmodDir ? 'chmod -R $octal <dir>' : 'chmod $octal <file>';
+    final String recursive =
+    _chmodDir ? 'chmod -R $octal <dir>' : 'chmod $octal <file>';
     setState(() {
       _chmodOctal = octal;
       _chmodSymbolic = sym;
@@ -243,17 +247,66 @@ class _DevCalcState extends State<DevCalc>
     await Clipboard.setData(ClipboardData(text: text));
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(context.t('devcalc_copied'))),
+      SnackBar(
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: Colors.black.withOpacity(0.75),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+        content: Text(context.t('devcalc_copied')),
+      ),
     );
   }
 
-  Future<void> _pasteTo(TextEditingController c) async {
-    final ClipboardData? data = await Clipboard.getData(Clipboard.kTextPlain);
-    if (data == null || data.text == null) return;
-    c.text = data.text!;
+  // -------- Glass helpers --------
+
+  Widget _glassCard({required Widget child, EdgeInsetsGeometry? padding}) {
+    final bool isDark = _isDark;
+    final Color tint =
+    isDark ? Colors.white.withOpacity(0.08) : Colors.white.withOpacity(0.55);
+    final Color borderColor =
+    isDark ? Colors.white.withOpacity(0.15) : Colors.white.withOpacity(0.6);
+
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(20),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+        child: Container(
+          padding: padding ?? const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: tint,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: borderColor, width: 1.2),
+            boxShadow: <BoxShadow>[
+              BoxShadow(
+                color: Colors.black.withOpacity(isDark ? 0.35 : 0.08),
+                blurRadius: 24,
+                offset: const Offset(0, 8),
+              ),
+              BoxShadow(
+                color: Colors.white.withOpacity(isDark ? 0.03 : 0.55),
+                blurRadius: 1,
+                spreadRadius: 0.5,
+                offset: const Offset(0, 1),
+              ),
+            ],
+          ),
+          child: child,
+        ),
+      ),
+    );
   }
 
-  // -------- UI helpers --------
+  Widget _sectionLabel(String text) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Text(
+        text,
+        style: Theme.of(context)
+            .textTheme
+            .titleSmall
+            ?.copyWith(fontWeight: FontWeight.w700),
+      ),
+    );
+  }
 
   Widget _numField({
     required String labelKey,
@@ -266,37 +319,48 @@ class _DevCalcState extends State<DevCalc>
       inputFormatters: <TextInputFormatter>[
         FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
       ],
+      style: const TextStyle(fontWeight: FontWeight.w600),
       decoration: InputDecoration(
         labelText: context.t(labelKey),
         suffixText: suffix,
-        border: const OutlineInputBorder(),
         isDense: true,
+        filled: true,
+        fillColor: Colors.white.withOpacity(_isDark ? 0.06 : 0.3),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: Colors.white.withOpacity(0.4)),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide:
+          BorderSide(color: Theme.of(context).colorScheme.primary, width: 1.5),
+        ),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
       ),
     );
   }
 
   Widget _resultCard(String text, ColorScheme colors) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Row(
-          children: <Widget>[
-            Expanded(
-              child: SelectableText(
-                text,
-                style: const TextStyle(
-                  fontFamily: 'monospace',
-                  fontSize: 13,
-                ),
+    return _glassCard(
+      padding: const EdgeInsets.all(12),
+      child: Row(
+        children: <Widget>[
+          Expanded(
+            child: SelectableText(
+              text,
+              style: const TextStyle(
+                fontFamily: 'monospace',
+                fontSize: 13,
+                fontWeight: FontWeight.w500,
               ),
             ),
-            IconButton(
-              visualDensity: VisualDensity.compact,
-              onPressed: () => _copy(text),
-              icon: const Icon(Icons.copy, size: 18),
-            ),
-          ],
-        ),
+          ),
+          IconButton(
+            visualDensity: VisualDensity.compact,
+            onPressed: () => _copy(text),
+            icon: const Icon(Icons.copy_rounded, size: 18),
+          ),
+        ],
       ),
     );
   }
@@ -305,9 +369,45 @@ class _DevCalcState extends State<DevCalc>
     if (key == null) return const SizedBox.shrink();
     return Padding(
       padding: const EdgeInsets.only(top: 8),
-      child: Text(
-        context.t(key),
-        style: TextStyle(color: colors.error, fontSize: 12),
+      child: Row(
+        children: <Widget>[
+          Icon(Icons.error_outline_rounded, size: 14, color: colors.error),
+          const SizedBox(width: 6),
+          Text(
+            context.t(key),
+            style: TextStyle(color: colors.error, fontSize: 12),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _glassPill({
+    required String label,
+    required bool selected,
+    required VoidCallback onTap,
+  }) {
+    final ColorScheme colors = Theme.of(context).colorScheme;
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 150),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+        decoration: BoxDecoration(
+          color: selected
+              ? colors.primary.withOpacity(0.85)
+              : Colors.white.withOpacity(0.3),
+          borderRadius: BorderRadius.circular(999),
+          border: Border.all(color: Colors.white.withOpacity(0.5)),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            fontSize: 11,
+            fontWeight: FontWeight.w600,
+            color: selected ? colors.onPrimary : colors.onSurface,
+          ),
+        ),
       ),
     );
   }
@@ -320,113 +420,105 @@ class _DevCalcState extends State<DevCalc>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          Text(
-            context.t('devcalc_ar_original'),
-            style: Theme.of(context).textTheme.titleSmall,
-          ),
-          const SizedBox(height: 8),
-          Row(
-            children: <Widget>[
-              Expanded(
-                child: _numField(
-                  labelKey: 'devcalc_ar_width',
-                  controller: _arW1,
+          _glassCard(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: <Widget>[
+                _sectionLabel(context.t('devcalc_ar_original')),
+                Row(
+                  children: <Widget>[
+                    Expanded(
+                      child: _numField(
+                        labelKey: 'devcalc_ar_width',
+                        controller: _arW1,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: _numField(
+                        labelKey: 'devcalc_ar_height',
+                        controller: _arH1,
+                      ),
+                    ),
+                  ],
                 ),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: _numField(
-                  labelKey: 'devcalc_ar_height',
-                  controller: _arH1,
+                const SizedBox(height: 16),
+                _sectionLabel(context.t('devcalc_ar_target')),
+                Row(
+                  children: <Widget>[
+                    Expanded(
+                      child: _numField(
+                        labelKey: 'devcalc_ar_width',
+                        controller: _arW2,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: _numField(
+                        labelKey: 'devcalc_ar_height',
+                        controller: _arH2,
+                      ),
+                    ),
+                  ],
                 ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          Text(
-            context.t('devcalc_ar_target'),
-            style: Theme.of(context).textTheme.titleSmall,
-          ),
-          const SizedBox(height: 8),
-          Row(
-            children: <Widget>[
-              Expanded(
-                child: _numField(
-                  labelKey: 'devcalc_ar_width',
-                  controller: _arW2,
+                const SizedBox(height: 12),
+                Row(
+                  children: <Widget>[
+                    _glassPill(
+                      label: context.t('devcalc_ar_lock_w'),
+                      selected: _arLockW,
+                      onTap: () {
+                        setState(() => _arLockW = true);
+                        _calcAspect();
+                      },
+                    ),
+                    const SizedBox(width: 8),
+                    _glassPill(
+                      label: context.t('devcalc_ar_lock_h'),
+                      selected: !_arLockW,
+                      onTap: () {
+                        setState(() => _arLockW = false);
+                        _calcAspect();
+                      },
+                    ),
+                  ],
                 ),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: _numField(
-                  labelKey: 'devcalc_ar_height',
-                  controller: _arH2,
-                ),
-              ),
-            ],
+                _errorText(_arError, colors),
+              ],
+            ),
           ),
-          const SizedBox(height: 8),
-          SegmentedButton<bool>(
-            segments: <ButtonSegment<bool>>[
-              ButtonSegment<bool>(
-                value: true,
-                label: Text(context.t('devcalc_ar_lock_w')),
-              ),
-              ButtonSegment<bool>(
-                value: false,
-                label: Text(context.t('devcalc_ar_lock_h')),
-              ),
-            ],
-            selected: <bool>{_arLockW},
-            onSelectionChanged: (Set<bool> s) {
-              setState(() {
-                _arLockW = s.first;
-              });
-              _calcAspect();
-            },
-          ),
-          _errorText(_arError, colors),
           const SizedBox(height: 16),
           if (_arResult.isNotEmpty) _resultCard(_arResult, colors),
           const SizedBox(height: 16),
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Text(
-                    context.t('devcalc_ar_common'),
-                    style: Theme.of(context).textTheme.titleSmall,
-                  ),
-                  const SizedBox(height: 8),
-                  Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
-                    children: <MapEntry<String, String>>[
-                      MapEntry<String, String>('16:9', '1920x1080'),
-                      MapEntry<String, String>('4:3', '1024x768'),
-                      MapEntry<String, String>('21:9', '2560x1080'),
-                      MapEntry<String, String>('1:1', '1080x1080'),
-                      MapEntry<String, String>('9:16', '1080x1920'),
-                      MapEntry<String, String>('3:2', '1500x1000'),
-                    ].map((MapEntry<String, String> e) {
-                      return ActionChip(
-                        label: Text(
-                          '${e.key}  (${e.value})',
-                          style: const TextStyle(fontSize: 11),
-                        ),
-                        onPressed: () {
-                          final List<String> wh = e.value.split('x');
-                          _arW1.text = wh[0];
-                          _arH1.text = wh[1];
-                          _calcAspect();
-                        },
-                      );
-                    }).toList(),
-                  ),
-                ],
-              ),
+          _glassCard(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                _sectionLabel(context.t('devcalc_ar_common')),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: <MapEntry<String, String>>[
+                    const MapEntry<String, String>('16:9', '1920x1080'),
+                    const MapEntry<String, String>('4:3', '1024x768'),
+                    const MapEntry<String, String>('21:9', '2560x1080'),
+                    const MapEntry<String, String>('1:1', '1080x1080'),
+                    const MapEntry<String, String>('9:16', '1080x1920'),
+                    const MapEntry<String, String>('3:2', '1500x1000'),
+                  ].map((MapEntry<String, String> e) {
+                    return _glassPill(
+                      label: '${e.key}  (${e.value})',
+                      selected: false,
+                      onTap: () {
+                        final List<String> wh = e.value.split('x');
+                        _arW1.text = wh[0];
+                        _arH1.text = wh[1];
+                        _calcAspect();
+                      },
+                    );
+                  }).toList(),
+                ),
+              ],
             ),
           ),
         ],
@@ -440,86 +532,89 @@ class _DevCalcState extends State<DevCalc>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          _numField(
-            labelKey: 'devcalc_fs_value',
-            controller: _fsValue,
-          ),
-          const SizedBox(height: 12),
-          Row(
-            children: <Widget>[
-              Expanded(
-                child: DropdownButtonFormField<String>(
-                  initialValue: _fsFrom,
-                  decoration: InputDecoration(
-                    labelText: context.t('devcalc_fs_from'),
-                    border: const OutlineInputBorder(),
-                    isDense: true,
-                  ),
-                  items: _sizeUnits
-                      .map((String u) => DropdownMenuItem<String>(
-                    value: u,
-                    child: Text(u),
-                  ))
-                      .toList(),
-                  onChanged: (String? v) {
-                    if (v == null) return;
-                    setState(() {
-                      _fsFrom = v;
-                    });
-                    _calcFileSize();
-                  },
+          _glassCard(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: <Widget>[
+                _numField(
+                  labelKey: 'devcalc_fs_value',
+                  controller: _fsValue,
                 ),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: DropdownButtonFormField<String>(
-                  initialValue: _fsTo,
-                  decoration: InputDecoration(
-                    labelText: context.t('devcalc_fs_to'),
-                    border: const OutlineInputBorder(),
-                    isDense: true,
-                  ),
-                  items: _sizeUnits
-                      .map((String u) => DropdownMenuItem<String>(
-                    value: u,
-                    child: Text(u),
-                  ))
-                      .toList(),
-                  onChanged: (String? v) {
-                    if (v == null) return;
-                    setState(() {
-                      _fsTo = v;
-                    });
-                    _calcFileSize();
-                  },
+                const SizedBox(height: 12),
+                Row(
+                  children: <Widget>[
+                    Expanded(
+                      child: DropdownButtonFormField<String>(
+                        initialValue: _fsFrom,
+                        decoration: InputDecoration(
+                          labelText: context.t('devcalc_fs_from'),
+                          isDense: true,
+                          filled: true,
+                          fillColor: Colors.white.withOpacity(_isDark ? 0.06 : 0.3),
+                          border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12)),
+                        ),
+                        items: _sizeUnits
+                            .map((String u) => DropdownMenuItem<String>(
+                          value: u,
+                          child: Text(u),
+                        ))
+                            .toList(),
+                        onChanged: (String? v) {
+                          if (v == null) return;
+                          setState(() {
+                            _fsFrom = v;
+                          });
+                          _calcFileSize();
+                        },
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: DropdownButtonFormField<String>(
+                        initialValue: _fsTo,
+                        decoration: InputDecoration(
+                          labelText: context.t('devcalc_fs_to'),
+                          isDense: true,
+                          filled: true,
+                          fillColor: Colors.white.withOpacity(_isDark ? 0.06 : 0.3),
+                          border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12)),
+                        ),
+                        items: _sizeUnits
+                            .map((String u) => DropdownMenuItem<String>(
+                          value: u,
+                          child: Text(u),
+                        ))
+                            .toList(),
+                        onChanged: (String? v) {
+                          if (v == null) return;
+                          setState(() {
+                            _fsTo = v;
+                          });
+                          _calcFileSize();
+                        },
+                      ),
+                    ),
+                  ],
                 ),
-              ),
-            ],
+                _errorText(_fsError, colors),
+              ],
+            ),
           ),
-          _errorText(_fsError, colors),
           const SizedBox(height: 16),
           if (_fsResult.isNotEmpty) _resultCard(_fsResult, colors),
           const SizedBox(height: 16),
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Text(
-                    context.t('devcalc_fs_common'),
-                    style: Theme.of(context).textTheme.titleSmall,
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    '1 KB = 1024 B\n1 MB = 1024 KB\n1 GB = 1024 MB\n1 TB = 1024 GB',
-                    style: const TextStyle(
-                      fontFamily: 'monospace',
-                      fontSize: 12,
-                    ),
-                  ),
-                ],
-              ),
+          _glassCard(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                _sectionLabel(context.t('devcalc_fs_common')),
+                const Text(
+                  '1 KB = 1024 B\n1 MB = 1024 KB\n1 GB = 1024 MB\n1 TB = 1024 GB',
+                  style: TextStyle(fontFamily: 'monospace', fontSize: 12),
+                ),
+              ],
             ),
           ),
         ],
@@ -533,93 +628,87 @@ class _DevCalcState extends State<DevCalc>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          Text(
-            context.t('devcalc_px_section'),
-            style: Theme.of(context).textTheme.titleSmall,
-          ),
-          const SizedBox(height: 8),
-          Row(
-            children: <Widget>[
-              Expanded(
-                flex: 2,
-                child: _numField(
-                  labelKey: 'devcalc_px_value',
-                  controller: _pxValue,
-                  suffix: 'px',
-                ),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: _numField(
-                  labelKey: 'devcalc_px_base',
-                  controller: _pxBase,
-                  suffix: 'px',
-                ),
-              ),
-            ],
-          ),
-          _errorText(_pxError, colors),
-          const SizedBox(height: 12),
-          if (_pxResultRem.isNotEmpty)
-            _resultCard('REM: $_pxResultRem\nEM: $_pxResultEm', colors),
-          const SizedBox(height: 24),
-          Divider(color: colors.outlineVariant),
-          const SizedBox(height: 12),
-          Text(
-            context.t('devcalc_rem_section'),
-            style: Theme.of(context).textTheme.titleSmall,
-          ),
-          const SizedBox(height: 8),
-          Row(
-            children: <Widget>[
-              Expanded(
-                flex: 2,
-                child: _numField(
-                  labelKey: 'devcalc_rem_value',
-                  controller: _remValue,
-                  suffix: 'rem',
-                ),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: _numField(
-                  labelKey: 'devcalc_rem_base',
-                  controller: _remBase,
-                  suffix: 'px',
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          if (_pxReversePx.isNotEmpty)
-            _resultCard('PX: $_pxReversePx', colors),
-          const SizedBox(height: 16),
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Text(
-                    context.t('devcalc_px_common'),
-                    style: Theme.of(context).textTheme.titleSmall,
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    '1rem = 16px (base)\n'
-                        '4px  = 0.25rem\n'
-                        '8px  = 0.5rem\n'
-                        '12px = 0.75rem\n'
-                        '16px = 1rem\n'
-                        '24px = 1.5rem\n'
-                        '32px = 2rem',
-                    style: const TextStyle(
-                      fontFamily: 'monospace',
-                      fontSize: 12,
+          _glassCard(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: <Widget>[
+                _sectionLabel(context.t('devcalc_px_section')),
+                Row(
+                  children: <Widget>[
+                    Expanded(
+                      flex: 2,
+                      child: _numField(
+                        labelKey: 'devcalc_px_value',
+                        controller: _pxValue,
+                        suffix: 'px',
+                      ),
                     ),
-                  ),
-                ],
-              ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: _numField(
+                        labelKey: 'devcalc_px_base',
+                        controller: _pxBase,
+                        suffix: 'px',
+                      ),
+                    ),
+                  ],
+                ),
+                _errorText(_pxError, colors),
+                const SizedBox(height: 12),
+                if (_pxResultRem.isNotEmpty)
+                  _resultCard('REM: $_pxResultRem\nEM: $_pxResultEm', colors),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
+          _glassCard(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: <Widget>[
+                _sectionLabel(context.t('devcalc_rem_section')),
+                Row(
+                  children: <Widget>[
+                    Expanded(
+                      flex: 2,
+                      child: _numField(
+                        labelKey: 'devcalc_rem_value',
+                        controller: _remValue,
+                        suffix: 'rem',
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: _numField(
+                        labelKey: 'devcalc_rem_base',
+                        controller: _remBase,
+                        suffix: 'px',
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                if (_pxReversePx.isNotEmpty)
+                  _resultCard('PX: $_pxReversePx', colors),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
+          _glassCard(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                _sectionLabel(context.t('devcalc_px_common')),
+                const Text(
+                  '1rem = 16px (base)\n'
+                      '4px  = 0.25rem\n'
+                      '8px  = 0.5rem\n'
+                      '12px = 0.75rem\n'
+                      '16px = 1rem\n'
+                      '24px = 1.5rem\n'
+                      '32px = 2rem',
+                  style: TextStyle(fontFamily: 'monospace', fontSize: 12),
+                ),
+              ],
             ),
           ),
         ],
@@ -645,119 +734,103 @@ class _DevCalcState extends State<DevCalc>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: <Widget>[
-                  Text(
-                    context.t('devcalc_chmod_owner'),
-                    style: Theme.of(context).textTheme.titleSmall,
-                  ),
-                  Row(
-                    children: <Widget>[
-                      _chmodSwitch('devcalc_chmod_r', _chmodOwnerR, (bool v) {
-                        setState(() => _chmodOwnerR = v);
-                        _calcChmod();
-                      }),
-                      _chmodSwitch('devcalc_chmod_w', _chmodOwnerW, (bool v) {
-                        setState(() => _chmodOwnerW = v);
-                        _calcChmod();
-                      }),
-                      _chmodSwitch('devcalc_chmod_x', _chmodOwnerX, (bool v) {
-                        setState(() => _chmodOwnerX = v);
-                        _calcChmod();
-                      }),
-                    ],
-                  ),
-                  Divider(color: colors.outlineVariant),
-                  Text(
-                    context.t('devcalc_chmod_group'),
-                    style: Theme.of(context).textTheme.titleSmall,
-                  ),
-                  Row(
-                    children: <Widget>[
-                      _chmodSwitch('devcalc_chmod_r', _chmodGroupR, (bool v) {
-                        setState(() => _chmodGroupR = v);
-                        _calcChmod();
-                      }),
-                      _chmodSwitch('devcalc_chmod_w', _chmodGroupW, (bool v) {
-                        setState(() => _chmodGroupW = v);
-                        _calcChmod();
-                      }),
-                      _chmodSwitch('devcalc_chmod_x', _chmodGroupX, (bool v) {
-                        setState(() => _chmodGroupX = v);
-                        _calcChmod();
-                      }),
-                    ],
-                  ),
-                  Divider(color: colors.outlineVariant),
-                  Text(
-                    context.t('devcalc_chmod_other'),
-                    style: Theme.of(context).textTheme.titleSmall,
-                  ),
-                  Row(
-                    children: <Widget>[
-                      _chmodSwitch('devcalc_chmod_r', _chmodOtherR, (bool v) {
-                        setState(() => _chmodOtherR = v);
-                        _calcChmod();
-                      }),
-                      _chmodSwitch('devcalc_chmod_w', _chmodOtherW, (bool v) {
-                        setState(() => _chmodOtherW = v);
-                        _calcChmod();
-                      }),
-                      _chmodSwitch('devcalc_chmod_x', _chmodOtherX, (bool v) {
-                        setState(() => _chmodOtherX = v);
-                        _calcChmod();
-                      }),
-                    ],
-                  ),
-                ],
-              ),
+          _glassCard(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: <Widget>[
+                _sectionLabel(context.t('devcalc_chmod_owner')),
+                Row(
+                  children: <Widget>[
+                    _chmodSwitch('devcalc_chmod_r', _chmodOwnerR, (bool v) {
+                      setState(() => _chmodOwnerR = v);
+                      _calcChmod();
+                    }),
+                    _chmodSwitch('devcalc_chmod_w', _chmodOwnerW, (bool v) {
+                      setState(() => _chmodOwnerW = v);
+                      _calcChmod();
+                    }),
+                    _chmodSwitch('devcalc_chmod_x', _chmodOwnerX, (bool v) {
+                      setState(() => _chmodOwnerX = v);
+                      _calcChmod();
+                    }),
+                  ],
+                ),
+                Divider(color: Colors.white.withOpacity(0.25)),
+                _sectionLabel(context.t('devcalc_chmod_group')),
+                Row(
+                  children: <Widget>[
+                    _chmodSwitch('devcalc_chmod_r', _chmodGroupR, (bool v) {
+                      setState(() => _chmodGroupR = v);
+                      _calcChmod();
+                    }),
+                    _chmodSwitch('devcalc_chmod_w', _chmodGroupW, (bool v) {
+                      setState(() => _chmodGroupW = v);
+                      _calcChmod();
+                    }),
+                    _chmodSwitch('devcalc_chmod_x', _chmodGroupX, (bool v) {
+                      setState(() => _chmodGroupX = v);
+                      _calcChmod();
+                    }),
+                  ],
+                ),
+                Divider(color: Colors.white.withOpacity(0.25)),
+                _sectionLabel(context.t('devcalc_chmod_other')),
+                Row(
+                  children: <Widget>[
+                    _chmodSwitch('devcalc_chmod_r', _chmodOtherR, (bool v) {
+                      setState(() => _chmodOtherR = v);
+                      _calcChmod();
+                    }),
+                    _chmodSwitch('devcalc_chmod_w', _chmodOtherW, (bool v) {
+                      setState(() => _chmodOtherW = v);
+                      _calcChmod();
+                    }),
+                    _chmodSwitch('devcalc_chmod_x', _chmodOtherX, (bool v) {
+                      setState(() => _chmodOtherX = v);
+                      _calcChmod();
+                    }),
+                  ],
+                ),
+              ],
             ),
           ),
           const SizedBox(height: 12),
-          SwitchListTile(
-            contentPadding: EdgeInsets.zero,
-            title: Text(context.t('devcalc_chmod_dir')),
-            value: _chmodDir,
-            onChanged: (bool v) {
-              setState(() => _chmodDir = v);
-              _calcChmod();
-            },
+          _glassCard(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            child: SwitchListTile(
+              contentPadding: EdgeInsets.zero,
+              title: Text(context.t('devcalc_chmod_dir')),
+              value: _chmodDir,
+              onChanged: (bool v) {
+                setState(() => _chmodDir = v);
+                _calcChmod();
+              },
+            ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 12),
           _resultCard(
             'Octal: $_chmodOctal\nSymbolic: $_chmodSymbolic\nCommand: $_chmodCommand',
             colors,
           ),
           const SizedBox(height: 16),
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Text(
-                    context.t('devcalc_chmod_common'),
-                    style: Theme.of(context).textTheme.titleSmall,
+          _glassCard(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                _sectionLabel(context.t('devcalc_chmod_common')),
+                const Text(
+                  '755 = rwxr-xr-x (scripts, executables)\n'
+                      '644 = rw-r--r-- (regular files)\n'
+                      '600 = rw------- (private keys)\n'
+                      '700 = rwx------ (private dirs)\n'
+                      '777 = rwxrwxrwx (FULL ACCESS — avoid!)',
+                  style: TextStyle(
+                    fontFamily: 'monospace',
+                    fontSize: 11,
+                    height: 1.5,
                   ),
-                  const SizedBox(height: 8),
-                  Text(
-                    '755 = rwxr-xr-x (scripts, executables)\n'
-                        '644 = rw-r--r-- (regular files)\n'
-                        '600 = rw------- (private keys)\n'
-                        '700 = rwx------ (private dirs)\n'
-                        '777 = rwxrwxrwx (FULL ACCESS — avoid!)',
-                    style: const TextStyle(
-                      fontFamily: 'monospace',
-                      fontSize: 11,
-                      height: 1.5,
-                    ),
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ],
@@ -768,29 +841,122 @@ class _DevCalcState extends State<DevCalc>
   @override
   Widget build(BuildContext context) {
     final ColorScheme colors = Theme.of(context).colorScheme;
+    final bool isDark = _isDark;
+
     return Scaffold(
+      extendBodyBehindAppBar: true,
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
-        title: Text(context.t('devcalc_title')),
-        bottom: TabBar(
-          controller: _tabController,
-          isScrollable: true,
-          tabs: <Widget>[
-            Tab(text: context.t('devcalc_tab_ar')),
-            Tab(text: context.t('devcalc_tab_fs')),
-            Tab(text: context.t('devcalc_tab_px')),
-            Tab(text: context.t('devcalc_tab_chmod')),
-          ],
+        title: Text(
+          context.t('devcalc_title'),
+          style: const TextStyle(fontWeight: FontWeight.w700),
+        ),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        scrolledUnderElevation: 0,
+        flexibleSpace: ClipRect(
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+            child: Container(color: colors.surface.withOpacity(0.35)),
+          ),
+        ),
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(52),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 10),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(999),
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+                child: Container(
+                  height: 42,
+                  padding: const EdgeInsets.all(4),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(isDark ? 0.08 : 0.4),
+                    borderRadius: BorderRadius.circular(999),
+                    border: Border.all(color: Colors.white.withOpacity(0.4)),
+                  ),
+                  child: TabBar(
+                    controller: _tabController,
+                    isScrollable: true,
+                    tabAlignment: TabAlignment.start,
+                    dividerColor: Colors.transparent,
+                    indicatorSize: TabBarIndicatorSize.tab,
+                    indicatorPadding: const EdgeInsets.symmetric(vertical: 2),
+                    indicator: BoxDecoration(
+                      color: colors.primary.withOpacity(0.85),
+                      borderRadius: BorderRadius.circular(999),
+                    ),
+                    labelColor: colors.onPrimary,
+                    unselectedLabelColor: colors.onSurface,
+                    labelStyle: const TextStyle(
+                        fontSize: 12, fontWeight: FontWeight.w600),
+                    tabs: <Widget>[
+                      Tab(text: context.t('devcalc_tab_ar')),
+                      Tab(text: context.t('devcalc_tab_fs')),
+                      Tab(text: context.t('devcalc_tab_px')),
+                      Tab(text: context.t('devcalc_tab_chmod')),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
         ),
       ),
-      body: TabBarView(
-        controller: _tabController,
+      body: Stack(
+        fit: StackFit.expand,
         children: <Widget>[
-          _buildAspect(colors),
-          _buildFileSize(colors),
-          _buildPx(colors),
-          _buildChmod(colors),
+          DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: isDark
+                    ? <Color>[
+                  const Color(0xFF1B1035),
+                  const Color(0xFF0F1C3F),
+                  const Color(0xFF091626),
+                ]
+                    : <Color>[
+                  const Color(0xFFDCE9FF),
+                  const Color(0xFFE9E2FF),
+                  const Color(0xFFF3F6FF),
+                ],
+              ),
+            ),
+          ),
+          Positioned(
+            top: -100,
+            right: -80,
+            child: _blob(colors.primary.withOpacity(0.28), 240),
+          ),
+          Positioned(
+            bottom: -90,
+            left: -60,
+            child: _blob(colors.tertiary.withOpacity(0.24), 220),
+          ),
+          SafeArea(
+            child: TabBarView(
+              controller: _tabController,
+              children: <Widget>[
+                _buildAspect(colors),
+                _buildFileSize(colors),
+                _buildPx(colors),
+                _buildChmod(colors),
+              ],
+            ),
+          ),
         ],
       ),
+    );
+  }
+
+  Widget _blob(Color color, double size) {
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(shape: BoxShape.circle, color: color),
     );
   }
 }
