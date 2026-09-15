@@ -5,7 +5,8 @@
 list(APPEND FLUTTER_PLUGIN_LIST
   file_saver
   file_selector_linux
-  image_compress_plus_linux
+  flutter_avif_linux
+  heic_native
   url_launcher_linux
 )
 

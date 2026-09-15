@@ -4,6 +4,7 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../../core/localization/app_localization.dart';
 import 'models.dart';
 import 'server.dart';
 import 'spec_parser.dart';
@@ -34,11 +35,13 @@ class _MockServerPageState extends State<MockServerPage>
   MockServerConfig _config = MockServerConfig();
 
   final TextEditingController _portCtrl = TextEditingController(text: '8080');
-  final TextEditingController _hostCtrl = TextEditingController(text: '0.0.0.0');
+  final TextEditingController _hostCtrl =
+  TextEditingController(text: '0.0.0.0');
   final TextEditingController _delayCtrl = TextEditingController(text: '0');
 
   Timer? _logTimer;
-  String? _startError;
+  String? _startErrorKey;
+  String? _startErrorDetail;
 
   @override
   void initState() {
@@ -48,8 +51,8 @@ class _MockServerPageState extends State<MockServerPage>
       MockEndpoint(
         method: 'GET',
         path: '/users',
-        responseBody: '[\n  {"id": 1, "name": "Alice"},\n  {"id": 2, "name": "Bob"}\n]',
-        description: 'Sample endpoint',
+        responseBody:
+        '[\n  {"id": 1, "name": "Alice"},\n  {"id": 2, "name": "Bob"}\n]',
       ),
     );
   }
@@ -78,7 +81,10 @@ class _MockServerPageState extends State<MockServerPage>
   Future<void> _startServer() async {
     FocusScope.of(context).unfocus();
     _syncConfigFromUI();
-    setState(() => _startError = null);
+    setState(() {
+      _startErrorKey = null;
+      _startErrorDetail = null;
+    });
 
     try {
       await _controller.start(
@@ -99,7 +105,8 @@ class _MockServerPageState extends State<MockServerPage>
     } catch (e) {
       if (!mounted) return;
       setState(() {
-        _startError = e.toString();
+        _startErrorKey = 'mockserver_error_start';
+        _startErrorDetail = e.toString();
       });
     }
   }
@@ -110,13 +117,6 @@ class _MockServerPageState extends State<MockServerPage>
     if (!mounted) return;
     setState(() {});
     HapticFeedback.lightImpact();
-  }
-
-  void _addEndpoint() {
-    setState(() {
-      _endpoints.add(MockEndpoint());
-      _controller.updateEndpoints(_endpoints);
-    });
   }
 
   void _removeEndpoint(int index) {
@@ -136,7 +136,7 @@ class _MockServerPageState extends State<MockServerPage>
     await Clipboard.setData(ClipboardData(text: text));
     HapticFeedback.lightImpact();
     if (!mounted) return;
-    _snack(message ?? 'Kopyalandı');
+    _snack(message ?? context.t('mockserver_copied'));
   }
 
   void _snack(String message) {
@@ -172,18 +172,21 @@ class _MockServerPageState extends State<MockServerPage>
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: <Widget>[
-                  const Text(
-                    'OpenAPI / Swagger import',
-                    style: TextStyle(
+                  Text(
+                    context.t('mockserver_import_title'),
+                    style: const TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.w700,
                       fontSize: 15,
                     ),
                   ),
                   const SizedBox(height: 6),
-                  const Text(
-                    'YAML və ya JSON formatında spec yapışdır',
-                    style: TextStyle(color: Colors.white60, fontSize: 11),
+                  Text(
+                    context.t('mockserver_import_hint'),
+                    style: const TextStyle(
+                      color: Colors.white60,
+                      fontSize: 11,
+                    ),
                   ),
                   const SizedBox(height: 14),
                   TextField(
@@ -196,7 +199,7 @@ class _MockServerPageState extends State<MockServerPage>
                       fontFamily: 'monospace',
                     ),
                     decoration: InputDecoration(
-                      hintText: 'openapi: 3.0.0\ninfo:\n  title: ...',
+                      hintText: context.t('mockserver_import_placeholder'),
                       hintStyle: TextStyle(
                         color: Colors.white.withOpacity(0.3),
                         fontSize: 11,
@@ -228,17 +231,17 @@ class _MockServerPageState extends State<MockServerPage>
                     children: <Widget>[
                       TextButton(
                         onPressed: () => Navigator.of(ctx).pop(false),
-                        child: const Text(
-                          'Ləğv et',
-                          style: TextStyle(color: Colors.white60),
+                        child: Text(
+                          context.t('mockserver_cancel'),
+                          style: const TextStyle(color: Colors.white60),
                         ),
                       ),
                       const SizedBox(width: 8),
                       TextButton(
                         onPressed: () => Navigator.of(ctx).pop(true),
-                        child: const Text(
-                          'İmport',
-                          style: TextStyle(
+                        child: Text(
+                          context.t('mockserver_import'),
+                          style: const TextStyle(
                             color: _accentB,
                             fontWeight: FontWeight.w700,
                           ),
@@ -266,7 +269,7 @@ class _MockServerPageState extends State<MockServerPage>
     if (!mounted) return;
 
     if (!parsed.isSuccess) {
-      _snack(parsed.error ?? 'Parse xətası');
+      _snack(parsed.error != null ? context.t(parsed.error!) : context.t('mockserver_error_parse'));
       return;
     }
 
@@ -276,7 +279,7 @@ class _MockServerPageState extends State<MockServerPage>
       _controller.updateEndpoints(_endpoints);
     });
     _tabs.animateTo(0);
-    _snack('${parsed.endpoints.length} endpoint əlavə edildi');
+    _snack('${parsed.endpoints.length} ${context.t('mockserver_import_added')}');
   }
 
   @override
@@ -289,18 +292,18 @@ class _MockServerPageState extends State<MockServerPage>
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        title: const Text('Mock Server'),
+        title: Text(context.t('mockserver_title')),
         actions: <Widget>[
           if (running)
             _glassIconButton(
               icon: Icons.link_rounded,
-              tooltip: 'URL kopyala',
+              tooltip: context.t('mockserver_copy_url'),
               onTap: () => _copyText(_controller.baseUrl, _controller.baseUrl),
             ),
           const SizedBox(width: 4),
           _glassIconButton(
             icon: Icons.file_download_outlined,
-            tooltip: 'OpenAPI import',
+            tooltip: context.t('mockserver_import_tooltip'),
             onTap: _openImportDialog,
           ),
           const SizedBox(width: 8),
@@ -363,11 +366,11 @@ class _MockServerPageState extends State<MockServerPage>
               fontSize: 11,
               fontWeight: FontWeight.w600,
             ),
-            tabs: const <Widget>[
-              Tab(text: 'Endpoints'),
-              Tab(text: 'Server'),
-              Tab(text: 'Config'),
-              Tab(text: 'Logs'),
+            tabs: <Widget>[
+              Tab(text: context.t('mockserver_tab_endpoints')),
+              Tab(text: context.t('mockserver_tab_server')),
+              Tab(text: context.t('mockserver_tab_config')),
+              Tab(text: context.t('mockserver_tab_logs')),
             ],
           ),
         ),
@@ -383,7 +386,7 @@ class _MockServerPageState extends State<MockServerPage>
           child: Row(
             children: <Widget>[
               Text(
-                '${_endpoints.length} endpoint',
+                '${_endpoints.length} ${context.t('mockserver_endpoints')}',
                 style: const TextStyle(color: Colors.white60, fontSize: 12),
               ),
               const Spacer(),
@@ -400,9 +403,9 @@ class _MockServerPageState extends State<MockServerPage>
                     size: 16,
                     color: _danger,
                   ),
-                  label: const Text(
-                    'Hamısını sil',
-                    style: TextStyle(color: _danger, fontSize: 12),
+                  label: Text(
+                    context.t('mockserver_clear_all'),
+                    style: const TextStyle(color: _danger, fontSize: 12),
                   ),
                 ),
             ],
@@ -412,7 +415,7 @@ class _MockServerPageState extends State<MockServerPage>
           child: _endpoints.isEmpty
               ? _emptyState(
             icon: Icons.dns_outlined,
-            message: 'Heç bir endpoint yoxdur',
+            message: context.t('mockserver_no_endpoints'),
           )
               : ListView.builder(
             padding: const EdgeInsets.fromLTRB(16, 0, 16, 100),
@@ -564,9 +567,9 @@ class _MockServerPageState extends State<MockServerPage>
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: <Widget>[
-                    const Text(
-                      'Endpoint redaktə',
-                      style: TextStyle(
+                    Text(
+                      context.t('mockserver_edit_endpoint'),
+                      style: const TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.w700,
                         fontSize: 15,
@@ -579,7 +582,7 @@ class _MockServerPageState extends State<MockServerPage>
                           flex: 2,
                           child: _dialogField(
                             controller: methodCtrl,
-                            label: 'Method',
+                            label: context.t('mockserver_field_method'),
                             hint: 'GET',
                           ),
                         ),
@@ -588,7 +591,7 @@ class _MockServerPageState extends State<MockServerPage>
                           flex: 4,
                           child: _dialogField(
                             controller: pathCtrl,
-                            label: 'Path',
+                            label: context.t('mockserver_field_path'),
                             hint: '/users/{id}',
                           ),
                         ),
@@ -600,7 +603,7 @@ class _MockServerPageState extends State<MockServerPage>
                         Expanded(
                           child: _dialogField(
                             controller: statusCtrl,
-                            label: 'Status',
+                            label: context.t('mockserver_field_status'),
                             hint: '200',
                             numeric: true,
                           ),
@@ -609,7 +612,7 @@ class _MockServerPageState extends State<MockServerPage>
                         Expanded(
                           child: _dialogField(
                             controller: delayCtrl,
-                            label: 'Delay (ms)',
+                            label: context.t('mockserver_field_delay'),
                             hint: '0',
                             numeric: true,
                           ),
@@ -619,13 +622,13 @@ class _MockServerPageState extends State<MockServerPage>
                     const SizedBox(height: 10),
                     _dialogField(
                       controller: descCtrl,
-                      label: 'Description',
-                      hint: 'Optional',
+                      label: context.t('mockserver_field_description'),
+                      hint: context.t('mockserver_hint_optional'),
                     ),
                     const SizedBox(height: 10),
                     _dialogField(
                       controller: bodyCtrl,
-                      label: 'Response body',
+                      label: context.t('mockserver_field_body'),
                       hint: '{"key": "value"}',
                       maxLines: 8,
                       minLines: 4,
@@ -637,17 +640,17 @@ class _MockServerPageState extends State<MockServerPage>
                       children: <Widget>[
                         TextButton(
                           onPressed: () => Navigator.of(ctx).pop(false),
-                          child: const Text(
-                            'Ləğv et',
-                            style: TextStyle(color: Colors.white60),
+                          child: Text(
+                            context.t('mockserver_cancel'),
+                            style: const TextStyle(color: Colors.white60),
                           ),
                         ),
                         const SizedBox(width: 8),
                         TextButton(
                           onPressed: () => Navigator.of(ctx).pop(true),
-                          child: const Text(
-                            'Yadda saxla',
-                            style: TextStyle(
+                          child: Text(
+                            context.t('mockserver_save'),
+                            style: const TextStyle(
                               color: _accentB,
                               fontWeight: FontWeight.w700,
                             ),
@@ -775,7 +778,7 @@ class _MockServerPageState extends State<MockServerPage>
                     ),
                     const SizedBox(width: 10),
                     Text(
-                      _statusLabel(status),
+                      context.t(_statusKey(status)),
                       style: TextStyle(
                         color: _statusIndicator(status),
                         fontWeight: FontWeight.w700,
@@ -786,9 +789,12 @@ class _MockServerPageState extends State<MockServerPage>
                 ),
                 const SizedBox(height: 14),
                 if (running) ...<Widget>[
-                  const Text(
-                    'Base URL',
-                    style: TextStyle(color: Colors.white54, fontSize: 11),
+                  Text(
+                    context.t('mockserver_base_url'),
+                    style: const TextStyle(
+                      color: Colors.white54,
+                      fontSize: 11,
+                    ),
                   ),
                   const SizedBox(height: 4),
                   Container(
@@ -824,14 +830,14 @@ class _MockServerPageState extends State<MockServerPage>
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Endpointlər: ${_endpoints.where((MockEndpoint e) => e.enabled).length} aktiv',
+                    '${context.t('mockserver_active_endpoints')}: ${_endpoints.where((MockEndpoint e) => e.enabled).length}',
                     style: const TextStyle(
                       color: Colors.white54,
                       fontSize: 11,
                     ),
                   ),
                 ],
-                if (_startError != null) ...<Widget>[
+                if (_startErrorKey != null) ...<Widget>[
                   const SizedBox(height: 10),
                   Container(
                     padding: const EdgeInsets.all(10),
@@ -840,12 +846,29 @@ class _MockServerPageState extends State<MockServerPage>
                       borderRadius: BorderRadius.circular(10),
                       border: Border.all(color: _danger.withOpacity(0.4)),
                     ),
-                    child: Text(
-                      _startError!,
-                      style: const TextStyle(
-                        color: Color(0xFFFFBFBF),
-                        fontSize: 11,
-                      ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Text(
+                          context.t(_startErrorKey!),
+                          style: const TextStyle(
+                            color: Color(0xFFFFBFBF),
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        if (_startErrorDetail != null) ...<Widget>[
+                          const SizedBox(height: 4),
+                          Text(
+                            _startErrorDetail!,
+                            style: const TextStyle(
+                              color: Color(0xFFFFBFBF),
+                              fontSize: 11,
+                              fontFamily: 'monospace',
+                            ),
+                          ),
+                        ],
+                      ],
                     ),
                   ),
                 ],
@@ -853,7 +876,7 @@ class _MockServerPageState extends State<MockServerPage>
                 if (running)
                   _primaryButton(
                     icon: Icons.stop_rounded,
-                    label: 'Serveri dayandır',
+                    label: context.t('mockserver_stop_server'),
                     color: _danger,
                     onTap: _stopServer,
                   )
@@ -862,7 +885,9 @@ class _MockServerPageState extends State<MockServerPage>
                     icon: starting
                         ? Icons.hourglass_top_rounded
                         : Icons.play_arrow_rounded,
-                    label: starting ? 'Başladılır...' : 'Serveri başlat',
+                    label: starting
+                        ? context.t('mockserver_starting')
+                        : context.t('mockserver_start_server'),
                     color: _success,
                     onTap: starting ? null : _startServer,
                   ),
@@ -874,18 +899,21 @@ class _MockServerPageState extends State<MockServerPage>
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
-                const Text(
-                  'Sürətli test',
-                  style: TextStyle(
+                Text(
+                  context.t('mockserver_quick_test'),
+                  style: const TextStyle(
                     color: Colors.white70,
                     fontWeight: FontWeight.w600,
                     fontSize: 13,
                   ),
                 ),
                 const SizedBox(height: 8),
-                const Text(
-                  'Server işə düşdükdən sonra brauzerdə və ya curl ilə yoxla:',
-                  style: TextStyle(color: Colors.white54, fontSize: 11),
+                Text(
+                  context.t('mockserver_quick_test_hint'),
+                  style: const TextStyle(
+                    color: Colors.white54,
+                    fontSize: 11,
+                  ),
                 ),
                 const SizedBox(height: 10),
                 if (running)
@@ -922,9 +950,12 @@ class _MockServerPageState extends State<MockServerPage>
                     ),
                   )
                 else
-                  const Text(
-                    'Server aktiv deyil',
-                    style: TextStyle(color: Colors.white38, fontSize: 11),
+                  Text(
+                    context.t('mockserver_server_inactive'),
+                    style: const TextStyle(
+                      color: Colors.white38,
+                      fontSize: 11,
+                    ),
                   ),
               ],
             ),
@@ -947,16 +978,16 @@ class _MockServerPageState extends State<MockServerPage>
     }
   }
 
-  String _statusLabel(MockServerStatus s) {
+  String _statusKey(MockServerStatus s) {
     switch (s) {
       case MockServerStatus.stopped:
-        return 'Dayandırılıb';
+        return 'mockserver_status_stopped';
       case MockServerStatus.starting:
-        return 'Başladılır...';
+        return 'mockserver_status_starting';
       case MockServerStatus.running:
-        return 'İşləyir';
+        return 'mockserver_status_running';
       case MockServerStatus.error:
-        return 'Xəta';
+        return 'mockserver_status_error';
     }
   }
 
@@ -970,9 +1001,9 @@ class _MockServerPageState extends State<MockServerPage>
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
-                const Text(
-                  'Şəbəkə',
-                  style: TextStyle(
+                Text(
+                  context.t('mockserver_section_network'),
+                  style: const TextStyle(
                     color: Colors.white70,
                     fontWeight: FontWeight.w600,
                     fontSize: 13,
@@ -985,7 +1016,7 @@ class _MockServerPageState extends State<MockServerPage>
                       flex: 3,
                       child: _dialogField(
                         controller: _hostCtrl,
-                        label: 'Host',
+                        label: context.t('mockserver_field_host'),
                         hint: '0.0.0.0',
                       ),
                     ),
@@ -994,7 +1025,7 @@ class _MockServerPageState extends State<MockServerPage>
                       flex: 2,
                       child: _dialogField(
                         controller: _portCtrl,
-                        label: 'Port',
+                        label: context.t('mockserver_field_port'),
                         hint: '8080',
                         numeric: true,
                       ),
@@ -1002,9 +1033,12 @@ class _MockServerPageState extends State<MockServerPage>
                   ],
                 ),
                 const SizedBox(height: 6),
-                const Text(
-                  '0.0.0.0 — bütün interfeyslərə açıqdır (LAN-dan da əlçatandır)',
-                  style: TextStyle(color: Colors.white38, fontSize: 10),
+                Text(
+                  context.t('mockserver_host_hint'),
+                  style: const TextStyle(
+                    color: Colors.white38,
+                    fontSize: 10,
+                  ),
                 ),
               ],
             ),
@@ -1014,9 +1048,9 @@ class _MockServerPageState extends State<MockServerPage>
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
-                const Text(
-                  'Davranış',
-                  style: TextStyle(
+                Text(
+                  context.t('mockserver_section_behavior'),
+                  style: const TextStyle(
                     color: Colors.white70,
                     fontWeight: FontWeight.w600,
                     fontSize: 13,
@@ -1024,7 +1058,7 @@ class _MockServerPageState extends State<MockServerPage>
                 ),
                 const SizedBox(height: 10),
                 _switchRow(
-                  label: 'CORS aktiv',
+                  label: context.t('mockserver_cors'),
                   value: _config.corsEnabled,
                   onChanged: (bool v) {
                     setState(() {
@@ -1039,7 +1073,7 @@ class _MockServerPageState extends State<MockServerPage>
                   },
                 ),
                 _switchRow(
-                  label: 'Sorğuları log et',
+                  label: context.t('mockserver_log_requests'),
                   value: _config.logRequests,
                   onChanged: (bool v) {
                     setState(() {
@@ -1056,7 +1090,7 @@ class _MockServerPageState extends State<MockServerPage>
                 const SizedBox(height: 6),
                 _dialogField(
                   controller: _delayCtrl,
-                  label: 'Qlobal gecikmə (ms)',
+                  label: context.t('mockserver_global_delay'),
                   hint: '0',
                   numeric: true,
                 ),
@@ -1068,18 +1102,18 @@ class _MockServerPageState extends State<MockServerPage>
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
-                const Text(
-                  'Qeyd',
-                  style: TextStyle(
+                Text(
+                  context.t('mockserver_section_note'),
+                  style: const TextStyle(
                     color: Colors.white70,
                     fontWeight: FontWeight.w600,
                     fontSize: 13,
                   ),
                 ),
                 const SizedBox(height: 8),
-                const Text(
-                  'Config dəyişiklikləri yalnız server dayandırılmış halda tətbiq olunur. Serveri yenidən başlat.',
-                  style: TextStyle(
+                Text(
+                  context.t('mockserver_config_note'),
+                  style: const TextStyle(
                     color: Colors.white54,
                     fontSize: 11,
                     height: 1.4,
@@ -1100,8 +1134,8 @@ class _MockServerPageState extends State<MockServerPage>
       return _emptyState(
         icon: Icons.receipt_long_outlined,
         message: _controller.status == MockServerStatus.running
-            ? 'Hələ sorğu gəlməyib'
-            : 'Server başladılmayıb',
+            ? context.t('mockserver_logs_empty_running')
+            : context.t('mockserver_logs_empty_stopped'),
       );
     }
 
@@ -1112,7 +1146,7 @@ class _MockServerPageState extends State<MockServerPage>
           child: Row(
             children: <Widget>[
               Text(
-                '${logs.length} sorğu',
+                '${logs.length} ${context.t('mockserver_requests')}',
                 style: const TextStyle(color: Colors.white60, fontSize: 12),
               ),
               const Spacer(),
@@ -1126,9 +1160,9 @@ class _MockServerPageState extends State<MockServerPage>
                   size: 16,
                   color: _danger,
                 ),
-                label: const Text(
-                  'Təmizlə',
-                  style: TextStyle(color: _danger, fontSize: 12),
+                label: Text(
+                  context.t('mockserver_clear'),
+                  style: const TextStyle(color: _danger, fontSize: 12),
                 ),
               ),
             ],

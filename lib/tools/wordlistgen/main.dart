@@ -11,6 +11,8 @@ import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 
+import '../../core/localization/app_localization.dart';
+
 const Color _accentA = Color(0xFF7C4DFF);
 const Color _accentB = Color(0xFF00E5FF);
 const Color _danger = Color(0xFFFF5C5C);
@@ -20,10 +22,6 @@ const Color _bgTop = Color(0xFF1B1035);
 const Color _bgMid = Color(0xFF2A1550);
 const Color _bgBot = Color(0xFF0F2A4A);
 
-// Hard safety cap: above this estimated combination count we refuse to
-// generate, since the algorithm builds the full result set in memory
-// before writing/sorting it — an unbounded run can freeze or crash the
-// app. The estimate is shown to the user live, before they tap Generate.
 const int _hardCombinationCap = 20000000;
 
 class WordlistGeneratorPage extends StatefulWidget {
@@ -50,7 +48,8 @@ class _WordlistGeneratorPageState extends State<WordlistGeneratorPage> {
 
   bool _generating = false;
   List<String> _generatedList = <String>[];
-  String _status = '';
+  String? _statusKey;
+  String? _statusDetail;
   int _previewLimit = 200;
 
   bool _copied = false;
@@ -76,10 +75,6 @@ class _WordlistGeneratorPageState extends State<WordlistGeneratorPage> {
     super.dispose();
   }
 
-  // -----------------------------------------------------------------
-  // Live combination estimate — lets the person see the scale of the
-  // job *before* they commit to generating it.
-  // -----------------------------------------------------------------
   BigInt _estimateCombinations() {
     final int minLen = int.tryParse(_minLenCtrl.text.trim()) ?? 0;
     final int maxLen = int.tryParse(_maxLenCtrl.text.trim()) ?? 0;
@@ -109,7 +104,8 @@ class _WordlistGeneratorPageState extends State<WordlistGeneratorPage> {
     String charset = _charsetCtrl.text.trim();
     if (_excludeSimilar) {
       const List<String> similar = <String>['0', 'O', 'o', '1', 'l', 'I'];
-      charset = charset.split('').where((String c) => !similar.contains(c)).join();
+      charset =
+          charset.split('').where((String c) => !similar.contains(c)).join();
     }
     return charset.split('').toSet().length;
   }
@@ -127,11 +123,6 @@ class _WordlistGeneratorPageState extends State<WordlistGeneratorPage> {
     return '${v.toStringAsFixed(v < 10 ? 2 : 1)}${units[unit]}';
   }
 
-  // -----------------------------------------------------------------
-  // Generation — runs in a real (killable) isolate so a "Cancel" button
-  // can actually stop a runaway job, unlike Isolate.run which can't be
-  // interrupted once started.
-  // -----------------------------------------------------------------
   Future<void> _generate() async {
     FocusScope.of(context).unfocus();
     final int minLen = int.tryParse(_minLenCtrl.text.trim()) ?? 3;
@@ -139,24 +130,24 @@ class _WordlistGeneratorPageState extends State<WordlistGeneratorPage> {
     final String charset = _charsetCtrl.text.trim();
 
     if (charset.isEmpty) {
-      _showToast('Charset boş ola bilməz');
+      _showToast(context.t('wordlistgen_error_charset_empty'));
       return;
     }
     if (minLen < 1 || maxLen < minLen || maxLen > 20) {
-      _showToast('Uzunluq 1-20 arası olmalıdır (min ≤ max)');
+      _showToast(context.t('wordlistgen_error_length'));
       return;
     }
 
     final Set<String> uniqueChars = charset.split('').toSet();
     if (uniqueChars.length < 2) {
-      _showToast('Charset ən azı 2 fərqli simvol olmalıdır');
+      _showToast(context.t('wordlistgen_error_charset_min'));
       return;
     }
 
     final BigInt estimate = _estimateCombinations();
     if (estimate > BigInt.from(_hardCombinationCap)) {
       _showToast(
-        'Çox böyük: ~${_formatBig(estimate)} kombinasiya. Uzunluğu/charset-i azaldın.',
+        '${context.t('wordlistgen_error_too_big')}: ~${_formatBig(estimate)}',
       );
       return;
     }
@@ -164,8 +155,10 @@ class _WordlistGeneratorPageState extends State<WordlistGeneratorPage> {
     String effectiveCharset = charset;
     if (_excludeSimilar) {
       const List<String> similar = <String>['0', 'O', 'o', '1', 'l', 'I'];
-      effectiveCharset =
-          effectiveCharset.split('').where((String c) => !similar.contains(c)).join();
+      effectiveCharset = effectiveCharset
+          .split('')
+          .where((String c) => !similar.contains(c))
+          .join();
     }
 
     final Map<String, dynamic> params = <String, dynamic>{
@@ -184,7 +177,8 @@ class _WordlistGeneratorPageState extends State<WordlistGeneratorPage> {
     setState(() {
       _generating = true;
       _generatedList = <String>[];
-      _status = 'Hazırlanır...';
+      _statusKey = 'wordlistgen_status_preparing';
+      _statusDetail = null;
       _previewLimit = 200;
     });
 
@@ -206,7 +200,8 @@ class _WordlistGeneratorPageState extends State<WordlistGeneratorPage> {
         setState(() {
           _generatedList = message;
           _generating = false;
-          _status = '${message.length} söz yaradıldı';
+          _statusKey = 'wordlistgen_status_generated';
+          _statusDetail = '${message.length}';
           _lastElapsed = _genStopwatch?.elapsed;
         });
         _history.insert(
@@ -224,7 +219,8 @@ class _WordlistGeneratorPageState extends State<WordlistGeneratorPage> {
       } else {
         setState(() {
           _generating = false;
-          _status = 'Xəta: $message';
+          _statusKey = 'wordlistgen_status_error';
+          _statusDetail = '$message';
         });
         HapticFeedback.heavyImpact();
       }
@@ -233,7 +229,8 @@ class _WordlistGeneratorPageState extends State<WordlistGeneratorPage> {
       if (!mounted) return;
       setState(() {
         _generating = false;
-        _status = 'Xəta: $e';
+        _statusKey = 'wordlistgen_status_error';
+        _statusDetail = '$e';
       });
     }
   }
@@ -245,7 +242,8 @@ class _WordlistGeneratorPageState extends State<WordlistGeneratorPage> {
     _genStopwatch?.stop();
     setState(() {
       _generating = false;
-      _status = 'Ləğv edildi';
+      _statusKey = 'wordlistgen_status_cancelled';
+      _statusDetail = null;
     });
   }
 
@@ -259,7 +257,8 @@ class _WordlistGeneratorPageState extends State<WordlistGeneratorPage> {
     if (_generatedList.isEmpty) return;
     try {
       final Directory dir = await getApplicationDocumentsDirectory();
-      final String fileName = 'wordlist_${DateTime.now().millisecondsSinceEpoch}.txt';
+      final String fileName =
+          'wordlist_${DateTime.now().millisecondsSinceEpoch}.txt';
       final File file = File('${dir.path}/$fileName');
       final IOSink sink = file.openWrite();
       for (final String w in _generatedList) {
@@ -272,10 +271,10 @@ class _WordlistGeneratorPageState extends State<WordlistGeneratorPage> {
       Future<void>.delayed(const Duration(seconds: 2), () {
         if (mounted) setState(() => _saved = false);
       });
-      _showToast('Fayl saxlanıldı: $fileName');
+      _showToast('${context.t('wordlistgen_saved')}: $fileName');
       HapticFeedback.lightImpact();
     } catch (e) {
-      _showToast('Fayl saxlanıla bilmədi: $e');
+      _showToast('${context.t('wordlistgen_error_save')}: $e');
     }
   }
 
@@ -283,7 +282,8 @@ class _WordlistGeneratorPageState extends State<WordlistGeneratorPage> {
     if (_generatedList.isEmpty) return;
     try {
       final Directory dir = await getApplicationDocumentsDirectory();
-      final String fileName = 'wordlist_${DateTime.now().millisecondsSinceEpoch}.txt';
+      final String fileName =
+          'wordlist_${DateTime.now().millisecondsSinceEpoch}.txt';
       final File file = File('${dir.path}/$fileName');
       final IOSink sink = file.openWrite();
       for (final String w in _generatedList) {
@@ -291,9 +291,9 @@ class _WordlistGeneratorPageState extends State<WordlistGeneratorPage> {
       }
       await sink.flush();
       await sink.close();
-      await Share.shareXFiles(<XFile>[XFile(file.path)], text: 'Wordlist');
+      await Share.shareXFiles(<XFile>[XFile(file.path)], text: fileName);
     } catch (e) {
-      _showToast('Paylaşıla bilmədi: $e');
+      _showToast('${context.t('wordlistgen_error_share')}: $e');
     }
   }
 
@@ -306,14 +306,15 @@ class _WordlistGeneratorPageState extends State<WordlistGeneratorPage> {
     Future<void>.delayed(const Duration(seconds: 2), () {
       if (mounted) setState(() => _copied = false);
     });
-    _showToast('Kopyalandı');
+    _showToast(context.t('wordlistgen_copied'));
   }
 
   void _clear() {
     HapticFeedback.lightImpact();
     setState(() {
       _generatedList = <String>[];
-      _status = '';
+      _statusKey = null;
+      _statusDetail = null;
       _previewLimit = 200;
       _lastElapsed = null;
     });
@@ -321,7 +322,9 @@ class _WordlistGeneratorPageState extends State<WordlistGeneratorPage> {
 
   void _loadMorePreview() {
     HapticFeedback.selectionClick();
-    setState(() => _previewLimit = min(_previewLimit + 400, _generatedList.length));
+    setState(
+          () => _previewLimit = min(_previewLimit + 400, _generatedList.length),
+    );
   }
 
   void _showToast(String message) {
@@ -350,28 +353,46 @@ class _WordlistGeneratorPageState extends State<WordlistGeneratorPage> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        title: const Text('Wordlist Generator', style: TextStyle(fontWeight: FontWeight.w700, letterSpacing: -0.4)),
+        title: Text(
+          context.t('wordlistgen_title'),
+          style: const TextStyle(
+            fontWeight: FontWeight.w700,
+            letterSpacing: -0.4,
+          ),
+        ),
         actions: <Widget>[
           if (_generatedList.isNotEmpty)
             _glassIconButton(
-              icon: _saved ? CupertinoIcons.checkmark_alt : CupertinoIcons.arrow_down_doc,
-              tooltip: 'Fayla saxla',
+              icon: _saved
+                  ? CupertinoIcons.checkmark_alt
+                  : CupertinoIcons.arrow_down_doc,
+              tooltip: context.t('wordlistgen_save_file'),
               onTap: _saveToFile,
               highlighted: _saved,
             ),
           const SizedBox(width: 4),
           if (_generatedList.isNotEmpty)
-            _glassIconButton(icon: CupertinoIcons.share, tooltip: 'Paylaş', onTap: _shareFile),
+            _glassIconButton(
+              icon: CupertinoIcons.share,
+              tooltip: context.t('wordlistgen_share'),
+              onTap: _shareFile,
+            ),
           const SizedBox(width: 4),
           if (_generatedList.isNotEmpty)
             _glassIconButton(
-              icon: _copied ? CupertinoIcons.checkmark_alt : CupertinoIcons.doc_on_doc,
-              tooltip: 'Kopyala',
+              icon: _copied
+                  ? CupertinoIcons.checkmark_alt
+                  : CupertinoIcons.doc_on_doc,
+              tooltip: context.t('wordlistgen_copy'),
               onTap: _copyAll,
               highlighted: _copied,
             ),
           const SizedBox(width: 4),
-          _glassIconButton(icon: CupertinoIcons.refresh, tooltip: 'Təmizlə', onTap: _clear),
+          _glassIconButton(
+            icon: CupertinoIcons.refresh,
+            tooltip: context.t('wordlistgen_clear'),
+            onTap: _clear,
+          ),
           const SizedBox(width: 8),
         ],
       ),
@@ -419,22 +440,36 @@ class _WordlistGeneratorPageState extends State<WordlistGeneratorPage> {
                               children: <Widget>[
                                 Expanded(
                                   child: Text(
-                                    _status,
-                                    style: const TextStyle(color: Colors.white70, fontSize: 12),
+                                    _statusKey != null
+                                        ? context.t(_statusKey!)
+                                        : '',
+                                    style: const TextStyle(
+                                      color: Colors.white70,
+                                      fontSize: 12,
+                                    ),
                                   ),
                                 ),
                                 GestureDetector(
                                   onTap: _cancelGeneration,
                                   child: Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 10,
+                                      vertical: 5,
+                                    ),
                                     decoration: BoxDecoration(
                                       color: _danger.withOpacity(0.15),
                                       borderRadius: BorderRadius.circular(8),
-                                      border: Border.all(color: _danger.withOpacity(0.4)),
+                                      border: Border.all(
+                                        color: _danger.withOpacity(0.4),
+                                      ),
                                     ),
-                                    child: const Text(
-                                      'Ləğv et',
-                                      style: TextStyle(color: _danger, fontSize: 11, fontWeight: FontWeight.w600),
+                                    child: Text(
+                                      context.t('wordlistgen_cancel'),
+                                      style: const TextStyle(
+                                        color: _danger,
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.w600,
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -444,26 +479,41 @@ class _WordlistGeneratorPageState extends State<WordlistGeneratorPage> {
                         ),
                       ),
                     ],
-                    if (!_generating && _status.isNotEmpty) ...<Widget>[
+                    if (!_generating &&
+                        _statusKey != null &&
+                        _statusKey!.isNotEmpty) ...<Widget>[
                       const SizedBox(height: 14),
                       _GlassCard(
                         child: Row(
                           children: <Widget>[
                             Icon(
-                              _status.startsWith('Xəta')
+                              _statusKey == 'wordlistgen_status_error'
                                   ? CupertinoIcons.exclamationmark_triangle
                                   : CupertinoIcons.check_mark_circled,
-                              color: _status.startsWith('Xəta') ? _danger : _success,
+                              color: _statusKey == 'wordlistgen_status_error'
+                                  ? _danger
+                                  : _success,
                               size: 18,
                             ),
                             const SizedBox(width: 10),
                             Expanded(
-                              child: Text(_status, style: const TextStyle(color: Colors.white70, fontSize: 12)),
+                              child: Text(
+                                _statusDetail != null
+                                    ? '${context.t(_statusKey!)} ${_statusDetail!}'
+                                    : context.t(_statusKey!),
+                                style: const TextStyle(
+                                  color: Colors.white70,
+                                  fontSize: 12,
+                                ),
+                              ),
                             ),
                             if (_lastElapsed != null)
                               Text(
                                 '${_lastElapsed!.inMilliseconds}ms',
-                                style: TextStyle(color: Colors.white.withOpacity(0.35), fontSize: 11),
+                                style: TextStyle(
+                                  color: Colors.white.withOpacity(0.35),
+                                  fontSize: 11,
+                                ),
                               ),
                           ],
                         ),
@@ -488,12 +538,16 @@ class _WordlistGeneratorPageState extends State<WordlistGeneratorPage> {
   }
 
   Widget _buildEstimateCard(BigInt estimate, bool tooBig) {
-    final Color color = tooBig ? _danger : (estimate > BigInt.from(200000) ? _warning : _success);
+    final Color color = tooBig
+        ? _danger
+        : (estimate > BigInt.from(200000) ? _warning : _success);
     return _GlassCard(
       child: Row(
         children: <Widget>[
           Icon(
-            tooBig ? CupertinoIcons.exclamationmark_triangle_fill : CupertinoIcons.chart_bar_alt_fill,
+            tooBig
+                ? CupertinoIcons.exclamationmark_triangle_fill
+                : CupertinoIcons.chart_bar_alt_fill,
             size: 18,
             color: color,
           ),
@@ -503,14 +557,21 @@ class _WordlistGeneratorPageState extends State<WordlistGeneratorPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 Text(
-                  '~${_formatBig(estimate)} kombinasiya',
-                  style: TextStyle(color: color, fontWeight: FontWeight.w700, fontSize: 14),
+                  '~${_formatBig(estimate)}',
+                  style: TextStyle(
+                    color: color,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 14,
+                  ),
                 ),
                 Text(
                   tooBig
-                      ? 'Limitdən (${_formatBig(BigInt.from(_hardCombinationCap))}) böyükdür — parametrləri azaldın'
-                      : 'Generate düyməsinə basmazdan əvvəlki təxmini say',
-                  style: const TextStyle(color: Colors.white38, fontSize: 11),
+                      ? '${context.t('wordlistgen_estimate_too_big')} (${_formatBig(BigInt.from(_hardCombinationCap))})'
+                      : context.t('wordlistgen_estimate_hint'),
+                  style: const TextStyle(
+                    color: Colors.white38,
+                    fontSize: 11,
+                  ),
                 ),
               ],
             ),
@@ -525,14 +586,17 @@ class _WordlistGeneratorPageState extends State<WordlistGeneratorPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          _sectionTitle(CupertinoIcons.arrow_left_right, 'Uzunluq aralığı'),
+          _sectionTitle(
+            CupertinoIcons.arrow_left_right,
+            context.t('wordlistgen_section_length'),
+          ),
           const SizedBox(height: 10),
           Row(
             children: <Widget>[
               Expanded(
                 child: _inlineField(
                   controller: _minLenCtrl,
-                  label: 'Min',
+                  label: context.t('wordlistgen_min'),
                   keyboard: TextInputType.number,
                   onChanged: () => setState(() {}),
                 ),
@@ -541,7 +605,7 @@ class _WordlistGeneratorPageState extends State<WordlistGeneratorPage> {
               Expanded(
                 child: _inlineField(
                   controller: _maxLenCtrl,
-                  label: 'Max',
+                  label: context.t('wordlistgen_max'),
                   keyboard: TextInputType.number,
                   onChanged: () => setState(() {}),
                 ),
@@ -549,7 +613,10 @@ class _WordlistGeneratorPageState extends State<WordlistGeneratorPage> {
             ],
           ),
           const SizedBox(height: 8),
-          const Text('Uzunluq 1-20 arası ola bilər', style: TextStyle(color: Colors.white38, fontSize: 11)),
+          Text(
+            context.t('wordlistgen_length_hint'),
+            style: const TextStyle(color: Colors.white38, fontSize: 11),
+          ),
         ],
       ),
     );
@@ -560,15 +627,24 @@ class _WordlistGeneratorPageState extends State<WordlistGeneratorPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          _sectionTitle(CupertinoIcons.textformat_abc, 'Simvol dəsti'),
+          _sectionTitle(
+            CupertinoIcons.textformat_abc,
+            context.t('wordlistgen_section_charset'),
+          ),
           const SizedBox(height: 10),
           TextField(
             controller: _charsetCtrl,
             maxLines: 3,
             minLines: 2,
             onChanged: (_) => setState(() {}),
-            style: const TextStyle(color: Colors.white, fontSize: 13, fontFamily: 'monospace'),
-            decoration: _inputDecoration('Məsələn: abc123'),
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 13,
+              fontFamily: 'monospace',
+            ),
+            decoration: _inputDecoration(
+              context.t('wordlistgen_charset_hint'),
+            ),
           ),
           const SizedBox(height: 8),
           Wrap(
@@ -621,35 +697,39 @@ class _WordlistGeneratorPageState extends State<WordlistGeneratorPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          _sectionTitle(CupertinoIcons.slider_horizontal_3, 'Seçimlər'),
+          _sectionTitle(
+            CupertinoIcons.slider_horizontal_3,
+            context.t('wordlistgen_section_options'),
+          ),
           const SizedBox(height: 6),
           _switchRow(
-            label: 'Təkrar simvollara icazə ver',
+            label: context.t('wordlistgen_allow_repeats'),
             value: _allowRepeats,
             onChanged: (bool v) => setState(() => _allowRepeats = v),
           ),
           if (_allowRepeats) ...<Widget>[
             const SizedBox(height: 4),
             _sliderRow(
-              label: 'Maks. ardıcıl təkrar',
+              label: context.t('wordlistgen_max_consecutive'),
               value: _maxConsecutiveRepeats.toDouble(),
               min: 1,
               max: 5,
-              onChanged: (double v) => setState(() => _maxConsecutiveRepeats = v.round()),
+              onChanged: (double v) =>
+                  setState(() => _maxConsecutiveRepeats = v.round()),
             ),
           ],
           _switchRow(
-            label: 'Bənzər simvolları çıxar (0/O, 1/l/I)',
+            label: context.t('wordlistgen_exclude_similar'),
             value: _excludeSimilar,
             onChanged: (bool v) => setState(() => _excludeSimilar = v),
           ),
           _switchRow(
-            label: 'Böyük/kiçik variantlar (case)',
+            label: context.t('wordlistgen_case_variations'),
             value: _caseVariations,
             onChanged: (bool v) => setState(() => _caseVariations = v),
           ),
           _switchRow(
-            label: 'Leet çevrilmə (a→4, e→3, i→1, o→0, s→5)',
+            label: context.t('wordlistgen_leet_variations'),
             value: _leetVariations,
             onChanged: (bool v) => setState(() => _leetVariations = v),
           ),
@@ -663,17 +743,33 @@ class _WordlistGeneratorPageState extends State<WordlistGeneratorPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          _sectionTitle(CupertinoIcons.link, 'Prefiks / Suffiks'),
+          _sectionTitle(
+            CupertinoIcons.link,
+            context.t('wordlistgen_section_affix'),
+          ),
           const SizedBox(height: 10),
           Row(
             children: <Widget>[
-              Expanded(child: _inlineField(controller: _prefixCtrl, label: 'Prefiks')),
+              Expanded(
+                child: _inlineField(
+                  controller: _prefixCtrl,
+                  label: context.t('wordlistgen_prefix'),
+                ),
+              ),
               const SizedBox(width: 10),
-              Expanded(child: _inlineField(controller: _suffixCtrl, label: 'Suffiks')),
+              Expanded(
+                child: _inlineField(
+                  controller: _suffixCtrl,
+                  label: context.t('wordlistgen_suffix'),
+                ),
+              ),
             ],
           ),
           const SizedBox(height: 10),
-          _inlineField(controller: _separatorCtrl, label: 'Ayırıcı (məsələn: - və ya _)'),
+          _inlineField(
+            controller: _separatorCtrl,
+            label: context.t('wordlistgen_separator'),
+          ),
         ],
       ),
     );
@@ -693,21 +789,31 @@ class _WordlistGeneratorPageState extends State<WordlistGeneratorPage> {
             child: Container(
               padding: const EdgeInsets.symmetric(vertical: 16),
               decoration: const BoxDecoration(
-                gradient: LinearGradient(colors: <Color>[_accentA, _accentB]),
+                gradient: LinearGradient(
+                  colors: <Color>[_accentA, _accentB],
+                ),
                 borderRadius: BorderRadius.all(Radius.circular(14)),
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   Icon(
-                    _generating ? CupertinoIcons.hourglass : CupertinoIcons.sparkles,
+                    _generating
+                        ? CupertinoIcons.hourglass
+                        : CupertinoIcons.sparkles,
                     color: Colors.white,
                     size: 20,
                   ),
                   const SizedBox(width: 10),
                   Text(
-                    _generating ? 'Yaradılır...' : 'Wordlist yarat',
-                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 14),
+                    _generating
+                        ? context.t('wordlistgen_generating')
+                        : context.t('wordlistgen_generate'),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w700,
+                      fontSize: 14,
+                    ),
                   ),
                 ],
               ),
@@ -726,9 +832,15 @@ class _WordlistGeneratorPageState extends State<WordlistGeneratorPage> {
         children: <Widget>[
           Row(
             children: <Widget>[
-              Expanded(child: _sectionTitle(CupertinoIcons.list_bullet, 'Önizləmə (ilk $previewCount)')),
+              Expanded(
+                child: _sectionTitle(
+                  CupertinoIcons.list_bullet,
+                  '${context.t('wordlistgen_preview')} ($previewCount)',
+                ),
+              ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                padding:
+                const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
                   color: _accentB.withOpacity(0.15),
                   borderRadius: BorderRadius.circular(6),
@@ -762,7 +874,11 @@ class _WordlistGeneratorPageState extends State<WordlistGeneratorPage> {
                   padding: const EdgeInsets.symmetric(vertical: 2),
                   child: Text(
                     _generatedList[i],
-                    style: const TextStyle(color: Colors.white, fontFamily: 'monospace', fontSize: 12),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontFamily: 'monospace',
+                      fontSize: 12,
+                    ),
                   ),
                 );
               },
@@ -780,9 +896,13 @@ class _WordlistGeneratorPageState extends State<WordlistGeneratorPage> {
                   border: Border.all(color: Colors.white.withOpacity(0.15)),
                 ),
                 child: Text(
-                  'Daha çox göstər (+${min(400, _generatedList.length - previewCount)})',
+                  '${context.t('wordlistgen_load_more')} (+${min(400, _generatedList.length - previewCount)})',
                   textAlign: TextAlign.center,
-                  style: const TextStyle(color: Colors.white70, fontSize: 12, fontWeight: FontWeight.w600),
+                  style: const TextStyle(
+                    color: Colors.white70,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
             ),
@@ -797,7 +917,10 @@ class _WordlistGeneratorPageState extends State<WordlistGeneratorPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          _sectionTitle(CupertinoIcons.clock, 'Son yaradılanlar'),
+          _sectionTitle(
+            CupertinoIcons.clock,
+            context.t('wordlistgen_history'),
+          ),
           const SizedBox(height: 8),
           ..._history.map((_RunHistoryItem h) {
             final String hh = h.at.hour.toString().padLeft(2, '0');
@@ -806,15 +929,28 @@ class _WordlistGeneratorPageState extends State<WordlistGeneratorPage> {
               padding: const EdgeInsets.symmetric(vertical: 5),
               child: Row(
                 children: <Widget>[
-                  const Icon(CupertinoIcons.doc_text, size: 13, color: _accentA),
+                  const Icon(
+                    CupertinoIcons.doc_text,
+                    size: 13,
+                    color: _accentA,
+                  ),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      '${h.count} söz · uz. ${h.minLen}-${h.maxLen} · ${h.charsetLen} simvol',
-                      style: const TextStyle(color: Colors.white70, fontSize: 12),
+                      '${h.count} · ${h.minLen}-${h.maxLen} · ${h.charsetLen}',
+                      style: const TextStyle(
+                        color: Colors.white70,
+                        fontSize: 12,
+                      ),
                     ),
                   ),
-                  Text('$hh:$mm', style: TextStyle(color: Colors.white.withOpacity(0.3), fontSize: 11)),
+                  Text(
+                    '$hh:$mm',
+                    style: TextStyle(
+                      color: Colors.white.withOpacity(0.3),
+                      fontSize: 11,
+                    ),
+                  ),
                 ],
               ),
             );
@@ -830,18 +966,34 @@ class _WordlistGeneratorPageState extends State<WordlistGeneratorPage> {
         Icon(icon, size: 16, color: Colors.white70),
         const SizedBox(width: 8),
         Expanded(
-          child: Text(text, style: const TextStyle(color: Colors.white70, fontWeight: FontWeight.w600, fontSize: 13)),
+          child: Text(
+            text,
+            style: const TextStyle(
+              color: Colors.white70,
+              fontWeight: FontWeight.w600,
+              fontSize: 13,
+            ),
+          ),
         ),
       ],
     );
   }
 
-  Widget _switchRow({required String label, required bool value, required ValueChanged<bool> onChanged}) {
+  Widget _switchRow({
+    required String label,
+    required bool value,
+    required ValueChanged<bool> onChanged,
+  }) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 2),
       child: Row(
         children: <Widget>[
-          Expanded(child: Text(label, style: const TextStyle(color: Colors.white70, fontSize: 12))),
+          Expanded(
+            child: Text(
+              label,
+              style: const TextStyle(color: Colors.white70, fontSize: 12),
+            ),
+          ),
           Transform.scale(
             scale: 0.85,
             child: CupertinoSwitch(
@@ -872,13 +1024,29 @@ class _WordlistGeneratorPageState extends State<WordlistGeneratorPage> {
         children: <Widget>[
           Row(
             children: <Widget>[
-              Expanded(child: Text(label, style: const TextStyle(color: Colors.white70, fontSize: 12))),
+              Expanded(
+                child: Text(
+                  label,
+                  style: const TextStyle(color: Colors.white70, fontSize: 12),
+                ),
+              ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                decoration: BoxDecoration(color: _accentB.withOpacity(0.15), borderRadius: BorderRadius.circular(6)),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 8,
+                  vertical: 3,
+                ),
+                decoration: BoxDecoration(
+                  color: _accentB.withOpacity(0.15),
+                  borderRadius: BorderRadius.circular(6),
+                ),
                 child: Text(
                   '${value.round()}',
-                  style: const TextStyle(color: _accentB, fontSize: 11, fontWeight: FontWeight.w700, fontFamily: 'monospace'),
+                  style: const TextStyle(
+                    color: _accentB,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
+                    fontFamily: 'monospace',
+                  ),
                 ),
               ),
             ],
@@ -913,15 +1081,23 @@ class _WordlistGeneratorPageState extends State<WordlistGeneratorPage> {
       controller: controller,
       keyboardType: keyboard,
       onChanged: (_) => onChanged?.call(),
-      style: const TextStyle(color: Colors.white, fontSize: 13, fontFamily: 'monospace'),
+      style: const TextStyle(
+        color: Colors.white,
+        fontSize: 13,
+        fontFamily: 'monospace',
+      ),
       decoration: InputDecoration(
         labelText: label,
         labelStyle: const TextStyle(color: Colors.white38, fontSize: 11),
         hintText: label,
-        hintStyle: TextStyle(color: Colors.white.withOpacity(0.25), fontSize: 12),
+        hintStyle: TextStyle(
+          color: Colors.white.withOpacity(0.25),
+          fontSize: 12,
+        ),
         filled: true,
         fillColor: Colors.white.withOpacity(0.06),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+        contentPadding:
+        const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
           borderSide: BorderSide(color: Colors.white.withOpacity(0.15)),
@@ -941,7 +1117,11 @@ class _WordlistGeneratorPageState extends State<WordlistGeneratorPage> {
   InputDecoration _inputDecoration(String hint) {
     return InputDecoration(
       hintText: hint,
-      hintStyle: TextStyle(color: Colors.white.withOpacity(0.28), fontSize: 12, fontFamily: 'monospace'),
+      hintStyle: TextStyle(
+        color: Colors.white.withOpacity(0.28),
+        fontSize: 12,
+        fontFamily: 'monospace',
+      ),
       filled: true,
       fillColor: Colors.white.withOpacity(0.05),
       contentPadding: const EdgeInsets.all(12),
@@ -973,12 +1153,18 @@ class _WordlistGeneratorPageState extends State<WordlistGeneratorPage> {
         child: BackdropFilter(
           filter: ui.ImageFilter.blur(sigmaX: 10, sigmaY: 10),
           child: Material(
-            color: highlighted ? _success.withOpacity(0.25) : Colors.white.withOpacity(0.08),
+            color: highlighted
+                ? _success.withOpacity(0.25)
+                : Colors.white.withOpacity(0.08),
             child: InkWell(
               onTap: onTap,
               child: Padding(
                 padding: const EdgeInsets.all(8),
-                child: Icon(icon, size: 18, color: highlighted ? _success : Colors.white),
+                child: Icon(
+                  icon,
+                  size: 18,
+                  color: highlighted ? _success : Colors.white,
+                ),
               ),
             ),
           ),
@@ -995,7 +1181,10 @@ class _WordlistGeneratorPageState extends State<WordlistGeneratorPage> {
           child: Container(
             width: size,
             height: size,
-            decoration: BoxDecoration(shape: BoxShape.circle, color: color.withOpacity(0.35)),
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: color.withOpacity(0.35),
+            ),
           ),
         ),
       ),
@@ -1049,8 +1238,16 @@ class _GlassCard extends StatelessWidget {
             borderRadius: BorderRadius.circular(radius),
             border: Border.all(color: Colors.white.withOpacity(0.2)),
             boxShadow: <BoxShadow>[
-              BoxShadow(color: Colors.black.withOpacity(0.25), blurRadius: 24, offset: const Offset(0, 12)),
-              BoxShadow(color: Colors.white.withOpacity(0.06), blurRadius: 1, offset: const Offset(0, 1)),
+              BoxShadow(
+                color: Colors.black.withOpacity(0.25),
+                blurRadius: 24,
+                offset: const Offset(0, 12),
+              ),
+              BoxShadow(
+                color: Colors.white.withOpacity(0.06),
+                blurRadius: 1,
+                offset: const Offset(0, 1),
+              ),
             ],
           ),
           child: child,
@@ -1081,7 +1278,10 @@ class _ToastBubble extends StatelessWidget {
             child: Text(
               message,
               textAlign: TextAlign.center,
-              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w500),
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w500,
+              ),
             ),
           ),
         ),
@@ -1089,10 +1289,6 @@ class _ToastBubble extends StatelessWidget {
     );
   }
 }
-
-// ============================================================
-// Isolate entry point — must be top-level/static so it can be spawned.
-// ============================================================
 
 void _isolateEntry(List<dynamic> args) {
   final SendPort sendPort = args[0] as SendPort;
@@ -1156,7 +1352,15 @@ void _generateForLength({
 
   void recurse(int depth, String current, String lastChar, int repeatCount) {
     if (depth == length) {
-      _emit(current, prefix, suffix, separator, caseVariations, leetVariations, results);
+      _emit(
+        current,
+        prefix,
+        suffix,
+        separator,
+        caseVariations,
+        leetVariations,
+        results,
+      );
       return;
     }
 
@@ -1186,7 +1390,8 @@ void _emit(
   final List<String> variants = <String>[base];
 
   if (caseVariations) {
-    final List<String> caseVariants = <String>{base, base.toUpperCase(), base.toLowerCase()}.toList();
+    final List<String> caseVariants =
+    <String>{base, base.toUpperCase(), base.toLowerCase()}.toList();
     variants.addAll(caseVariants);
   }
 
@@ -1196,7 +1401,9 @@ void _emit(
 
   for (final String v in variants) {
     if (prefix.isNotEmpty || suffix.isNotEmpty) {
-      final String joined = <String>[prefix, v, suffix].where((String s) => s.isNotEmpty).join(separator);
+      final String joined = <String>[prefix, v, suffix]
+          .where((String s) => s.isNotEmpty)
+          .join(separator);
       results.add(joined);
     } else {
       results.add(v);

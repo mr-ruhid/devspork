@@ -1,6 +1,9 @@
 import 'dart:ui' as ui;
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+
+import '../../core/localization/app_localization.dart';
 import 'generator.dart';
 import 'models.dart';
 
@@ -102,32 +105,32 @@ class _K8sGenState extends State<K8sGen> {
     });
   }
 
-  String _typeLabel(K8sResourceType t) {
+  String _typeKey(K8sResourceType t) {
     switch (t) {
       case K8sResourceType.deployment:
-        return 'Deployment';
+        return 'k8sgen_type_deployment';
       case K8sResourceType.statefulSet:
-        return 'StatefulSet';
+        return 'k8sgen_type_statefulset';
       case K8sResourceType.daemonSet:
-        return 'DaemonSet';
+        return 'k8sgen_type_daemonset';
       case K8sResourceType.service:
-        return 'Service';
+        return 'k8sgen_type_service';
       case K8sResourceType.configMap:
-        return 'ConfigMap';
+        return 'k8sgen_type_configmap';
       case K8sResourceType.secret:
-        return 'Secret';
+        return 'k8sgen_type_secret';
       case K8sResourceType.ingress:
-        return 'Ingress';
+        return 'k8sgen_type_ingress';
       case K8sResourceType.namespace:
-        return 'Namespace';
+        return 'k8sgen_type_namespace';
       case K8sResourceType.pvc:
-        return 'PVC';
+        return 'k8sgen_type_pvc';
       case K8sResourceType.cronJob:
-        return 'CronJob';
+        return 'k8sgen_type_cronjob';
       case K8sResourceType.job:
-        return 'Job';
+        return 'k8sgen_type_job';
       case K8sResourceType.hpa:
-        return 'HPA';
+        return 'k8sgen_type_hpa';
     }
   }
 
@@ -168,11 +171,11 @@ class _K8sGenState extends State<K8sGen> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        title: const Text('Kubernetes YAML Generator'),
+        title: Text(context.t('k8sgen_title')),
         actions: <Widget>[
           _glassIconButton(
             icon: _copied ? Icons.check_rounded : Icons.copy_rounded,
-            tooltip: 'Kopyala',
+            tooltip: context.t('k8sgen_copy'),
             onTap: _copy,
             highlighted: _copied,
           ),
@@ -240,7 +243,8 @@ class _K8sGenState extends State<K8sGen> {
               padding: const EdgeInsets.symmetric(horizontal: 14),
               decoration: BoxDecoration(
                 gradient: selected
-                    ? const LinearGradient(colors: <Color>[_accentA, _accentB])
+                    ? const LinearGradient(
+                    colors: <Color>[_accentA, _accentB])
                     : null,
                 color: selected ? null : Colors.white.withOpacity(0.06),
                 borderRadius: BorderRadius.circular(12),
@@ -253,14 +257,10 @@ class _K8sGenState extends State<K8sGen> {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
-                  Icon(
-                    _typeIcon(t),
-                    size: 14,
-                    color: Colors.white,
-                  ),
+                  Icon(_typeIcon(t), size: 14, color: Colors.white),
                   const SizedBox(width: 6),
                   Text(
-                    _typeLabel(t),
+                    context.t(_typeKey(t)),
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 12,
@@ -316,7 +316,7 @@ class _K8sGenState extends State<K8sGen> {
           _metadataCard(_configMap.metadata),
           const SizedBox(height: 14),
           _buildKeyValueCard(
-            title: 'Data',
+            titleKey: 'k8sgen_section_data',
             icon: Icons.data_object_rounded,
             map: _configMap.data,
           ),
@@ -328,7 +328,7 @@ class _K8sGenState extends State<K8sGen> {
           _buildSecretFields(),
           const SizedBox(height: 14),
           _buildKeyValueCard(
-            title: 'Data',
+            titleKey: 'k8sgen_section_data',
             icon: Icons.lock_outline_rounded,
             map: _secret.data,
           ),
@@ -344,9 +344,7 @@ class _K8sGenState extends State<K8sGen> {
           _buildIngressTlsCard(),
         ];
       case K8sResourceType.namespace:
-        return <Widget>[
-          _metadataCard(_namespace),
-        ];
+        return <Widget>[_metadataCard(_namespace)];
       case K8sResourceType.pvc:
         return <Widget>[
           _metadataCard(_pvc.metadata),
@@ -383,12 +381,15 @@ class _K8sGenState extends State<K8sGen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          _sectionTitle(Icons.info_outline_rounded, 'Metadata'),
+          _sectionTitle(
+            Icons.info_outline_rounded,
+            context.t('k8sgen_section_metadata'),
+          ),
           const SizedBox(height: 10),
           _field(
-            label: 'Name',
+            label: context.t('k8sgen_field_name'),
             value: m.name,
-            hint: 'my-app',
+            hint: context.t('k8sgen_hint_name'),
             onChanged: (String v) {
               m.name = v;
               _regenerate();
@@ -397,9 +398,9 @@ class _K8sGenState extends State<K8sGen> {
           const SizedBox(height: 10),
           if (_type != K8sResourceType.namespace)
             _field(
-              label: 'Namespace',
+              label: context.t('k8sgen_field_namespace'),
               value: m.namespace,
-              hint: 'default',
+              hint: context.t('k8sgen_hint_namespace'),
               onChanged: (String v) {
                 m.namespace = v;
                 _regenerate();
@@ -407,14 +408,14 @@ class _K8sGenState extends State<K8sGen> {
             ),
           const SizedBox(height: 10),
           _buildMapEditor(
-            title: 'Labels',
+            titleKey: 'k8sgen_section_labels',
             map: m.labels,
             keyPresets: _labelPresets,
             onChanged: _regenerate,
           ),
           const SizedBox(height: 10),
           _buildMapEditor(
-            title: 'Annotations',
+            titleKey: 'k8sgen_section_annotations',
             map: m.annotations,
             keyPresets: const <String>[],
             onChanged: _regenerate,
@@ -429,10 +430,13 @@ class _K8sGenState extends State<K8sGen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          _sectionTitle(Icons.tune_rounded, 'Deployment'),
+          _sectionTitle(
+            Icons.tune_rounded,
+            context.t('k8sgen_section_deployment'),
+          ),
           const SizedBox(height: 10),
           _numberField(
-            label: 'Replicas',
+            label: context.t('k8sgen_field_replicas'),
             value: _deployment.replicas,
             onChanged: (int v) {
               _deployment.replicas = v;
@@ -444,7 +448,7 @@ class _K8sGenState extends State<K8sGen> {
             children: <Widget>[
               Expanded(
                 child: _field(
-                  label: 'Selector key',
+                  label: context.t('k8sgen_field_selector_key'),
                   value: _deployment.selectorKey,
                   hint: 'app',
                   onChanged: (String v) {
@@ -456,9 +460,9 @@ class _K8sGenState extends State<K8sGen> {
               const SizedBox(width: 10),
               Expanded(
                 child: _field(
-                  label: 'Selector value',
+                  label: context.t('k8sgen_field_selector_value'),
                   value: _deployment.selectorValue,
-                  hint: '(name)',
+                  hint: context.t('k8sgen_hint_name_optional'),
                   onChanged: (String v) {
                     _deployment.selectorValue = v;
                     _regenerate();
@@ -477,10 +481,13 @@ class _K8sGenState extends State<K8sGen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          _sectionTitle(Icons.tune_rounded, 'StatefulSet'),
+          _sectionTitle(
+            Icons.tune_rounded,
+            context.t('k8sgen_section_statefulset'),
+          ),
           const SizedBox(height: 10),
           _numberField(
-            label: 'Replicas',
+            label: context.t('k8sgen_field_replicas'),
             value: _statefulSet.replicas,
             onChanged: (int v) {
               _statefulSet.replicas = v;
@@ -489,9 +496,9 @@ class _K8sGenState extends State<K8sGen> {
           ),
           const SizedBox(height: 10),
           _field(
-            label: 'Service Name',
+            label: context.t('k8sgen_field_service_name'),
             value: _statefulSet.serviceName,
-            hint: '(name)',
+            hint: context.t('k8sgen_hint_name_optional'),
             onChanged: (String v) {
               _statefulSet.serviceName = v;
               _regenerate();
@@ -502,7 +509,7 @@ class _K8sGenState extends State<K8sGen> {
             children: <Widget>[
               Expanded(
                 child: _field(
-                  label: 'Selector key',
+                  label: context.t('k8sgen_field_selector_key'),
                   value: _statefulSet.selectorKey,
                   hint: 'app',
                   onChanged: (String v) {
@@ -514,9 +521,9 @@ class _K8sGenState extends State<K8sGen> {
               const SizedBox(width: 10),
               Expanded(
                 child: _field(
-                  label: 'Selector value',
+                  label: context.t('k8sgen_field_selector_value'),
                   value: _statefulSet.selectorValue,
-                  hint: '(name)',
+                  hint: context.t('k8sgen_hint_name_optional'),
                   onChanged: (String v) {
                     _statefulSet.selectorValue = v;
                     _regenerate();
@@ -535,13 +542,16 @@ class _K8sGenState extends State<K8sGen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          _sectionTitle(Icons.tune_rounded, 'DaemonSet'),
+          _sectionTitle(
+            Icons.tune_rounded,
+            context.t('k8sgen_section_daemonset'),
+          ),
           const SizedBox(height: 10),
           Row(
             children: <Widget>[
               Expanded(
                 child: _field(
-                  label: 'Selector key',
+                  label: context.t('k8sgen_field_selector_key'),
                   value: _daemonSet.selectorKey,
                   hint: 'app',
                   onChanged: (String v) {
@@ -553,9 +563,9 @@ class _K8sGenState extends State<K8sGen> {
               const SizedBox(width: 10),
               Expanded(
                 child: _field(
-                  label: 'Selector value',
+                  label: context.t('k8sgen_field_selector_value'),
                   value: _daemonSet.selectorValue,
-                  hint: '(name)',
+                  hint: context.t('k8sgen_hint_name_optional'),
                   onChanged: (String v) {
                     _daemonSet.selectorValue = v;
                     _regenerate();
@@ -580,10 +590,13 @@ class _K8sGenState extends State<K8sGen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          _sectionTitle(Icons.tune_rounded, 'Service'),
+          _sectionTitle(
+            Icons.tune_rounded,
+            context.t('k8sgen_section_service'),
+          ),
           const SizedBox(height: 10),
           _enumField(
-            label: 'Type',
+            label: context.t('k8sgen_field_type'),
             value: _service.type,
             values: types,
             onChanged: (String v) {
@@ -596,7 +609,7 @@ class _K8sGenState extends State<K8sGen> {
             children: <Widget>[
               Expanded(
                 child: _field(
-                  label: 'Selector key',
+                  label: context.t('k8sgen_field_selector_key'),
                   value: _service.selectorKey,
                   hint: 'app',
                   onChanged: (String v) {
@@ -608,9 +621,9 @@ class _K8sGenState extends State<K8sGen> {
               const SizedBox(width: 10),
               Expanded(
                 child: _field(
-                  label: 'Selector value',
+                  label: context.t('k8sgen_field_selector_value'),
                   value: _service.selectorValue,
-                  hint: '(name)',
+                  hint: context.t('k8sgen_hint_name_optional'),
                   onChanged: (String v) {
                     _service.selectorValue = v;
                     _regenerate();
@@ -621,9 +634,9 @@ class _K8sGenState extends State<K8sGen> {
           ),
           const SizedBox(height: 10),
           _field(
-            label: 'Cluster IP (optional)',
+            label: context.t('k8sgen_field_cluster_ip'),
             value: _service.clusterIP,
-            hint: 'None / 10.0.0.1',
+            hint: context.t('k8sgen_hint_cluster_ip'),
             onChanged: (String v) {
               _service.clusterIP = v;
               _regenerate();
@@ -639,13 +652,15 @@ class _K8sGenState extends State<K8sGen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          _sectionTitle(Icons.settings_ethernet_rounded, 'Ports'),
+          _sectionTitle(
+            Icons.settings_ethernet_rounded,
+            context.t('k8sgen_section_ports'),
+          ),
           const SizedBox(height: 10),
-          for (int i = 0; i < _service.ports.length; i++)
-            _servicePortRow(i),
+          for (int i = 0; i < _service.ports.length; i++) _servicePortRow(i),
           const SizedBox(height: 8),
           _dashedButton(
-            label: 'Port əlavə et',
+            label: context.t('k8sgen_add_port'),
             onTap: () {
               setState(() {
                 _service.ports.add(ServicePort());
@@ -674,7 +689,7 @@ class _K8sGenState extends State<K8sGen> {
           Row(
             children: <Widget>[
               Text(
-                'Port #${index + 1}',
+                '${context.t('k8sgen_port_label')} #${index + 1}',
                 style: const TextStyle(
                   color: Colors.white70,
                   fontSize: 11,
@@ -699,7 +714,7 @@ class _K8sGenState extends State<K8sGen> {
             children: <Widget>[
               Expanded(
                 child: _field(
-                  label: 'Name',
+                  label: context.t('k8sgen_field_name'),
                   value: p.name,
                   hint: 'http',
                   onChanged: (String v) {
@@ -711,7 +726,7 @@ class _K8sGenState extends State<K8sGen> {
               const SizedBox(width: 8),
               Expanded(
                 child: _numberField(
-                  label: 'Port',
+                  label: context.t('k8sgen_field_port'),
                   value: p.port,
                   onChanged: (int v) {
                     p.port = v;
@@ -726,7 +741,7 @@ class _K8sGenState extends State<K8sGen> {
             children: <Widget>[
               Expanded(
                 child: _numberField(
-                  label: 'Target',
+                  label: context.t('k8sgen_field_target'),
                   value: p.targetPort,
                   onChanged: (int v) {
                     p.targetPort = v;
@@ -738,7 +753,7 @@ class _K8sGenState extends State<K8sGen> {
               if (_service.type == 'NodePort')
                 Expanded(
                   child: _numberField(
-                    label: 'NodePort',
+                    label: context.t('k8sgen_field_node_port'),
                     value: p.nodePort ?? 30000,
                     onChanged: (int v) {
                       p.nodePort = v;
@@ -770,10 +785,13 @@ class _K8sGenState extends State<K8sGen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          _sectionTitle(Icons.tune_rounded, 'Secret'),
+          _sectionTitle(
+            Icons.tune_rounded,
+            context.t('k8sgen_section_secret'),
+          ),
           const SizedBox(height: 10),
           _enumField(
-            label: 'Type',
+            label: context.t('k8sgen_field_type'),
             value: _secret.type,
             values: types,
             onChanged: (String v) {
@@ -783,7 +801,7 @@ class _K8sGenState extends State<K8sGen> {
           ),
           const SizedBox(height: 8),
           _switchRow(
-            label: 'Base64 avtomatik kodla',
+            label: context.t('k8sgen_field_base64'),
             value: _secret.encodeBase64,
             onChanged: (bool v) {
               _secret.encodeBase64 = v;
@@ -800,10 +818,13 @@ class _K8sGenState extends State<K8sGen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          _sectionTitle(Icons.tune_rounded, 'Ingress'),
+          _sectionTitle(
+            Icons.tune_rounded,
+            context.t('k8sgen_section_ingress'),
+          ),
           const SizedBox(height: 10),
           _field(
-            label: 'Ingress Class Name',
+            label: context.t('k8sgen_field_ingress_class'),
             value: _ingress.ingressClassName,
             hint: 'nginx',
             onChanged: (String v) {
@@ -821,12 +842,15 @@ class _K8sGenState extends State<K8sGen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          _sectionTitle(Icons.rule_rounded, 'Rules'),
+          _sectionTitle(
+            Icons.rule_rounded,
+            context.t('k8sgen_section_rules'),
+          ),
           const SizedBox(height: 10),
           for (int i = 0; i < _ingress.rules.length; i++) _ingressRuleRow(i),
           const SizedBox(height: 8),
           _dashedButton(
-            label: 'Rule əlavə et',
+            label: context.t('k8sgen_add_rule'),
             onTap: () {
               setState(() {
                 _ingress.rules.add(IngressRule());
@@ -855,7 +879,7 @@ class _K8sGenState extends State<K8sGen> {
           Row(
             children: <Widget>[
               Text(
-                'Rule #${index + 1}',
+                '${context.t('k8sgen_rule_label')} #${index + 1}',
                 style: const TextStyle(
                   color: Colors.white70,
                   fontSize: 11,
@@ -877,9 +901,9 @@ class _K8sGenState extends State<K8sGen> {
           ),
           const SizedBox(height: 6),
           _field(
-            label: 'Host',
+            label: context.t('k8sgen_field_host'),
             value: r.host,
-            hint: 'example.com',
+            hint: context.t('k8sgen_hint_host'),
             onChanged: (String v) {
               r.host = v;
               _regenerate();
@@ -889,7 +913,7 @@ class _K8sGenState extends State<K8sGen> {
           for (int j = 0; j < r.paths.length; j++) _ingressPathRow(r, j),
           const SizedBox(height: 4),
           _dashedButton(
-            label: 'Path əlavə et',
+            label: context.t('k8sgen_add_path'),
             onTap: () {
               setState(() {
                 r.paths.add(IngressPath());
@@ -918,7 +942,7 @@ class _K8sGenState extends State<K8sGen> {
             children: <Widget>[
               Expanded(
                 child: _field(
-                  label: 'Path',
+                  label: context.t('k8sgen_field_path'),
                   value: p.path,
                   hint: '/',
                   onChanged: (String v) {
@@ -945,9 +969,9 @@ class _K8sGenState extends State<K8sGen> {
             children: <Widget>[
               Expanded(
                 child: _field(
-                  label: 'Service Name',
+                  label: context.t('k8sgen_field_service_name'),
                   value: p.serviceName,
-                  hint: 'my-svc',
+                  hint: context.t('k8sgen_hint_service_name'),
                   onChanged: (String v) {
                     p.serviceName = v;
                     _regenerate();
@@ -957,7 +981,7 @@ class _K8sGenState extends State<K8sGen> {
               const SizedBox(width: 8),
               Expanded(
                 child: _numberField(
-                  label: 'Service Port',
+                  label: context.t('k8sgen_field_service_port'),
                   value: p.servicePort,
                   onChanged: (int v) {
                     p.servicePort = v;
@@ -977,12 +1001,15 @@ class _K8sGenState extends State<K8sGen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          _sectionTitle(Icons.lock_outline_rounded, 'TLS'),
+          _sectionTitle(
+            Icons.lock_outline_rounded,
+            context.t('k8sgen_section_tls'),
+          ),
           const SizedBox(height: 10),
           for (int i = 0; i < _ingress.tls.length; i++) _ingressTlsRow(i),
           const SizedBox(height: 8),
           _dashedButton(
-            label: 'TLS əlavə et',
+            label: context.t('k8sgen_add_tls'),
             onTap: () {
               setState(() {
                 _ingress.tls.add(IngressTls());
@@ -1034,9 +1061,9 @@ class _K8sGenState extends State<K8sGen> {
           ),
           const SizedBox(height: 6),
           _field(
-            label: 'Secret Name',
+            label: context.t('k8sgen_field_secret_name'),
             value: t.secretName,
-            hint: 'tls-secret',
+            hint: context.t('k8sgen_hint_secret_name'),
             onChanged: (String v) {
               t.secretName = v;
               _regenerate();
@@ -1051,8 +1078,8 @@ class _K8sGenState extends State<K8sGen> {
               fontFamily: 'monospace',
             ),
             decoration: _inputDecoration(
-              'Hosts (vergüllə ayır)',
-              'example.com, www.example.com',
+              context.t('k8sgen_field_hosts'),
+              context.t('k8sgen_hint_hosts'),
             ),
             onChanged: (String v) {
               t.hosts = v
@@ -1079,10 +1106,10 @@ class _K8sGenState extends State<K8sGen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          _sectionTitle(Icons.tune_rounded, 'PVC'),
+          _sectionTitle(Icons.tune_rounded, context.t('k8sgen_section_pvc')),
           const SizedBox(height: 10),
           _enumField(
-            label: 'Access Mode',
+            label: context.t('k8sgen_field_access_mode'),
             value: _pvc.accessMode,
             values: access,
             onChanged: (String v) {
@@ -1092,7 +1119,7 @@ class _K8sGenState extends State<K8sGen> {
           ),
           const SizedBox(height: 10),
           _field(
-            label: 'Size',
+            label: context.t('k8sgen_field_size'),
             value: _pvc.size,
             hint: '1Gi',
             onChanged: (String v) {
@@ -1102,9 +1129,9 @@ class _K8sGenState extends State<K8sGen> {
           ),
           const SizedBox(height: 10),
           _field(
-            label: 'Storage Class (optional)',
+            label: context.t('k8sgen_field_storage_class'),
             value: _pvc.storageClass,
-            hint: 'standard',
+            hint: context.t('k8sgen_hint_storage_class'),
             onChanged: (String v) {
               _pvc.storageClass = v;
               _regenerate();
@@ -1116,21 +1143,20 @@ class _K8sGenState extends State<K8sGen> {
   }
 
   Widget _buildCronJobFields() {
-    const List<String> conc = <String>[
-      'Allow',
-      'Forbid',
-      'Replace',
-    ];
+    const List<String> conc = <String>['Allow', 'Forbid', 'Replace'];
     return _GlassCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          _sectionTitle(Icons.tune_rounded, 'CronJob'),
+          _sectionTitle(
+            Icons.tune_rounded,
+            context.t('k8sgen_section_cronjob'),
+          ),
           const SizedBox(height: 10),
           _field(
-            label: 'Schedule (cron)',
+            label: context.t('k8sgen_field_schedule'),
             value: _cronJob.schedule,
-            hint: '*/5 * * * *',
+            hint: context.t('k8sgen_hint_schedule'),
             onChanged: (String v) {
               _cronJob.schedule = v;
               _regenerate();
@@ -1138,7 +1164,7 @@ class _K8sGenState extends State<K8sGen> {
           ),
           const SizedBox(height: 10),
           _enumField(
-            label: 'Concurrency Policy',
+            label: context.t('k8sgen_field_concurrency'),
             value: _cronJob.concurrencyPolicy,
             values: conc,
             onChanged: (String v) {
@@ -1151,7 +1177,7 @@ class _K8sGenState extends State<K8sGen> {
             children: <Widget>[
               Expanded(
                 child: _numberField(
-                  label: 'Backoff Limit',
+                  label: context.t('k8sgen_field_backoff_limit'),
                   value: _cronJob.backoffLimit,
                   onChanged: (int v) {
                     _cronJob.backoffLimit = v;
@@ -1162,7 +1188,7 @@ class _K8sGenState extends State<K8sGen> {
               const SizedBox(width: 10),
               Expanded(
                 child: _numberField(
-                  label: 'Success History',
+                  label: context.t('k8sgen_field_success_history'),
                   value: _cronJob.successfulJobsHistoryLimit ?? 3,
                   onChanged: (int v) {
                     _cronJob.successfulJobsHistoryLimit = v;
@@ -1182,13 +1208,13 @@ class _K8sGenState extends State<K8sGen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          _sectionTitle(Icons.tune_rounded, 'Job'),
+          _sectionTitle(Icons.tune_rounded, context.t('k8sgen_section_job')),
           const SizedBox(height: 10),
           Row(
             children: <Widget>[
               Expanded(
                 child: _numberField(
-                  label: 'Completions',
+                  label: context.t('k8sgen_field_completions'),
                   value: _job.completions,
                   onChanged: (int v) {
                     _job.completions = v;
@@ -1199,7 +1225,7 @@ class _K8sGenState extends State<K8sGen> {
               const SizedBox(width: 10),
               Expanded(
                 child: _numberField(
-                  label: 'Parallelism',
+                  label: context.t('k8sgen_field_parallelism'),
                   value: _job.parallelism,
                   onChanged: (int v) {
                     _job.parallelism = v;
@@ -1211,7 +1237,7 @@ class _K8sGenState extends State<K8sGen> {
           ),
           const SizedBox(height: 10),
           _numberField(
-            label: 'Backoff Limit',
+            label: context.t('k8sgen_field_backoff_limit'),
             value: _job.backoffLimit,
             onChanged: (int v) {
               _job.backoffLimit = v;
@@ -1233,10 +1259,10 @@ class _K8sGenState extends State<K8sGen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          _sectionTitle(Icons.tune_rounded, 'HPA'),
+          _sectionTitle(Icons.tune_rounded, context.t('k8sgen_section_hpa')),
           const SizedBox(height: 10),
           _enumField(
-            label: 'Target Kind',
+            label: context.t('k8sgen_field_target_kind'),
             value: _hpa.targetKind,
             values: kinds,
             onChanged: (String v) {
@@ -1246,9 +1272,9 @@ class _K8sGenState extends State<K8sGen> {
           ),
           const SizedBox(height: 10),
           _field(
-            label: 'Target Name',
+            label: context.t('k8sgen_field_target_name'),
             value: _hpa.targetName,
-            hint: 'my-deployment',
+            hint: context.t('k8sgen_hint_target_name'),
             onChanged: (String v) {
               _hpa.targetName = v;
               _regenerate();
@@ -1259,7 +1285,7 @@ class _K8sGenState extends State<K8sGen> {
             children: <Widget>[
               Expanded(
                 child: _numberField(
-                  label: 'Min Replicas',
+                  label: context.t('k8sgen_field_min_replicas'),
                   value: _hpa.minReplicas,
                   onChanged: (int v) {
                     _hpa.minReplicas = v;
@@ -1270,7 +1296,7 @@ class _K8sGenState extends State<K8sGen> {
               const SizedBox(width: 10),
               Expanded(
                 child: _numberField(
-                  label: 'Max Replicas',
+                  label: context.t('k8sgen_field_max_replicas'),
                   value: _hpa.maxReplicas,
                   onChanged: (int v) {
                     _hpa.maxReplicas = v;
@@ -1285,7 +1311,7 @@ class _K8sGenState extends State<K8sGen> {
             children: <Widget>[
               Expanded(
                 child: _numberField(
-                  label: 'CPU %',
+                  label: context.t('k8sgen_field_cpu_target'),
                   value: _hpa.cpuTarget,
                   onChanged: (int v) {
                     _hpa.cpuTarget = v;
@@ -1296,7 +1322,7 @@ class _K8sGenState extends State<K8sGen> {
               const SizedBox(width: 10),
               Expanded(
                 child: _numberField(
-                  label: 'Memory %',
+                  label: context.t('k8sgen_field_memory_target'),
                   value: _hpa.memoryTarget,
                   onChanged: (int v) {
                     _hpa.memoryTarget = v;
@@ -1316,10 +1342,13 @@ class _K8sGenState extends State<K8sGen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          _sectionTitle(Icons.widgets_rounded, 'Container'),
+          _sectionTitle(
+            Icons.widgets_rounded,
+            context.t('k8sgen_section_container'),
+          ),
           const SizedBox(height: 10),
           _field(
-            label: 'Name',
+            label: context.t('k8sgen_field_name'),
             value: c.name,
             hint: 'app',
             onChanged: (String v) {
@@ -1329,9 +1358,9 @@ class _K8sGenState extends State<K8sGen> {
           ),
           const SizedBox(height: 10),
           _field(
-            label: 'Image',
+            label: context.t('k8sgen_field_image'),
             value: c.image,
-            hint: 'nginx:latest',
+            hint: context.t('k8sgen_hint_image'),
             onChanged: (String v) {
               c.image = v;
               _regenerate();
@@ -1339,7 +1368,7 @@ class _K8sGenState extends State<K8sGen> {
           ),
           const SizedBox(height: 10),
           _field(
-            label: 'Image Pull Policy',
+            label: context.t('k8sgen_field_image_pull'),
             value: c.imagePullPolicy,
             hint: 'IfNotPresent',
             onChanged: (String v) {
@@ -1348,13 +1377,15 @@ class _K8sGenState extends State<K8sGen> {
             },
           ),
           const SizedBox(height: 14),
-          _sectionTitle(Icons.settings_ethernet_rounded, 'Ports'),
+          _sectionTitle(
+            Icons.settings_ethernet_rounded,
+            context.t('k8sgen_section_ports'),
+          ),
           const SizedBox(height: 8),
-          for (int i = 0; i < c.ports.length; i++)
-            _containerPortRow(c, i),
+          for (int i = 0; i < c.ports.length; i++) _containerPortRow(c, i),
           const SizedBox(height: 6),
           _dashedButton(
-            label: 'Port əlavə et',
+            label: context.t('k8sgen_add_port'),
             onTap: () {
               setState(() {
                 c.ports.add(ContainerPort());
@@ -1363,12 +1394,15 @@ class _K8sGenState extends State<K8sGen> {
             },
           ),
           const SizedBox(height: 14),
-          _sectionTitle(Icons.vpn_key_rounded, 'Environment'),
+          _sectionTitle(
+            Icons.vpn_key_rounded,
+            context.t('k8sgen_section_env'),
+          ),
           const SizedBox(height: 8),
           for (int i = 0; i < c.env.length; i++) _envRow(c, i),
           const SizedBox(height: 6),
           _dashedButton(
-            label: 'Env əlavə et',
+            label: context.t('k8sgen_add_env'),
             onTap: () {
               setState(() {
                 c.env.add(EnvVar());
@@ -1377,13 +1411,16 @@ class _K8sGenState extends State<K8sGen> {
             },
           ),
           const SizedBox(height: 14),
-          _sectionTitle(Icons.memory_rounded, 'Resources'),
+          _sectionTitle(
+            Icons.memory_rounded,
+            context.t('k8sgen_section_resources'),
+          ),
           const SizedBox(height: 8),
           Row(
             children: <Widget>[
               Expanded(
                 child: _field(
-                  label: 'CPU Request',
+                  label: context.t('k8sgen_field_cpu_request'),
                   value: c.resources.cpuRequest,
                   hint: '100m',
                   onChanged: (String v) {
@@ -1395,7 +1432,7 @@ class _K8sGenState extends State<K8sGen> {
               const SizedBox(width: 10),
               Expanded(
                 child: _field(
-                  label: 'CPU Limit',
+                  label: context.t('k8sgen_field_cpu_limit'),
                   value: c.resources.cpuLimit,
                   hint: '500m',
                   onChanged: (String v) {
@@ -1411,7 +1448,7 @@ class _K8sGenState extends State<K8sGen> {
             children: <Widget>[
               Expanded(
                 child: _field(
-                  label: 'Mem Request',
+                  label: context.t('k8sgen_field_mem_request'),
                   value: c.resources.memoryRequest,
                   hint: '128Mi',
                   onChanged: (String v) {
@@ -1423,7 +1460,7 @@ class _K8sGenState extends State<K8sGen> {
               const SizedBox(width: 10),
               Expanded(
                 child: _field(
-                  label: 'Mem Limit',
+                  label: context.t('k8sgen_field_mem_limit'),
                   value: c.resources.memoryLimit,
                   hint: '512Mi',
                   onChanged: (String v) {
@@ -1452,7 +1489,7 @@ class _K8sGenState extends State<K8sGen> {
         children: <Widget>[
           Expanded(
             child: _field(
-              label: 'Name',
+              label: context.t('k8sgen_field_name'),
               value: p.name,
               hint: 'http',
               onChanged: (String v) {
@@ -1464,7 +1501,7 @@ class _K8sGenState extends State<K8sGen> {
           const SizedBox(width: 6),
           Expanded(
             child: _numberField(
-              label: 'Port',
+              label: context.t('k8sgen_field_port'),
               value: p.port,
               onChanged: (int v) {
                 p.port = v;
@@ -1502,9 +1539,9 @@ class _K8sGenState extends State<K8sGen> {
             children: <Widget>[
               Expanded(
                 child: _field(
-                  label: 'Key',
+                  label: context.t('k8sgen_field_key'),
                   value: e.key,
-                  hint: 'DATABASE_URL',
+                  hint: context.t('k8sgen_hint_env_key'),
                   onChanged: (String v) {
                     e.key = v;
                     _regenerate();
@@ -1525,9 +1562,9 @@ class _K8sGenState extends State<K8sGen> {
           const SizedBox(height: 6),
           if (!e.isSecret && !e.isConfigMap)
             _field(
-              label: 'Value',
+              label: context.t('k8sgen_field_value'),
               value: e.value,
-              hint: 'value',
+              hint: context.t('k8sgen_hint_value'),
               onChanged: (String v) {
                 e.value = v;
                 _regenerate();
@@ -1538,7 +1575,7 @@ class _K8sGenState extends State<K8sGen> {
             spacing: 6,
             children: <Widget>[
               _chip(
-                label: 'Plain',
+                labelKey: 'k8sgen_chip_plain',
                 selected: !e.isSecret && !e.isConfigMap,
                 onTap: () {
                   e.isSecret = false;
@@ -1547,7 +1584,7 @@ class _K8sGenState extends State<K8sGen> {
                 },
               ),
               _chip(
-                label: 'Secret',
+                labelKey: 'k8sgen_chip_secret',
                 selected: e.isSecret,
                 onTap: () {
                   e.isSecret = true;
@@ -1556,7 +1593,7 @@ class _K8sGenState extends State<K8sGen> {
                 },
               ),
               _chip(
-                label: 'ConfigMap',
+                labelKey: 'k8sgen_chip_configmap',
                 selected: e.isConfigMap,
                 onTap: () {
                   e.isSecret = false;
@@ -1572,9 +1609,11 @@ class _K8sGenState extends State<K8sGen> {
               children: <Widget>[
                 Expanded(
                   child: _field(
-                    label: e.isSecret ? 'Secret Name' : 'ConfigMap Name',
+                    label: e.isSecret
+                        ? context.t('k8sgen_field_secret_name')
+                        : context.t('k8sgen_field_configmap_name'),
                     value: e.sourceName,
-                    hint: 'my-secret',
+                    hint: context.t('k8sgen_hint_source_name'),
                     onChanged: (String v) {
                       e.sourceName = v;
                       _regenerate();
@@ -1584,9 +1623,9 @@ class _K8sGenState extends State<K8sGen> {
                 const SizedBox(width: 8),
                 Expanded(
                   child: _field(
-                    label: 'Key',
+                    label: context.t('k8sgen_field_key'),
                     value: e.sourceKey,
-                    hint: 'password',
+                    hint: context.t('k8sgen_hint_source_key'),
                     onChanged: (String v) {
                       e.sourceKey = v;
                       _regenerate();
@@ -1602,7 +1641,7 @@ class _K8sGenState extends State<K8sGen> {
   }
 
   Widget _chip({
-    required String label,
+    required String labelKey,
     required bool selected,
     required VoidCallback onTap,
   }) {
@@ -1626,7 +1665,7 @@ class _K8sGenState extends State<K8sGen> {
           ),
         ),
         child: Text(
-          label,
+          context.t(labelKey),
           style: const TextStyle(
             color: Colors.white,
             fontSize: 11,
@@ -1638,7 +1677,7 @@ class _K8sGenState extends State<K8sGen> {
   }
 
   Widget _buildKeyValueCard({
-    required String title,
+    required String titleKey,
     required IconData icon,
     required Map<String, String> map,
   }) {
@@ -1646,12 +1685,12 @@ class _K8sGenState extends State<K8sGen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          _sectionTitle(icon, title),
+          _sectionTitle(icon, context.t(titleKey)),
           const SizedBox(height: 10),
           for (int i = 0; i < map.length; i++) _kvRow(map, i),
           const SizedBox(height: 6),
           _dashedButton(
-            label: 'Əlavə et',
+            label: context.t('k8sgen_add_entry'),
             onTap: () {
               setState(() {
                 map['key${map.length + 1}'] = '';
@@ -1687,7 +1726,10 @@ class _K8sGenState extends State<K8sGen> {
                 fontSize: 12,
                 fontFamily: 'monospace',
               ),
-              decoration: _inputDecoration('Key', 'key'),
+              decoration: _inputDecoration(
+                context.t('k8sgen_field_key'),
+                'key',
+              ),
               onSubmitted: (String v) {
                 if (v.isEmpty || v == k) return;
                 final String val = map[k] ?? '';
@@ -1707,7 +1749,10 @@ class _K8sGenState extends State<K8sGen> {
                 fontSize: 12,
                 fontFamily: 'monospace',
               ),
-              decoration: _inputDecoration('Value', 'value'),
+              decoration: _inputDecoration(
+                context.t('k8sgen_field_value'),
+                context.t('k8sgen_hint_value'),
+              ),
               onChanged: (String v) {
                 map[k] = v;
                 _regenerate();
@@ -1729,7 +1774,7 @@ class _K8sGenState extends State<K8sGen> {
   }
 
   Widget _buildMapEditor({
-    required String title,
+    required String titleKey,
     required Map<String, String> map,
     required List<String> keyPresets,
     required VoidCallback onChanged,
@@ -1738,7 +1783,7 @@ class _K8sGenState extends State<K8sGen> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
         Text(
-          title,
+          context.t(titleKey),
           style: const TextStyle(
             color: Colors.white70,
             fontSize: 12,
@@ -1771,7 +1816,10 @@ class _K8sGenState extends State<K8sGen> {
                       fontSize: 12,
                       fontFamily: 'monospace',
                     ),
-                    decoration: _inputDecoration('value', 'value'),
+                    decoration: _inputDecoration(
+                      context.t('k8sgen_field_value'),
+                      context.t('k8sgen_hint_value'),
+                    ),
                     onChanged: (String v) {
                       map[e.key] = v;
                       onChanged();
@@ -1805,8 +1853,10 @@ class _K8sGenState extends State<K8sGen> {
                   onChanged();
                 },
                 child: Container(
-                  padding:
-                  const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
                     color: _accentB.withOpacity(0.12),
                     borderRadius: BorderRadius.circular(6),
@@ -1836,11 +1886,14 @@ class _K8sGenState extends State<K8sGen> {
           Row(
             children: <Widget>[
               Expanded(
-                child: _sectionTitle(Icons.code_rounded, 'YAML Output'),
+                child: _sectionTitle(
+                  Icons.code_rounded,
+                  context.t('k8sgen_section_output'),
+                ),
               ),
               _glassIconButton(
                 icon: _copied ? Icons.check_rounded : Icons.copy_rounded,
-                tooltip: 'Kopyala',
+                tooltip: context.t('k8sgen_copy'),
                 onTap: _copy,
                 highlighted: _copied,
               ),

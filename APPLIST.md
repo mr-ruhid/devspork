@@ -140,6 +140,8 @@ Image Compress
 
 Image Format Converter
 
+=========================
+
 PDF Merge
 
 Image to PDF

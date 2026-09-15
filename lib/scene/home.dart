@@ -27,6 +27,8 @@ import '../tools/excel2table.dart';
 import '../tools/gitgen/main.dart';
 import '../tools/hashgen.dart';
 import '../tools/htmlent.dart';
+import '../tools/imagecompress/main.dart';
+import '../tools/imageconvert/main.dart';
 import '../tools/jsoncodegen/main.dart';
 import '../tools/jsonfmt.dart';
 import '../tools/jsonschemagen/main.dart';
@@ -34,6 +36,7 @@ import '../tools/jsonschemavalidator/main.dart';
 import '../tools/jsonsuite.dart';
 import '../tools/jwtdec.dart';
 import '../tools/jwtgen/main.dart';
+import '../tools/k8sgen/main.dart';
 import '../tools/listconv.dart';
 import '../tools/loccompare.dart';
 import '../tools/loremgen.dart';
@@ -42,6 +45,7 @@ import '../tools/mdpreview.dart';
 import '../tools/mdtable/main.dart';
 import '../tools/mimelist.dart';
 import '../tools/mockgen.dart';
+import '../tools/mockserver/main.dart';
 import '../tools/netpack/main.dart';
 import '../tools/passgen.dart';
 import '../tools/passstrength/main.dart';
@@ -66,6 +70,7 @@ import '../tools/tsconv.dart';
 import '../tools/uaparse.dart';
 import '../tools/urlparse.dart';
 import '../tools/uuidgen.dart';
+import '../tools/wordlistgen/main.dart';
 import '../tools/yamljson.dart';
 
 class Home extends StatefulWidget {
@@ -351,6 +356,13 @@ class _HomeState extends State<Home> {
       builder: () => const PassStrength(),
     ),
     _ToolItem(
+      id: 'wordlistgen',
+      category: 'security',
+      icon: Icons.list_alt_rounded,
+      gradient: <Color>[Color(0xFF0F2027), Color(0xFF2C5364)],
+      builder: () => const WordlistGeneratorPage(),
+    ),
+    _ToolItem(
       id: 'totpgen',
       category: 'security',
       icon: Icons.timer_rounded,
@@ -538,6 +550,20 @@ class _HomeState extends State<Home> {
       gradient: <Color>[Color(0xFFDA22FF), Color(0xFF9733EE)],
       builder: () => const SvgPathViewer(),
     ),
+    _ToolItem(
+      id: 'imagecompress',
+      category: 'media',
+      icon: Icons.compress_rounded,
+      gradient: <Color>[Color(0xFF11998E), Color(0xFF38EF7D)],
+      builder: () => const ImageCompressPage(),
+    ),
+    _ToolItem(
+      id: 'imageconvert',
+      category: 'media',
+      icon: Icons.swap_horiz_rounded,
+      gradient: <Color>[Color(0xFF00C6FF), Color(0xFF0072FF)],
+      builder: () => const ImageConvertPage(),
+    ),
 
     // ===================== DEV =====================
     _ToolItem(
@@ -553,6 +579,20 @@ class _HomeState extends State<Home> {
       icon: Icons.terminal_rounded,
       gradient: <Color>[Color(0xFF8E2DE2), Color(0xFF4A00E0)],
       builder: () => const DevOpsGen(),
+    ),
+    _ToolItem(
+      id: 'k8sgen',
+      category: 'dev',
+      icon: Icons.cloud_queue_rounded,
+      gradient: <Color>[Color(0xFF326CE5), Color(0xFF00E5FF)],
+      builder: () => const K8sGen(),
+    ),
+    _ToolItem(
+      id: 'mockserver',
+      category: 'dev',
+      icon: Icons.dns_rounded,
+      gradient: <Color>[Color(0xFF4B9BFF), Color(0xFF00E5FF)],
+      builder: () => const MockServerPage(),
     ),
 
     // ===================== OTHER =====================
