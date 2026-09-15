@@ -58,13 +58,10 @@ dependencies:
   file_picker: ^8.1.7
   file_saver: ^0.2.14
   platform_image_converter: ^2.2.0
-  swipelab_webp: ^1.0.0
   heic_native: ^1.1.0
   flutter_svg: ^2.0.17
   flutter_avif: ^3.1.0
   jxl_coder: ^0.1.0
-
-
 
 
 

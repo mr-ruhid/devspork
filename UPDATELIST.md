@@ -1,5 +1,5 @@
 Update mini tools list:
-UP0.0.15.0.26
+UP0.0.15.09.26
 
 lib/tools/asciiart.dart
 lib/tools/b64img.dart
@@ -16,3 +16,8 @@ lib/tools/csstools.dart
 lib/tools/devcalc.dart
 lib/tools/diffcheck.dart
 ==============================
+UP0.0.16.09.26
+
+lib/tools/imagecompress/compressor.dart
+lib/tools/imagecompress/models.dart
+lib/tools/imageconvert/converter.dart

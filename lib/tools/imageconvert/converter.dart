@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:image/image.dart' as img;
+import 'package:platform_image_converter/platform_image_converter.dart' as pic;
 
 import 'models.dart';
 
@@ -46,13 +47,12 @@ class ImageConverter {
     }
 
     try {
-      Uint8List? result = await _tryNative(
+      Uint8List? result = await _tryPlatformConverter(
         bytes: inputBytes,
-        fileName: fileName,
         config: config,
       );
 
-      result ??= await _tryPureDart(
+      result ??= _convertWithPureDart(
         bytes: inputBytes,
         config: config,
       );
@@ -78,184 +78,6 @@ class ImageConverter {
         error: e.toString(),
       );
     }
-  }
-
-  static Future<Uint8List?> _tryNative({
-    required Uint8List bytes,
-    required String fileName,
-    required ImageConvertConfig config,
-  }) async {
-    switch (config.format) {
-      case ImageOutputFormat.svg:
-        return _trySvgEncode(bytes, config);
-      default:
-        return null;
-    }
-  }
-
-  static Future<Uint8List?> _trySvgEncode(
-      Uint8List bytes,
-      ImageConvertConfig config,
-      ) async {
-    try {
-      final img.Image? decoded = img.decodeImage(bytes);
-      if (decoded == null) return null;
-
-      final img.Image resized = _applyResize(decoded, config);
-
-      final String svg = _rasterToSvg(resized, config.svgThreshold);
-      return Uint8List.fromList(svg.codeUnits);
-    } catch (_) {
-      return null;
-    }
-  }
-
-  static Future<Uint8List?> _tryPureDart({
-    required Uint8List bytes,
-    required ImageConvertConfig config,
-  }) async {
-    img.Image? decoded;
-
-    try {
-      decoded = img.decodeImage(bytes);
-    } catch (_) {
-      decoded = null;
-    }
-
-    if (decoded == null) {
-      return null;
-    }
-
-    decoded = _applyRotateIfNeeded(decoded, config);
-    decoded = _applyResize(decoded, config);
-
-    return _encodeWithPureDart(decoded, config);
-  }
-
-  static img.Image _applyRotateIfNeeded(
-      img.Image image,
-      ImageConvertConfig config,
-      ) {
-    return image;
-  }
-
-  static img.Image _applyResize(
-      img.Image image,
-      ImageConvertConfig config,
-      ) {
-    final int? maxW = config.maxWidth;
-    final int? maxH = config.maxHeight;
-
-    if (maxW == null && maxH == null) return image;
-
-    final int w = image.width;
-    final int h = image.height;
-
-    int newW = w;
-    int newH = h;
-
-    if (maxW != null && w > maxW) {
-      newW = maxW;
-      newH = (h * maxW / w).round();
-    }
-    if (maxH != null && newH > maxH) {
-      newH = maxH;
-      newW = (newW * maxH / newH).round();
-    }
-
-    if (newW == w && newH == h) return image;
-
-    return img.copyResize(
-      image,
-      width: newW,
-      height: newH,
-      interpolation: img.Interpolation.average,
-    );
-  }
-
-  static Uint8List? _encodeWithPureDart(
-      img.Image image,
-      ImageConvertConfig config,
-      ) {
-    try {
-      switch (config.format) {
-        case ImageOutputFormat.png:
-          return Uint8List.fromList(img.encodePng(image, level: 6));
-
-        case ImageOutputFormat.jpeg:
-          return Uint8List.fromList(
-            img.encodeJpg(image, quality: config.quality),
-          );
-
-        case ImageOutputFormat.bmp:
-          return Uint8List.fromList(img.encodeBmp(image));
-
-        case ImageOutputFormat.tga:
-          return Uint8List.fromList(img.encodeTga(image));
-
-        case ImageOutputFormat.gif:
-          return Uint8List.fromList(img.encodeGif(image));
-
-        case ImageOutputFormat.tiff:
-          return Uint8List.fromList(img.encodeTiff(image));
-
-        case ImageOutputFormat.ico:
-          return Uint8List.fromList(img.encodeIco(image));
-
-        case ImageOutputFormat.wbmp:
-          return Uint8List.fromList(img.encodeJpg(image, quality: config.quality));
-
-        case ImageOutputFormat.webp:
-        case ImageOutputFormat.heic:
-        case ImageOutputFormat.avif:
-        case ImageOutputFormat.jpegXl:
-          return Uint8List.fromList(
-            img.encodeJpg(image, quality: config.quality),
-          );
-
-        case ImageOutputFormat.svg:
-          return null;
-      }
-    } catch (_) {
-      return null;
-    }
-  }
-
-  static String _rasterToSvg(img.Image image, int threshold) {
-    final StringBuffer sb = StringBuffer();
-
-    sb.writeln(
-      '<svg xmlns="http://www.w3.org/2000/svg" '
-          'width="${image.width}" height="${image.height}" '
-          'viewBox="0 0 ${image.width} ${image.height}">',
-    );
-
-    for (int y = 0; y < image.height; y++) {
-      for (int x = 0; x < image.width; x++) {
-        final img.Pixel pixel = image.getPixel(x, y);
-        final int r = pixel.r.toInt();
-        final int g = pixel.g.toInt();
-        final int b = pixel.b.toInt();
-        final num a = pixel.a;
-
-        if (a < 32) continue;
-
-        final int gray = ((r + g + b) / 3).round();
-        if (gray > threshold) continue;
-
-        final String hex = '#'
-            '${r.toRadixString(16).padLeft(2, '0')}'
-            '${g.toRadixString(16).padLeft(2, '0')}'
-            '${b.toRadixString(16).padLeft(2, '0')}';
-
-        sb.writeln(
-          '<rect x="$x" y="$y" width="1" height="1" fill="$hex"/>',
-        );
-      }
-    }
-
-    sb.writeln('</svg>');
-    return sb.toString();
   }
 
   static Future<List<BatchConvertItem>> convertBatch({
@@ -295,5 +117,134 @@ class ImageConverter {
     }
 
     return results;
+  }
+
+  static Future<Uint8List?> _tryPlatformConverter({
+    required Uint8List bytes,
+    required ImageConvertConfig config,
+  }) async {
+    final pic.OutputFormat? format = _platformFormat(config.format);
+    if (format == null) return null;
+
+    try {
+      final pic.ResizeMode resizeMode = _buildResizeMode(config);
+
+      final Uint8List result = await pic.ImageConverter.convert(
+        inputData: bytes,
+        format: format,
+        quality: config.quality,
+        resizeMode: resizeMode,
+      );
+
+      return result;
+    } on UnsupportedError {
+      return null;
+    } on pic.ImageDecodingException {
+      return null;
+    } on pic.ImageEncodingException {
+      return null;
+    } on pic.ImageConversionException {
+      return null;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  static pic.ResizeMode _buildResizeMode(ImageConvertConfig config) {
+    if (config.maxWidth == null && config.maxHeight == null) {
+      return const pic.OriginalResizeMode();
+    }
+    return pic.FitResizeMode(
+      width: config.maxWidth,
+      height: config.maxHeight,
+    );
+  }
+
+  static pic.OutputFormat? _platformFormat(ImageOutputFormat format) {
+    switch (format) {
+      case ImageOutputFormat.jpeg:
+        return pic.OutputFormat.jpeg;
+      case ImageOutputFormat.png:
+        return pic.OutputFormat.png;
+      case ImageOutputFormat.webp:
+        return pic.OutputFormat.webp;
+      case ImageOutputFormat.heic:
+        return pic.OutputFormat.heic;
+      default:
+        return null;
+    }
+  }
+
+  static Uint8List? _convertWithPureDart({
+    required Uint8List bytes,
+    required ImageConvertConfig config,
+  }) {
+    img.Image? decoded;
+    try {
+      decoded = img.decodeImage(bytes);
+    } catch (_) {
+      decoded = null;
+    }
+
+    if (decoded == null) return null;
+
+    if (config.maxWidth != null || config.maxHeight != null) {
+      final int w = decoded.width;
+      final int h = decoded.height;
+      int newW = w;
+      int newH = h;
+
+      if (config.maxWidth != null && w > config.maxWidth!) {
+        newW = config.maxWidth!;
+        newH = (h * config.maxWidth! / w).round();
+      }
+      if (config.maxHeight != null && newH > config.maxHeight!) {
+        newH = config.maxHeight!;
+        newW = (newW * config.maxHeight! / newH).round();
+      }
+      if (newW != w || newH != h) {
+        decoded = img.copyResize(
+          decoded,
+          width: newW,
+          height: newH,
+          interpolation: img.Interpolation.average,
+        );
+      }
+    }
+
+    try {
+      switch (config.format) {
+        case ImageOutputFormat.jpeg:
+          return Uint8List.fromList(
+            img.encodeJpg(decoded, quality: config.quality),
+          );
+        case ImageOutputFormat.png:
+          return Uint8List.fromList(img.encodePng(decoded, level: 6));
+        case ImageOutputFormat.webp:
+          return Uint8List.fromList(
+            img.encodeWebP(decoded, quality: config.quality),
+          );
+        case ImageOutputFormat.bmp:
+          return Uint8List.fromList(img.encodeBmp(decoded));
+        case ImageOutputFormat.gif:
+          return Uint8List.fromList(img.encodeGif(decoded));
+        case ImageOutputFormat.tiff:
+          return Uint8List.fromList(img.encodeTiff(decoded));
+        case ImageOutputFormat.ico:
+          return Uint8List.fromList(img.encodeIco(decoded));
+        case ImageOutputFormat.tga:
+          return Uint8List.fromList(img.encodeTga(decoded));
+        case ImageOutputFormat.wbmp:
+        case ImageOutputFormat.heic:
+        case ImageOutputFormat.avif:
+        case ImageOutputFormat.jpegXl:
+        case ImageOutputFormat.svg:
+          return Uint8List.fromList(
+            img.encodeJpg(decoded, quality: config.quality),
+          );
+      }
+    } catch (_) {
+      return null;
+    }
   }
 }

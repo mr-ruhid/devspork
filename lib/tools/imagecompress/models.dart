@@ -1,4 +1,4 @@
-enum ImageOutputFormat { jpeg, png, webp, heic }
+enum ImageOutputFormat { jpeg, png, webp }
 
 enum CompressionPreset { low, medium, high, custom }
 

@@ -77,10 +77,10 @@ packages:
     dependency: transitive
     description:
       name: code_assets
-      sha256: "83ccdaa064c980b5596c35dd64a8d3ecc68620174ab9b90b6343b753aa721687"
+      sha256: bf394f466ba9205f1812a0433b392d6af280f155f56651eda7c18cc32ed493b8
       url: "https://pub.dev"
     source: hosted
-    version: "1.0.0"
+    version: "1.2.1"
   collection:
     dependency: transitive
     description:
@@ -368,14 +368,6 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-  glob:
-    dependency: transitive
-    description:
-      name: glob
-      sha256: "218aeb56050c714f62a3182775320dfa04602b55074873e24e31bbd39bda96fb"
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.2.0"
   heic_native:
     dependency: "direct main"
     description:
@@ -388,10 +380,10 @@ packages:
     dependency: transitive
     description:
       name: hooks
-      sha256: "025f060e86d2d4c3c47b56e33caf7f93bf9283340f26d23424ebcfccf34f621e"
+      sha256: eaac480a35ec0814146c2c48d96aaa829e0e44a7662c88ae84c9edf4bc35651f
       url: "https://pub.dev"
     source: hosted
-    version: "1.0.3"
+    version: "2.2.0"
   html:
     dependency: "direct main"
     description:
@@ -624,22 +616,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.0"
-  native_toolchain_c:
-    dependency: transitive
-    description:
-      name: native_toolchain_c
-      sha256: "6ba77bb18063eebe9de401f5e6437e95e1438af0a87a3a39084fbd37c90df572"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.17.6"
   objective_c:
     dependency: transitive
     description:
       name: objective_c
-      sha256: "100a1c87616ab6ed41ec263b083c0ef3261ee6cd1dc3b0f35f8ddfa4f996fe52"
+      sha256: b7fb95a6d9a4f009edd63dc5ac69f07420b23a16161c6dd8660290b59c602e8e
       url: "https://pub.dev"
     source: hosted
-    version: "9.3.0"
+    version: "9.5.0"
   package_config:
     dependency: transitive
     description:
@@ -804,10 +788,10 @@ packages:
     dependency: transitive
     description:
       name: record_use
-      sha256: "2551bd8eecfe95d14ae75f6021ad0248be5c27f138c2ec12fcb52b500b3ba1ed"
+      sha256: "1cb8564af8d43b464294411db9217f5ec04891c6f22ee2c32d73ae05e88a6bd2"
       url: "https://pub.dev"
     source: hosted
-    version: "0.6.0"
+    version: "1.1.1"
   rfc_6901:
     dependency: transitive
     description:
@@ -989,14 +973,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.4.1"
-  swipelab_webp:
-    dependency: "direct main"
-    description:
-      name: swipelab_webp
-      sha256: c5e9aa236bff713ef0d35a61c34bceb335c839ba83dfb39aed8e4dddd2540a08
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.0.0"
   synchronized:
     dependency: transitive
     description:
