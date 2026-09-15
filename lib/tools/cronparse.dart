@@ -3,10 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../core/localization/app_localization.dart';
 
-/// ---------------------------------------------------------------------------
-/// Liquid Glass primitives — iOS 18/26 tərzi "frosted glass" komponentləri.
-/// BackdropFilter + yarımşəffaf overlay + incə sərhəd + yumşaq kölgə.
-/// ---------------------------------------------------------------------------
+
 class _GlassSurface extends StatelessWidget {
   const _GlassSurface({
     required this.child,

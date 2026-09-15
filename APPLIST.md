@@ -127,3 +127,45 @@ HMAC Generator, AES, SRI, OAuth
 SEO paketi (Sitemap, Redirect, Meta, JSON-LD)
 
 Şəbəkə (DNS, IP, Status, WS)
+
+====================================================
+
+Wordlist generator
+
+Kubernetes YAML Generator
+
+API Mock Server Generator
+
+Image Compress
+
+Image Format Converter
+
+PDF Merge
+
+Image to PDF
+
+PDF Split
+
+PDF Compress
+
+Image Crop / Rotate
+
+Audio Format Converter
+
+Audio Trim / Fade
+
+Audio Waveform
+
+Video Thumbnail Generator
+
+File Hash Verify
+
+Archive Manager (ZIP)
+
+Noise Reduction
+
+OCR (Image to Text)
+
+Universal File Converter
+
+Audio Vocal Separation
