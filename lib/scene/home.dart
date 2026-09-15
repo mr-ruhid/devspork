@@ -16,6 +16,8 @@ import '../tools/colorconv.dart';
 import '../tools/colorpalette.dart';
 import '../tools/cronbuilder/main.dart';
 import '../tools/cronparse.dart';
+import '../tools/cryptotoolkit/main.dart';
+import '../tools/csslayout/main.dart';
 import '../tools/csstools.dart';
 import '../tools/devcalc.dart';
 import '../tools/devopsgen/main.dart';
@@ -37,18 +39,23 @@ import '../tools/loccompare.dart';
 import '../tools/loremgen.dart';
 import '../tools/mdhtml.dart';
 import '../tools/mdpreview.dart';
+import '../tools/mdtable/main.dart';
 import '../tools/mimelist.dart';
 import '../tools/mockgen.dart';
+import '../tools/netpack/main.dart';
 import '../tools/passgen.dart';
+import '../tools/passstrength/main.dart';
 import '../tools/qrgen.dart';
 import '../tools/regexbuilder/main.dart';
 import '../tools/regextest.dart';
 import '../tools/rsagen.dart';
+import '../tools/seopack/main.dart';
 import '../tools/seotools.dart';
 import '../tools/sluggen.dart';
 import '../tools/sociallinks.dart';
 import '../tools/sqlbuilder/main.dart';
 import '../tools/sqlfmt.dart';
+import '../tools/svgpath/main.dart';
 import '../tools/tableviewer/main.dart';
 import '../tools/textmasker.dart';
 import '../tools/textools.dart';
@@ -149,6 +156,13 @@ class _HomeState extends State<Home> {
       icon: Icons.swap_horiz,
       gradient: <Color>[Color(0xFF1FA2FF), Color(0xFF12D8FA)],
       builder: () => const MdHtml(),
+    ),
+    _ToolItem(
+      id: 'mdtable',
+      category: 'text',
+      icon: Icons.table_rows_rounded,
+      gradient: <Color>[Color(0xFF1FA2FF), Color(0xFF12D8FA)],
+      builder: () => const MdTableBuilder(),
     ),
     _ToolItem(
       id: 'excel2table',
@@ -288,6 +302,13 @@ class _HomeState extends State<Home> {
       builder: () => const BcryptGen(),
     ),
     _ToolItem(
+      id: 'cryptotoolkit',
+      category: 'security',
+      icon: Icons.enhanced_encryption_rounded,
+      gradient: <Color>[Color(0xFF232526), Color(0xFF414345)],
+      builder: () => const CryptoToolkit(),
+    ),
+    _ToolItem(
       id: 'jwtdec',
       category: 'security',
       icon: Icons.vpn_key,
@@ -321,6 +342,13 @@ class _HomeState extends State<Home> {
       icon: Icons.password,
       gradient: <Color>[Color(0xFF134E5E), Color(0xFF71B280)],
       builder: () => const PassGen(),
+    ),
+    _ToolItem(
+      id: 'passstrength',
+      category: 'security',
+      icon: Icons.shield_moon_rounded,
+      gradient: <Color>[Color(0xFFB92B27), Color(0xFF1565C0)],
+      builder: () => const PassStrength(),
     ),
     _ToolItem(
       id: 'totpgen',
@@ -374,6 +402,13 @@ class _HomeState extends State<Home> {
       builder: () => const SeoTools(),
     ),
     _ToolItem(
+      id: 'seopack',
+      category: 'web',
+      icon: Icons.travel_explore_rounded,
+      gradient: <Color>[Color(0xFF43CEA2), Color(0xFF185A9D)],
+      builder: () => const SeoPack(),
+    ),
+    _ToolItem(
       id: 'uaparse',
       category: 'web',
       icon: Icons.devices,
@@ -393,6 +428,20 @@ class _HomeState extends State<Home> {
       icon: Icons.brush,
       gradient: <Color>[Color(0xFF396AFC), Color(0xFF00C9FF)],
       builder: () => const CssTools(),
+    ),
+    _ToolItem(
+      id: 'csslayout',
+      category: 'web',
+      icon: Icons.dashboard_customize_rounded,
+      gradient: <Color>[Color(0xFF7C4DFF), Color(0xFF00E5FF)],
+      builder: () => const CssLayoutGen(),
+    ),
+    _ToolItem(
+      id: 'netpack',
+      category: 'web',
+      icon: Icons.lan_rounded,
+      gradient: <Color>[Color(0xFF11998E), Color(0xFF38EF7D)],
+      builder: () => const NetPack(),
     ),
 
     // ===================== CONVERT =====================
@@ -481,6 +530,13 @@ class _HomeState extends State<Home> {
       icon: Icons.palette_rounded,
       gradient: <Color>[Color(0xFFEC008C), Color(0xFFFC6767)],
       builder: () => const ColorPalette(),
+    ),
+    _ToolItem(
+      id: 'svgpath',
+      category: 'media',
+      icon: Icons.polyline_rounded,
+      gradient: <Color>[Color(0xFFDA22FF), Color(0xFF9733EE)],
+      builder: () => const SvgPathViewer(),
     ),
 
     // ===================== DEV =====================
