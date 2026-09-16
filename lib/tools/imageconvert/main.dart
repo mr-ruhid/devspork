@@ -1,3 +1,5 @@
+// lib/tools/imageconvert/main.dart
+
 import 'dart:io';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
@@ -157,7 +159,7 @@ class _ImageConvertPageState extends State<ImageConvertPage> {
       await FileSaver.instance.saveFile(
         name: item.outputName?.replaceAll('.$ext', '') ?? 'converted',
         bytes: Uint8List.fromList(item.bytes!),
-        ext: ext,
+        fileExtension: ext,
         mimeType: _mimeType(ext),
       );
       if (!mounted) return;
@@ -183,7 +185,7 @@ class _ImageConvertPageState extends State<ImageConvertPage> {
         await FileSaver.instance.saveFile(
           name: item.outputName?.replaceAll('.$ext', '') ?? 'converted',
           bytes: Uint8List.fromList(item.bytes!),
-          ext: ext,
+          fileExtension: ext,
           mimeType: _mimeType(ext),
         );
       } catch (_) {}

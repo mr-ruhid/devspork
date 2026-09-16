@@ -1,3 +1,5 @@
+// lib/tools/imagecompress/main.dart
+
 import 'dart:io';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
@@ -150,7 +152,7 @@ class _ImageCompressPageState extends State<ImageCompressPage> {
       await FileSaver.instance.saveFile(
         name: outputName.replaceAll('.$ext', ''),
         bytes: bytes,
-        ext: ext,
+        fileExtension: ext,
         mimeType: _mimeType(ext),
       );
       if (!mounted) return;

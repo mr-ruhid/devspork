@@ -3,10 +3,13 @@
 #
 
 list(APPEND FLUTTER_PLUGIN_LIST
+  ffmpeg_kit_flutter_new_audio
   file_saver
   file_selector_windows
   flutter_avif_windows
   heic_native
+  pdf_combiner
+  pdfx
   share_plus
   url_launcher_windows
 )

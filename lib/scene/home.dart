@@ -1,9 +1,13 @@
-import 'dart:ui' as ui;
+// lib/screens/home.dart
+
 import 'package:flutter/material.dart';
+
 import '../core/localization/app_localization.dart';
+import '../core/theme/app_ui_kit.dart';
 
 import '../tools/apibuilder/main.dart';
 import '../tools/asciiart.dart';
+import '../tools/audioconvert/main.dart';
 import '../tools/b64img.dart';
 import '../tools/b64urlend.dart';
 import '../tools/baseconv.dart';
@@ -29,6 +33,8 @@ import '../tools/hashgen.dart';
 import '../tools/htmlent.dart';
 import '../tools/imagecompress/main.dart';
 import '../tools/imageconvert/main.dart';
+import '../tools/imagecrop.dart';
+import '../tools/imagetopdf/main.dart';
 import '../tools/jsoncodegen/main.dart';
 import '../tools/jsonfmt.dart';
 import '../tools/jsonschemagen/main.dart';
@@ -49,6 +55,9 @@ import '../tools/mockserver/main.dart';
 import '../tools/netpack/main.dart';
 import '../tools/passgen.dart';
 import '../tools/passstrength/main.dart';
+import '../tools/pdfcompress.dart';
+import '../tools/pdfmerge/main.dart';
+import '../tools/pdfsplit/main.dart';
 import '../tools/qrgen.dart';
 import '../tools/regexbuilder/main.dart';
 import '../tools/regextest.dart';
@@ -98,7 +107,6 @@ class _HomeState extends State<Home> {
   ];
 
   late final List<_ToolItem> _tools = <_ToolItem>[
-    // ===================== TEXT =====================
     _ToolItem(
       id: 'caseconv',
       category: 'text',
@@ -184,7 +192,6 @@ class _HomeState extends State<Home> {
       builder: () => const CodeFmt(),
     ),
 
-    // ===================== DATA =====================
     _ToolItem(
       id: 'jsonfmt',
       category: 'data',
@@ -291,7 +298,6 @@ class _HomeState extends State<Home> {
       builder: () => const TableViewer(),
     ),
 
-    // ===================== SECURITY =====================
     _ToolItem(
       id: 'hashgen',
       category: 'security',
@@ -384,7 +390,6 @@ class _HomeState extends State<Home> {
       builder: () => const HtmlEnt(),
     ),
 
-    // ===================== WEB =====================
     _ToolItem(
       id: 'urlparse',
       category: 'web',
@@ -456,7 +461,6 @@ class _HomeState extends State<Home> {
       builder: () => const NetPack(),
     ),
 
-    // ===================== CONVERT =====================
     _ToolItem(
       id: 'codefilecon',
       category: 'convert',
@@ -514,7 +518,6 @@ class _HomeState extends State<Home> {
       builder: () => const EnvManager(),
     ),
 
-    // ===================== MEDIA =====================
     _ToolItem(
       id: 'b64img',
       category: 'media',
@@ -564,8 +567,49 @@ class _HomeState extends State<Home> {
       gradient: <Color>[Color(0xFF00C6FF), Color(0xFF0072FF)],
       builder: () => const ImageConvertPage(),
     ),
+    _ToolItem(
+      id: 'imagecrop',
+      category: 'media',
+      icon: Icons.crop_rounded,
+      gradient: <Color>[Color(0xFF7C4DFF), Color(0xFFFF6A00)],
+      builder: () => const ImageCrop(),
+    ),
+    _ToolItem(
+      id: 'imagetopdf',
+      category: 'media',
+      icon: Icons.picture_as_pdf_rounded,
+      gradient: <Color>[Color(0xFFDD2476), Color(0xFF2196F3)],
+      builder: () => const ImageToPdfPage(),
+    ),
+    _ToolItem(
+      id: 'pdfmerge',
+      category: 'media',
+      icon: Icons.merge_type_rounded,
+      gradient: <Color>[Color(0xFFB92B27), Color(0xFF1565C0)],
+      builder: () => const PdfMerge(),
+    ),
+    _ToolItem(
+      id: 'pdfsplit',
+      category: 'media',
+      icon: Icons.content_cut_rounded,
+      gradient: <Color>[Color(0xFF8E2DE2), Color(0xFF4A00E0)],
+      builder: () => const PdfSplitPage(),
+    ),
+    _ToolItem(
+      id: 'pdfcompress',
+      category: 'media',
+      icon: Icons.compress,
+      gradient: <Color>[Color(0xFFB92B27), Color(0xFFDD2476)],
+      builder: () => const PdfCompress(),
+    ),
+    _ToolItem(
+      id: 'audioconvert',
+      category: 'media',
+      icon: Icons.audio_file_rounded,
+      gradient: <Color>[Color(0xFF00B8D4), Color(0xFF64FFDA)],
+      builder: () => const AudioConvert(),
+    ),
 
-    // ===================== DEV =====================
     _ToolItem(
       id: 'gitgen',
       category: 'dev',
@@ -595,7 +639,6 @@ class _HomeState extends State<Home> {
       builder: () => const MockServerPage(),
     ),
 
-    // ===================== OTHER =====================
     _ToolItem(
       id: 'timezoneplanner',
       category: 'other',
@@ -616,10 +659,8 @@ class _HomeState extends State<Home> {
       if (_category != 'all' && t.category != _category) return false;
       if (_query.isEmpty) return true;
       final String q = _query.toLowerCase();
-      final String title =
-      context.t('home_tool_${t.id}_title').toLowerCase();
-      final String desc =
-      context.t('home_tool_${t.id}_desc').toLowerCase();
+      final String title = context.t('home_tool_${t.id}_title').toLowerCase();
+      final String desc = context.t('home_tool_${t.id}_desc').toLowerCase();
       return title.contains(q) || desc.contains(q) || t.id.contains(q);
     }).toList();
   }
@@ -633,132 +674,89 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     final ColorScheme colors = Theme.of(context).colorScheme;
-    final bool dark = Theme.of(context).brightness == Brightness.dark;
     final List<_ToolItem> visible = _filtered;
 
     return Scaffold(
       extendBodyBehindAppBar: true,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        title: Text(
-          context.t('home_title'),
-          style: const TextStyle(fontWeight: FontWeight.w700),
-        ),
+      backgroundColor: kScaffoldBg,
+      appBar: GlassAppBar(
+        title: context.t('home_title'),
         actions: <Widget>[
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.settings_outlined),
+          GlassIconButton(
+            icon: Icons.settings_outlined,
             tooltip: context.t('home_settings'),
+            onTap: () {},
           ),
+          const SizedBox(width: 8),
         ],
       ),
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: dark
-                ? <Color>[
-              const Color(0xFF0F0B24),
-              const Color(0xFF1A0F3C),
-              const Color(0xFF071B33),
-            ]
-                : <Color>[
-              const Color(0xFFF5F3FF),
-              const Color(0xFFEEF2FF),
-              const Color(0xFFE0F2FE),
-            ],
-          ),
-        ),
-        child: Stack(
-          children: <Widget>[
-            Positioned(
-              top: -100,
-              left: -80,
-              child: _blob(240, const Color(0xFF7C4DFF)),
-            ),
-            Positioned(
-              bottom: -120,
-              right: -80,
-              child: _blob(280, const Color(0xFF00E5FF)),
-            ),
-            SafeArea(
-              child: Column(
-                children: <Widget>[
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
-                    child: _searchBar(colors, dark),
+      body: GlassBackground(
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.only(top: kToolbarHeight),
+            child: Column(
+              children: <Widget>[
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
+                  child: _searchBar(),
+                ),
+                SizedBox(
+                  height: 42,
+                  child: ListView.separated(
+                    scrollDirection: Axis.horizontal,
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    itemCount: _categories.length,
+                    separatorBuilder: (_, __) => const SizedBox(width: 8),
+                    itemBuilder: (BuildContext context, int index) {
+                      final String c = _categories[index];
+                      return GlassChip(
+                        label: context.t('home_cat_$c'),
+                        selected: _category == c,
+                        onTap: () {
+                          setState(() {
+                            _category = c;
+                          });
+                        },
+                      );
+                    },
                   ),
-                  SizedBox(
-                    height: 42,
-                    child: ListView.separated(
-                      scrollDirection: Axis.horizontal,
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      itemCount: _categories.length,
-                      separatorBuilder: (_, __) => const SizedBox(width: 8),
-                      itemBuilder: (BuildContext context, int index) {
-                        final String c = _categories[index];
-                        final bool selected = _category == c;
-                        return _categoryChip(c, selected, dark);
-                      },
-                    ),
+                ),
+                const SizedBox(height: 8),
+                Expanded(
+                  child: visible.isEmpty
+                      ? _emptyState(colors)
+                      : LayoutBuilder(
+                    builder: (
+                        BuildContext context,
+                        BoxConstraints constraints,
+                        ) {
+                      final double w = constraints.maxWidth;
+                      final int cols = w > 1100
+                          ? 5
+                          : w > 850
+                          ? 4
+                          : w > 600
+                          ? 3
+                          : 2;
+                      return GridView.builder(
+                        padding:
+                        const EdgeInsets.fromLTRB(16, 8, 16, 32),
+                        gridDelegate:
+                        SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: cols,
+                          crossAxisSpacing: 12,
+                          mainAxisSpacing: 12,
+                          childAspectRatio: 0.95,
+                        ),
+                        itemCount: visible.length,
+                        itemBuilder: (BuildContext context, int i) {
+                          return _toolCard(visible[i]);
+                        },
+                      );
+                    },
                   ),
-                  const SizedBox(height: 8),
-                  Expanded(
-                    child: visible.isEmpty
-                        ? _emptyState(colors)
-                        : LayoutBuilder(
-                      builder: (
-                          BuildContext context,
-                          BoxConstraints constraints,
-                          ) {
-                        final double w = constraints.maxWidth;
-                        final int cols = w > 1100
-                            ? 5
-                            : w > 850
-                            ? 4
-                            : w > 600
-                            ? 3
-                            : 2;
-                        return GridView.builder(
-                          padding:
-                          const EdgeInsets.fromLTRB(16, 8, 16, 32),
-                          gridDelegate:
-                          SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: cols,
-                            crossAxisSpacing: 12,
-                            mainAxisSpacing: 12,
-                            childAspectRatio: 0.95,
-                          ),
-                          itemCount: visible.length,
-                          itemBuilder: (BuildContext context, int i) {
-                            return _toolCard(visible[i], dark);
-                          },
-                        );
-                      },
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _blob(double size, Color color) {
-    return IgnorePointer(
-      child: ClipRRect(
-        child: BackdropFilter(
-          filter: ui.ImageFilter.blur(sigmaX: 60, sigmaY: 60),
-          child: Container(
-            width: size,
-            height: size,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: color.withValues(alpha: 0.25),
+                ),
+              ],
             ),
           ),
         ),
@@ -766,98 +764,37 @@ class _HomeState extends State<Home> {
     );
   }
 
-  Widget _searchBar(ColorScheme colors, bool dark) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(16),
-      child: BackdropFilter(
-        filter: ui.ImageFilter.blur(sigmaX: 14, sigmaY: 14),
-        child: TextField(
-          controller: _searchController,
-          onChanged: (String v) {
-            setState(() {
-              _query = v;
-            });
-          },
-          style: TextStyle(
-            color: dark ? Colors.white : Colors.black87,
-            fontSize: 14,
-          ),
-          decoration: InputDecoration(
-            hintText: context.t('home_search_hint'),
-            hintStyle: TextStyle(
-              color: dark ? Colors.white54 : Colors.black45,
-              fontSize: 13,
-            ),
-            prefixIcon: Icon(
-              Icons.search,
-              color: dark ? Colors.white70 : Colors.black54,
-            ),
-            suffixIcon: _query.isEmpty
-                ? null
-                : IconButton(
-              onPressed: () {
-                _searchController.clear();
-                setState(() {
-                  _query = '';
-                });
-              },
-              icon: Icon(
-                Icons.close,
-                color: dark ? Colors.white70 : Colors.black54,
-              ),
-            ),
-            border: InputBorder.none,
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 12,
-              vertical: 14,
-            ),
-            filled: true,
-            fillColor:
-            dark ? Colors.white.withValues(alpha: 0.08) : Colors.white,
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _categoryChip(String c, bool selected, bool dark) {
-    return GestureDetector(
-      onTap: () {
-        setState(() {
-          _category = c;
-        });
-      },
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 180),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-        decoration: BoxDecoration(
-          gradient: selected
-              ? const LinearGradient(
-            colors: <Color>[Color(0xFF7C4DFF), Color(0xFF00E5FF)],
-          )
-              : null,
-          color: selected
+  Widget _searchBar() {
+    return GlassCard(
+      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+      radius: 16,
+      child: TextField(
+        controller: _searchController,
+        onChanged: (String v) {
+          setState(() {
+            _query = v;
+          });
+        },
+        style: const TextStyle(color: Colors.white, fontSize: 14),
+        decoration: InputDecoration(
+          hintText: context.t('home_search_hint'),
+          hintStyle: const TextStyle(color: Colors.white54, fontSize: 13),
+          prefixIcon: const Icon(Icons.search, color: Colors.white70),
+          suffixIcon: _query.isEmpty
               ? null
-              : dark
-              ? Colors.white.withValues(alpha: 0.08)
-              : Colors.white,
-          borderRadius: BorderRadius.circular(24),
-          border: Border.all(
-            color: selected
-                ? Colors.transparent
-                : (dark
-                ? Colors.white.withValues(alpha: 0.15)
-                : Colors.black.withValues(alpha: 0.08)),
+              : IconButton(
+            onPressed: () {
+              _searchController.clear();
+              setState(() {
+                _query = '';
+              });
+            },
+            icon: const Icon(Icons.close, color: Colors.white70),
           ),
-        ),
-        child: Text(
-          context.t('home_cat_$c'),
-          style: TextStyle(
-            color: selected
-                ? Colors.white
-                : (dark ? Colors.white70 : Colors.black87),
-            fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
-            fontSize: 13,
+          border: InputBorder.none,
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 12,
+            vertical: 14,
           ),
         ),
       ),
@@ -880,84 +817,65 @@ class _HomeState extends State<Home> {
     );
   }
 
-  Widget _toolCard(_ToolItem tool, bool dark) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(18),
-      child: BackdropFilter(
-        filter: ui.ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-        child: Material(
-          color: dark
-              ? Colors.white.withValues(alpha: 0.06)
-              : Colors.white.withValues(alpha: 0.85),
-          child: InkWell(
-            onTap: () => _openTool(tool),
-            child: Container(
-              padding: const EdgeInsets.all(14),
+  Widget _toolCard(_ToolItem tool) {
+    return GestureDetector(
+      onTap: () => _openTool(tool),
+      child: GlassCard(
+        padding: const EdgeInsets.all(14),
+        radius: 18,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Container(
+              width: 46,
+              height: 46,
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(18),
-                border: Border.all(
-                  color: dark
-                      ? Colors.white.withValues(alpha: 0.1)
-                      : Colors.black.withValues(alpha: 0.06),
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: tool.gradient,
                 ),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Container(
-                    width: 46,
-                    height: 46,
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: tool.gradient,
-                      ),
-                      borderRadius: BorderRadius.circular(14),
-                      boxShadow: <BoxShadow>[
-                        BoxShadow(
-                          color: tool.gradient.first
-                              .withValues(alpha: 0.35),
-                          blurRadius: 12,
-                          offset: const Offset(0, 6),
-                        ),
-                      ],
-                    ),
-                    child: Icon(
-                      tool.icon,
-                      color: Colors.white,
-                      size: 24,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  Expanded(
-                    child: Text(
-                      context.t('home_tool_${tool.id}_title'),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        fontWeight: FontWeight.w700,
-                        fontSize: 14,
-                        height: 1.2,
-                        color: dark ? Colors.white : Colors.black87,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    context.t('home_tool_${tool.id}_desc'),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      fontSize: 11,
-                      height: 1.3,
-                      color: dark ? Colors.white60 : Colors.black54,
-                    ),
+                borderRadius: BorderRadius.circular(14),
+                boxShadow: <BoxShadow>[
+                  BoxShadow(
+                    color: tool.gradient.first.withOpacity(0.35),
+                    blurRadius: 12,
+                    offset: const Offset(0, 6),
                   ),
                 ],
               ),
+              child: Icon(
+                tool.icon,
+                color: Colors.white,
+                size: 24,
+              ),
             ),
-          ),
+            const SizedBox(height: 12),
+            Expanded(
+              child: Text(
+                context.t('home_tool_${tool.id}_title'),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  fontWeight: FontWeight.w700,
+                  fontSize: 14,
+                  height: 1.2,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              context.t('home_tool_${tool.id}_desc'),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                fontSize: 11,
+                height: 1.3,
+                color: Colors.white60,
+              ),
+            ),
+          ],
         ),
       ),
     );

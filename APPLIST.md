@@ -154,6 +154,8 @@ Image Crop / Rotate
 
 Audio Format Converter
 
+=================================
+
 Audio Trim / Fade
 
 Audio Waveform

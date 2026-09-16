@@ -3,10 +3,12 @@
 #
 
 list(APPEND FLUTTER_PLUGIN_LIST
+  ffmpeg_kit_flutter_new_audio
   file_saver
   file_selector_linux
   flutter_avif_linux
   heic_native
+  pdf_combiner
   url_launcher_linux
 )
 
