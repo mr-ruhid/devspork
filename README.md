@@ -1,6 +1,6 @@
 # DevSpork
 
-> **Beta status** — DevSpork is in active beta development (`v0.0.13`). Features, tools and UI may change without notice. Use in production at your own discretion.
+> **Beta status** — DevSpork is in active beta development (`v0.0.14`). Features, tools and UI may change without notice. Use in production at your own discretion.
 
 All-in-one cross-platform developer toolbox — 80+ offline utilities for text, JSON, SQL, security, media, web and more. Built with Flutter for Android, iOS, Web, Windows, macOS and Linux.
 
