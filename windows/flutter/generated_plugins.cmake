@@ -10,8 +10,10 @@ list(APPEND FLUTTER_PLUGIN_LIST
   heic_native
   pdf_combiner
   pdfx
+  screen_retriever_windows
   share_plus
   url_launcher_windows
+  window_manager
 )
 
 list(APPEND FLUTTER_FFI_PLUGIN_LIST

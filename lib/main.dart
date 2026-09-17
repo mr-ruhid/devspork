@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+
 import 'core/localization/app_localization.dart';
+import 'core/platform/window_initializer.dart';
 import 'scene/home.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await WindowInitializer.initialize();
   await AppLocalization.instance.init();
   runApp(const DevSporkApp());
 }

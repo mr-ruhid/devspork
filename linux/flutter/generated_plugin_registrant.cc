@@ -12,7 +12,9 @@
 #include <flutter_avif_linux/flutter_avif_linux_plugin.h>
 #include <heic_native/heic_native_plugin.h>
 #include <pdf_combiner/pdf_combiner_plugin.h>
+#include <screen_retriever_linux/screen_retriever_linux_plugin.h>
 #include <url_launcher_linux/url_launcher_plugin.h>
+#include <window_manager/window_manager_plugin.h>
 
 void fl_register_plugins(FlPluginRegistry* registry) {
   g_autoptr(FlPluginRegistrar) ffmpeg_kit_flutter_new_audio_registrar =
@@ -33,7 +35,13 @@ void fl_register_plugins(FlPluginRegistry* registry) {
   g_autoptr(FlPluginRegistrar) pdf_combiner_registrar =
       fl_plugin_registry_get_registrar_for_plugin(registry, "PdfCombinerPlugin");
   pdf_combiner_plugin_register_with_registrar(pdf_combiner_registrar);
+  g_autoptr(FlPluginRegistrar) screen_retriever_linux_registrar =
+      fl_plugin_registry_get_registrar_for_plugin(registry, "ScreenRetrieverLinuxPlugin");
+  screen_retriever_linux_plugin_register_with_registrar(screen_retriever_linux_registrar);
   g_autoptr(FlPluginRegistrar) url_launcher_linux_registrar =
       fl_plugin_registry_get_registrar_for_plugin(registry, "UrlLauncherPlugin");
   url_launcher_plugin_register_with_registrar(url_launcher_linux_registrar);
+  g_autoptr(FlPluginRegistrar) window_manager_registrar =
+      fl_plugin_registry_get_registrar_for_plugin(registry, "WindowManagerPlugin");
+  window_manager_plugin_register_with_registrar(window_manager_registrar);
 }

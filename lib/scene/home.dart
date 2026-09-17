@@ -1,8 +1,13 @@
-// lib/screens/home.dart
+import 'dart:async';
+import 'dart:ui' as ui;
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:window_manager/window_manager.dart';
 
 import '../core/localization/app_localization.dart';
+import '../core/platform/platform_detector.dart';
+import '../core/platform/window_controls.dart';
 import '../core/theme/app_ui_kit.dart';
 
 import '../tools/apibuilder/main.dart';
@@ -82,6 +87,12 @@ import '../tools/uuidgen.dart';
 import '../tools/wordlistgen/main.dart';
 import '../tools/yamljson.dart';
 
+/// Fixed tile height for every tool card. Because the card now fills the
+/// whole grid tile (see `_ToolCard`), this single value decides the card
+/// height for all of them — no more cards shrinking to fit their text.
+const double _kTileHeight = 168;
+const double _kTileMaxWidth = 220;
+
 class Home extends StatefulWidget {
   const Home({super.key});
 
@@ -93,6 +104,14 @@ class _HomeState extends State<Home> {
   final TextEditingController _searchController = TextEditingController();
   String _query = '';
   String _category = 'all';
+  Timer? _searchDebounce;
+
+  // Cache of localized title/description per tool id. `context.t()` was
+  // previously called twice for *every* tool on *every* rebuild — i.e.
+  // ~160 lookups per keystroke while typing in the search box. We build
+  // it once per locale instead.
+  final Map<String, _ToolStrings> _stringsCache = <String, _ToolStrings>{};
+  Locale? _cachedLocale;
 
   static const List<String> _categories = <String>[
     'all',
@@ -191,7 +210,6 @@ class _HomeState extends State<Home> {
       gradient: <Color>[Color(0xFF1FA2FF), Color(0xFF12D8FA)],
       builder: () => const CodeFmt(),
     ),
-
     _ToolItem(
       id: 'jsonfmt',
       category: 'data',
@@ -297,7 +315,6 @@ class _HomeState extends State<Home> {
       gradient: <Color>[Color(0xFF2193B0), Color(0xFF6DD5ED)],
       builder: () => const TableViewer(),
     ),
-
     _ToolItem(
       id: 'hashgen',
       category: 'security',
@@ -389,7 +406,6 @@ class _HomeState extends State<Home> {
       gradient: <Color>[Color(0xFFee0979), Color(0xFFff6a00)],
       builder: () => const HtmlEnt(),
     ),
-
     _ToolItem(
       id: 'urlparse',
       category: 'web',
@@ -460,7 +476,6 @@ class _HomeState extends State<Home> {
       gradient: <Color>[Color(0xFF11998E), Color(0xFF38EF7D)],
       builder: () => const NetPack(),
     ),
-
     _ToolItem(
       id: 'codefilecon',
       category: 'convert',
@@ -517,7 +532,6 @@ class _HomeState extends State<Home> {
       gradient: <Color>[Color(0xFF134E5E), Color(0xFF71B280)],
       builder: () => const EnvManager(),
     ),
-
     _ToolItem(
       id: 'b64img',
       category: 'media',
@@ -609,7 +623,6 @@ class _HomeState extends State<Home> {
       gradient: <Color>[Color(0xFF00B8D4), Color(0xFF64FFDA)],
       builder: () => const AudioConvert(),
     ),
-
     _ToolItem(
       id: 'gitgen',
       category: 'dev',
@@ -638,7 +651,6 @@ class _HomeState extends State<Home> {
       gradient: <Color>[Color(0xFF4B9BFF), Color(0xFF00E5FF)],
       builder: () => const MockServerPage(),
     ),
-
     _ToolItem(
       id: 'timezoneplanner',
       category: 'other',
@@ -650,19 +662,35 @@ class _HomeState extends State<Home> {
 
   @override
   void dispose() {
+    _searchDebounce?.cancel();
     _searchController.dispose();
     super.dispose();
   }
 
-  List<_ToolItem> get _filtered {
-    return _tools.where((_ToolItem t) {
-      if (_category != 'all' && t.category != _category) return false;
-      if (_query.isEmpty) return true;
-      final String q = _query.toLowerCase();
-      final String title = context.t('home_tool_${t.id}_title').toLowerCase();
-      final String desc = context.t('home_tool_${t.id}_desc').toLowerCase();
-      return title.contains(q) || desc.contains(q) || t.id.contains(q);
-    }).toList();
+  void _onSearchChanged(String value) {
+    // Debounced: a rebuild of the whole grid on every keystroke was a
+    // large part of the input lag.
+    _searchDebounce?.cancel();
+    _searchDebounce = Timer(const Duration(milliseconds: 220), () {
+      if (!mounted) return;
+      setState(() => _query = value);
+    });
+  }
+
+  void _ensureStringsCache() {
+    final Locale locale = Localizations.localeOf(context);
+    if (_cachedLocale == locale && _stringsCache.isNotEmpty) return;
+    _cachedLocale = locale;
+    _stringsCache.clear();
+    for (final _ToolItem tool in _tools) {
+      final String title = context.t('home_tool_${tool.id}_title');
+      final String desc = context.t('home_tool_${tool.id}_desc');
+      _stringsCache[tool.id] = _ToolStrings(
+        title: title,
+        description: desc,
+        searchBlob: '$title $desc ${tool.id}'.toLowerCase(),
+      );
+    }
   }
 
   void _openTool(_ToolItem tool) {
@@ -671,25 +699,55 @@ class _HomeState extends State<Home> {
     );
   }
 
+  PreferredSizeWidget _buildAppBar(BuildContext context) {
+    return GlassAppBar(
+      title: context.t('home_title'),
+      actions: <Widget>[
+        GlassIconButton(
+          icon: Icons.settings_outlined,
+          tooltip: context.t('home_settings'),
+          onTap: () {},
+        ),
+        const SizedBox(width: 8),
+        const WindowControls(),
+      ],
+    );
+  }
+
+  PreferredSizeWidget _desktopAppBar(BuildContext context) {
+    return PreferredSize(
+      preferredSize: const Size.fromHeight(kToolbarHeight),
+      child: DragToMoveArea(
+        child: _buildAppBar(context),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    _ensureStringsCache();
+
     final ColorScheme colors = Theme.of(context).colorScheme;
-    final List<_ToolItem> visible = _filtered;
+    final String q = _query.trim().toLowerCase();
+
+    final List<_ResolvedTool> resolved = <_ResolvedTool>[];
+    for (final _ToolItem tool in _tools) {
+      if (_category != 'all' && tool.category != _category) continue;
+      final _ToolStrings s = _stringsCache[tool.id]!;
+      if (q.isNotEmpty && !s.searchBlob.contains(q)) continue;
+      resolved.add(_ResolvedTool(
+        item: tool,
+        title: s.title,
+        description: s.description,
+      ));
+    }
 
     return Scaffold(
       extendBodyBehindAppBar: true,
       backgroundColor: kScaffoldBg,
-      appBar: GlassAppBar(
-        title: context.t('home_title'),
-        actions: <Widget>[
-          GlassIconButton(
-            icon: Icons.settings_outlined,
-            tooltip: context.t('home_settings'),
-            onTap: () {},
-          ),
-          const SizedBox(width: 8),
-        ],
-      ),
+      appBar: PlatformDetector.isDesktop
+          ? _desktopAppBar(context)
+          : _buildAppBar(context),
       body: GlassBackground(
         child: SafeArea(
           child: Padding(
@@ -723,35 +781,32 @@ class _HomeState extends State<Home> {
                 ),
                 const SizedBox(height: 8),
                 Expanded(
-                  child: visible.isEmpty
+                  child: resolved.isEmpty
                       ? _emptyState(colors)
-                      : LayoutBuilder(
-                    builder: (
-                        BuildContext context,
-                        BoxConstraints constraints,
-                        ) {
-                      final double w = constraints.maxWidth;
-                      final int cols = w > 1100
-                          ? 5
-                          : w > 850
-                          ? 4
-                          : w > 600
-                          ? 3
-                          : 2;
-                      return GridView.builder(
-                        padding:
-                        const EdgeInsets.fromLTRB(16, 8, 16, 32),
-                        gridDelegate:
-                        SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: cols,
-                          crossAxisSpacing: 12,
-                          mainAxisSpacing: 12,
-                          childAspectRatio: 0.95,
-                        ),
-                        itemCount: visible.length,
-                        itemBuilder: (BuildContext context, int i) {
-                          return _toolCard(visible[i]);
-                        },
+                      : GridView.builder(
+                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
+                    addAutomaticKeepAlives: false,
+                    addRepaintBoundaries: false,
+                    // Keep only a modest offscreen buffer so we
+                    // don't build/paint far more cards than are
+                    // visible.
+                    cacheExtent: _kTileHeight * 2,
+                    gridDelegate:
+                    const SliverGridDelegateWithMaxCrossAxisExtent(
+                      maxCrossAxisExtent: _kTileMaxWidth,
+                      crossAxisSpacing: 12,
+                      mainAxisSpacing: 12,
+                      mainAxisExtent: _kTileHeight,
+                    ),
+                    itemCount: resolved.length,
+                    itemBuilder: (BuildContext context, int i) {
+                      final _ResolvedTool r = resolved[i];
+                      return _ToolCard(
+                        key: ValueKey<String>(r.item.id),
+                        tool: r.item,
+                        title: r.title,
+                        description: r.description,
+                        onTap: () => _openTool(r.item),
                       );
                     },
                   ),
@@ -770,11 +825,7 @@ class _HomeState extends State<Home> {
       radius: 16,
       child: TextField(
         controller: _searchController,
-        onChanged: (String v) {
-          setState(() {
-            _query = v;
-          });
-        },
+        onChanged: _onSearchChanged,
         style: const TextStyle(color: Colors.white, fontSize: 14),
         decoration: InputDecoration(
           hintText: context.t('home_search_hint'),
@@ -784,6 +835,7 @@ class _HomeState extends State<Home> {
               ? null
               : IconButton(
             onPressed: () {
+              _searchDebounce?.cancel();
               _searchController.clear();
               setState(() {
                 _query = '';
@@ -816,67 +868,195 @@ class _HomeState extends State<Home> {
       ),
     );
   }
+}
 
-  Widget _toolCard(_ToolItem tool) {
-    return GestureDetector(
-      onTap: () => _openTool(tool),
-      child: GlassCard(
-        padding: const EdgeInsets.all(14),
-        radius: 18,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Container(
-              width: 46,
-              height: 46,
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: tool.gradient,
-                ),
-                borderRadius: BorderRadius.circular(14),
-                boxShadow: <BoxShadow>[
-                  BoxShadow(
-                    color: tool.gradient.first.withOpacity(0.35),
-                    blurRadius: 12,
-                    offset: const Offset(0, 6),
-                  ),
+class _ToolStrings {
+  const _ToolStrings({
+    required this.title,
+    required this.description,
+    required this.searchBlob,
+  });
+
+  final String title;
+  final String description;
+  final String searchBlob;
+}
+
+class _ResolvedTool {
+  final _ToolItem item;
+  final String title;
+  final String description;
+
+  const _ResolvedTool({
+    required this.item,
+    required this.title,
+    required this.description,
+  });
+}
+
+/// A tool tile.
+///
+/// Two things changed here versus the previous version:
+///
+/// 1. **Equal sizing.** The card used to sit inside a `Stack` as a
+///    non-positioned child, so the Stack sized itself to the card's
+///    intrinsic height and each card ended up as tall as its own text —
+///    hence the ragged grid. The card now fills the whole tile.
+///
+/// 2. **No per-card `BackdropFilter`.** `GlassCard` applies a real
+///    backdrop blur; with dozens of tiles on screen that is dozens of
+///    simultaneous GPU blur passes, which is what made scrolling freeze.
+///    The tiles now use a static frosted fill (gradient + border +
+///    shadow) that is visually near-identical over this background but
+///    costs a fraction to paint. Blur is kept where there is only one of
+///    them on screen: the app bar and the search field.
+class _ToolCard extends StatefulWidget {
+  const _ToolCard({
+    super.key,
+    required this.tool,
+    required this.title,
+    required this.description,
+    required this.onTap,
+  });
+
+  final _ToolItem tool;
+  final String title;
+  final String description;
+  final VoidCallback onTap;
+
+  @override
+  State<_ToolCard> createState() => _ToolCardState();
+}
+
+class _ToolCardState extends State<_ToolCard> {
+  bool _hovered = false;
+
+  void _setHovered(bool value) {
+    if (_hovered == value) return;
+    setState(() => _hovered = value);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final Color glow = widget.tool.gradient.first;
+
+    return RepaintBoundary(
+      child: MouseRegion(
+        cursor: SystemMouseCursors.click,
+        onEnter: (_) => _setHovered(true),
+        onExit: (_) => _setHovered(false),
+        child: GestureDetector(
+          onTap: widget.onTap,
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 180),
+            curve: Curves.easeOut,
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: <Color>[
+                  Colors.white.withOpacity(_hovered ? 0.16 : 0.10),
+                  Colors.white.withOpacity(0.04),
                 ],
               ),
-              child: Icon(
-                tool.icon,
-                color: Colors.white,
-                size: 24,
+              borderRadius: BorderRadius.circular(18),
+              border: Border.all(
+                color: _hovered
+                    ? glow.withOpacity(0.55)
+                    : Colors.white.withOpacity(0.18),
               ),
-            ),
-            const SizedBox(height: 12),
-            Expanded(
-              child: Text(
-                context.t('home_tool_${tool.id}_title'),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  fontWeight: FontWeight.w700,
-                  fontSize: 14,
-                  height: 1.2,
-                  color: Colors.white,
+              boxShadow: <BoxShadow>[
+                BoxShadow(
+                  color: _hovered
+                      ? glow.withOpacity(0.25)
+                      : Colors.black.withOpacity(0.22),
+                  blurRadius: _hovered ? 20 : 14,
+                  offset: const Offset(0, 8),
                 ),
-              ),
+              ],
             ),
-            const SizedBox(height: 6),
-            Text(
-              context.t('home_tool_${tool.id}_desc'),
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                fontSize: 11,
-                height: 1.3,
-                color: Colors.white60,
-              ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                _ToolIcon(
+                  hovered: _hovered,
+                  gradient: widget.tool.gradient,
+                  icon: widget.tool.icon,
+                ),
+                const SizedBox(height: 12),
+                SizedBox(
+                  height: 36,
+                  child: Text(
+                    widget.title,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w700,
+                      fontSize: 13.5,
+                      height: 1.25,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Expanded(
+                  child: Text(
+                    widget.description,
+                    maxLines: 3,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 11,
+                      height: 1.35,
+                      color: Colors.white60,
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
+      ),
+    );
+  }
+}
+
+class _ToolIcon extends StatelessWidget {
+  const _ToolIcon({
+    required this.hovered,
+    required this.gradient,
+    required this.icon,
+  });
+
+  final bool hovered;
+  final List<Color> gradient;
+  final IconData icon;
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 180),
+      width: 44,
+      height: 44,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: gradient,
+        ),
+        borderRadius: BorderRadius.circular(13),
+        boxShadow: <BoxShadow>[
+          BoxShadow(
+            color: gradient.first.withOpacity(hovered ? 0.55 : 0.3),
+            blurRadius: hovered ? 16 : 10,
+            offset: const Offset(0, 5),
+          ),
+        ],
+      ),
+      child: Icon(
+        icon,
+        color: Colors.white,
+        size: 22,
       ),
     );
   }
