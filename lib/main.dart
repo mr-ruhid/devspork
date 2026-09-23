@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'core/localization/app_localization.dart';
+import 'core/navigation/app_navigator.dart';
 import 'core/platform/window_initializer.dart';
 import 'core/widgets/main_shell.dart';
 import 'scene/home.dart';
@@ -23,6 +24,7 @@ class DevSporkApp extends StatelessWidget {
         return MaterialApp(
           title: 'DevSpork',
           debugShowCheckedModeBanner: false,
+          navigatorKey: AppNavigator.key,
           themeMode: ThemeMode.system,
           theme: _lightTheme(),
           darkTheme: _darkTheme(),
