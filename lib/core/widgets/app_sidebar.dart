@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../localization/app_localization.dart';
-
 class AppSidebar extends StatelessWidget {
   const AppSidebar({
     super.key,
@@ -19,10 +17,10 @@ class AppSidebar extends StatelessWidget {
     return Container(
       width: width,
       decoration: BoxDecoration(
-        color: const Color(0xFF15102E),
+        color: const Color(0xFF0F0B24),
         border: Border(
           right: BorderSide(
-            color: Colors.white.withOpacity(0.08),
+            color: Colors.white.withOpacity(0.06),
           ),
         ),
       ),
@@ -48,32 +46,27 @@ class AppSidebar extends StatelessWidget {
             const SizedBox(height: 24),
             _SidebarIcon(
               icon: Icons.home_rounded,
-              tooltip: context.t('sidebar_home'),
               selected: selectedIndex == 0,
               onTap: () => onSelect(0),
             ),
             _SidebarIcon(
               icon: Icons.grid_view_rounded,
-              tooltip: context.t('sidebar_tools'),
               selected: selectedIndex == 1,
               onTap: () => onSelect(1),
             ),
             _SidebarIcon(
               icon: Icons.star_rounded,
-              tooltip: context.t('sidebar_favorites'),
               selected: selectedIndex == 2,
               onTap: () => onSelect(2),
             ),
             _SidebarIcon(
               icon: Icons.history_rounded,
-              tooltip: context.t('sidebar_history'),
               selected: selectedIndex == 3,
               onTap: () => onSelect(3),
             ),
             const Spacer(),
             _SidebarIcon(
               icon: Icons.settings_outlined,
-              tooltip: context.t('sidebar_settings'),
               selected: selectedIndex == 4,
               onTap: () => onSelect(4),
             ),
@@ -88,13 +81,11 @@ class AppSidebar extends StatelessWidget {
 class _SidebarIcon extends StatelessWidget {
   const _SidebarIcon({
     required this.icon,
-    required this.tooltip,
     required this.selected,
     required this.onTap,
   });
 
   final IconData icon;
-  final String tooltip;
   final bool selected;
   final VoidCallback onTap;
 
@@ -102,33 +93,30 @@ class _SidebarIcon extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Tooltip(
-        message: tooltip,
-        child: Material(
-          color: Colors.transparent,
-          child: InkWell(
-            onTap: onTap,
-            borderRadius: BorderRadius.circular(12),
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 150),
-              width: 44,
-              height: 44,
-              decoration: BoxDecoration(
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(12),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 150),
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(
+              color: selected
+                  ? Colors.white.withOpacity(0.12)
+                  : Colors.transparent,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
                 color: selected
-                    ? Colors.white.withOpacity(0.12)
+                    ? Colors.white.withOpacity(0.20)
                     : Colors.transparent,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                  color: selected
-                      ? Colors.white.withOpacity(0.20)
-                      : Colors.transparent,
-                ),
               ),
-              child: Icon(
-                icon,
-                size: 20,
-                color: selected ? Colors.white : Colors.white60,
-              ),
+            ),
+            child: Icon(
+              icon,
+              size: 20,
+              color: selected ? Colors.white : Colors.white60,
             ),
           ),
         ),
