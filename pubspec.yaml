@@ -65,6 +65,9 @@ flutter:
 
   assets:
     - assets/icon/app_icon.png
+    - assets/lang/az.json
+    - assets/lang/en.json
+
 
 flutter_launcher_icons:
   image_path: "assets/icon/app_icon.png"

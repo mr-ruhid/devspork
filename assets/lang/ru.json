@@ -1,0 +1,984 @@
+{
+  "home_title": "Главная",
+  "home_settings": "Настройки",
+  "home_search_hint": "Поиск по инструментам...",
+  "home_no_results": "Инструменты не найдены",
+
+  "home_cat_all": "Все",
+  "home_cat_text": "Текст",
+  "home_cat_data": "Данные",
+  "home_cat_security": "Безопасность",
+  "home_cat_web": "Веб",
+  "home_cat_convert": "Конвертеры",
+  "home_cat_media": "Медиа",
+  "home_cat_dev": "Разработка",
+  "home_cat_other": "Другое",
+
+  "home_tool_caseconv_title": "Конвертер регистра",
+  "home_tool_caseconv_desc": "Преобразование текста в верхний, нижний регистр, camelCase и др.",
+
+  "home_tool_textstats_title": "Статистика текста",
+  "home_tool_textstats_desc": "Подсчет символов, слов и строк в тексте.",
+
+  "home_tool_textools_title": "Инструменты для текста",
+  "home_tool_textools_desc": "Различные утилиты для работы с текстом и форматирования.",
+
+  "home_tool_textmasker_title": "Маскировка текста",
+  "home_tool_textmasker_desc": "Скрытие или маскировка конфиденциальной информации в тексте.",
+
+  "home_tool_loremgen_title": "Генератор Lorem Ipsum",
+  "home_tool_loremgen_desc": "Генерация текста-заглушки для ваших дизайнов.",
+
+  "home_tool_sluggen_title": "Генератор слагов",
+  "home_tool_sluggen_desc": "Преобразование обычного текста в URL-дружественный слаг.",
+
+  "home_tool_diffcheck_title": "Сравнение текстов",
+  "home_tool_diffcheck_desc": "Сравните два фрагмента текста и подсветите различия.",
+
+  "home_tool_mdpreview_title": "Предпросмотр Markdown",
+  "home_tool_mdpreview_desc": "Посмотрите, как будет выглядеть ваш Markdown.",
+
+  "home_tool_mdhtml_title": "Markdown в HTML",
+  "home_tool_mdhtml_desc": "Конвертация Markdown в HTML-код.",
+
+  "home_tool_excel2table_title": "Excel в таблицу",
+  "home_tool_excel2table_desc": "Преобразование данных Excel или CSV в HTML/Markdown таблицы.",
+
+  "home_tool_codefmt_title": "Форматировщик кода",
+  "home_tool_codefmt_desc": "Приведите исходный код в красивый и читаемый вид.",
+
+  "home_tool_jsonfmt_title": "Форматировщик JSON",
+  "home_tool_jsonfmt_desc": "Форматирование, украшение и проверка JSON-данных.",
+
+  "home_tool_jsonsuite_title": "Набор инструментов JSON",
+  "home_tool_jsonsuite_desc": "Полный набор инструментов для работы с JSON.",
+
+  "home_tool_jsonschemagen_title": "Генератор JSON-схемы",
+  "home_tool_jsonschemagen_desc": "Генерация JSON-схемы на основе JSON-объекта.",
+
+  "home_tool_jsonschemavalidator_title": "Валидатор JSON-схемы",
+  "home_tool_jsonschemavalidator_desc": "Проверка JSON-данных по вашей схеме.",
+
+  "home_tool_jsoncodegen_title": "JSON в код",
+  "home_tool_jsoncodegen_desc": "Генерация моделей на языках программирования из JSON.",
+
+  "home_tool_sqlfmt_title": "Форматировщик SQL",
+  "home_tool_sqlfmt_desc": "Приведите сложные SQL-запросы в читаемый вид.",
+
+  "home_tool_sqlbuilder_title": "Конструктор SQL",
+  "home_tool_sqlbuilder_desc": "Визуальное создание и построение SQL-запросов.",
+
+  "home_tool_mockgen_title": "Генератор мок-данных",
+  "home_tool_mockgen_desc": "Генерация реалистичных тестовых данных.",
+
+  "home_tool_loccompare_title": "Сравнение локализаций",
+  "home_tool_loccompare_desc": "Легкое сравнение и управление файлами локализации.",
+
+  "home_tool_binview_title": "Просмотр бинарных данных",
+  "home_tool_binview_desc": "Просмотр файлов в бинарном и hex-формате.",
+
+  "home_tool_cronparse_title": "Парсер Cron",
+  "home_tool_cronparse_desc": "Перевод cron-выражений в понятный текст.",
+
+  "home_tool_cronbuilder_title": "Конструктор Cron",
+  "home_tool_cronbuilder_desc": "Создание cron-выражений через визуальный интерфейс.",
+
+  "home_tool_regextest_title": "Тестер RegEx",
+  "home_tool_regextest_desc": "Тестирование и проверка регулярных выражений.",
+
+  "home_tool_regexbuilder_title": "Конструктор RegEx",
+  "home_tool_regexbuilder_desc": "Визуальное создание сложных регулярных выражений.",
+
+  "home_tool_tableviewer_title": "Просмотр таблиц",
+  "home_tool_tableviewer_desc": "Просмотр, редактирование и анализ табличных данных.",
+
+  "home_tool_hashgen_title": "Генератор хешей",
+  "home_tool_hashgen_desc": "Генерация хешей MD5, SHA-1, SHA-256 и других.",
+
+  "home_tool_bcryptgen_title": "Генератор Bcrypt",
+  "home_tool_bcryptgen_desc": "Генерация и проверка Bcrypt-хешей паролей.",
+
+  "home_tool_jwtdec_title": "Декодер JWT",
+  "home_tool_jwtdec_desc": "Декодирование и просмотр JSON Web Tokens.",
+
+  "home_tool_jwtgen_title": "Генератор JWT",
+  "home_tool_jwtgen_desc": "Создание JSON Web Tokens для тестов.",
+
+  "home_tool_rsagen_title": "Генератор RSA-ключей",
+  "home_tool_rsagen_desc": "Генерация безопасных пар RSA-ключей.",
+
+  "home_tool_uuidgen_title": "Генератор UUID",
+  "home_tool_uuidgen_desc": "Генерация случайных UUID/GUID версии 4.",
+
+  "home_tool_passgen_title": "Генератор паролей",
+  "home_tool_passgen_desc": "Создание надежных случайных паролей.",
+
+  "home_tool_totpgen_title": "Генератор TOTP",
+  "home_tool_totpgen_desc": "Генерация одноразовых паролей для 2FA.",
+
+  "home_tool_b64urlend_title": "Base64 URL-кодирование",
+  "home_tool_b64urlend_desc": "Безопасное кодирование/декодирование Base64 для URL.",
+
+  "home_tool_htmlent_title": "HTML-сущности",
+  "home_tool_htmlent_desc": "Кодирование и декодирование спецсимволов в HTML-сущности.",
+
+  "home_tool_urlparse_title": "Парсер URL",
+  "home_tool_urlparse_desc": "Разбор URL на составные части.",
+
+  "home_tool_apibuilder_title": "Конструктор API",
+  "home_tool_apibuilder_desc": "Создание и тестирование API-запросов.",
+
+  "home_tool_sociallinks_title": "Ссылки для соцсетей",
+  "home_tool_sociallinks_desc": "Генерация ссылок для шаринга в соцсетях.",
+
+  "home_tool_seotools_title": "SEO-инструменты",
+  "home_tool_seotools_desc": "Анализ и оптимизация мета-тегов для SEO.",
+
+  "home_tool_uaparse_title": "Парсер User-Agent",
+  "home_tool_uaparse_desc": "Извлечение информации об устройстве и браузере из User-Agent.",
+
+  "home_tool_mimelist_title": "MIME-типы",
+  "home_tool_mimelist_desc": "Поиск MIME-типов по расширениям файлов.",
+
+  "home_tool_csstools_title": "Инструменты CSS",
+  "home_tool_csstools_desc": "Различные утилиты для работы с CSS и стилями.",
+
+  "home_tool_codefilecon_title": "Конвертер файлов",
+  "home_tool_codefilecon_desc": "Конвертация синтаксиса между разными конфигами.",
+
+  "home_tool_yamljson_title": "YAML в JSON",
+  "home_tool_yamljson_desc": "Легкая конвертация между YAML и JSON.",
+
+  "home_tool_listconv_title": "Конвертер списков",
+  "home_tool_listconv_desc": "Преобразование текстовых списков в разные форматы строк.",
+
+  "home_tool_baseconv_title": "Конвертер систем счисления",
+  "home_tool_baseconv_desc": "Перевод чисел между hex, decimal, binary и др.",
+
+  "home_tool_colorconv_title": "Конвертер цветов",
+  "home_tool_colorconv_desc": "Конвертация цветов между HEX, RGB, HSL и др.",
+
+  "home_tool_tsconv_title": "Конвертер времени",
+  "home_tool_tsconv_desc": "Преобразование Unix-меток в читаемую дату.",
+
+  "home_tool_devcalc_title": "Калькулятор разработчика",
+  "home_tool_devcalc_desc": "Калькулятор для разработчиков (битовые операции, hex).",
+
+  "home_tool_envmanager_title": "Менеджер ENV",
+  "home_tool_envmanager_desc": "Управление и форматирование .env файлов.",
+
+  "home_tool_b64img_title": "Base64 в картинку",
+  "home_tool_b64img_desc": "Конвертация Base64-строк в изображения и обратно.",
+
+  "home_tool_qrgen_title": "Генератор QR-кодов",
+  "home_tool_qrgen_desc": "Создание QR-кодов из текста или URL.",
+
+  "home_tool_asciiart_title": "ASCII Art",
+  "home_tool_asciiart_desc": "Генерация ASCII-арта из обычного текста.",
+
+  "home_tool_colorpalette_title": "Цветовая палитра",
+  "home_tool_colorpalette_desc": "Создание и извлечение красивых цветовых палитр.",
+
+  "home_tool_gitgen_title": "Шпаргалка по Git",
+  "home_tool_gitgen_desc": "Быстрый справочник и генератор команд Git.",
+
+  "home_tool_devopsgen_title": "Генератор DevOps",
+  "home_tool_devopsgen_desc": "Генерация базовых конфигураций CI/CD пайплайнов.",
+
+  "home_tool_timezoneplanner_title": "Планировщик часовых поясов",
+  "home_tool_timezoneplanner_desc": "Планирование встреч с учетом разных часовых поясов.",
+
+  "apibuilder_title": "Конструктор API",
+
+  "apibuilder_tab_request": "Запрос",
+  "apibuilder_tab_response": "Ответ",
+  "apibuilder_tab_history": "История",
+  "apibuilder_tab_saved": "Сохраненные",
+
+  "apibuilder_url_hint": "Введите URL запроса...",
+  "apibuilder_url_required": "URL обязателен",
+
+  "apibuilder_headers": "Заголовки",
+  "apibuilder_header_key": "Ключ",
+  "apibuilder_header_value": "Значение",
+
+  "apibuilder_body": "Тело",
+  "apibuilder_body_hint": "Введите содержимое тела запроса...",
+  "apibuilder_body_json": "JSON тело",
+  "apibuilder_body_text": "Текстовое тело",
+
+  "apibuilder_send": "Отправить",
+  "apibuilder_sending": "Отправка...",
+
+  "apibuilder_save": "Сохранить",
+  "apibuilder_save_request": "Сохранить запрос",
+  "apibuilder_name_hint": "Введите название запроса...",
+  "apibuilder_saved": "Запрос успешно сохранен",
+  "apibuilder_saved_empty": "Нет сохраненных запросов",
+
+  "apibuilder_import": "Импорт",
+  "apibuilder_export": "Экспорт",
+  "apibuilder_curl_import": "Импорт cURL",
+  "apibuilder_curl_export": "Экспорт cURL",
+  "apibuilder_curl_paste": "Вставьте сюда вашу cURL-команду",
+  "apibuilder_curl_invalid": "Неверная cURL-команда",
+  "apibuilder_curl_loaded": "cURL успешно загружен",
+
+  "apibuilder_clear": "Очистить",
+  "apibuilder_clear_all": "Очистить все",
+
+  "apibuilder_copy": "Копировать",
+  "apibuilder_copied": "Скопировано в буфер обмена",
+  "apibuilder_cancel": "Отмена",
+
+  "apibuilder_no_response": "Пока нет ответа. Отправьте запрос.",
+  "apibuilder_response_headers": "Заголовки ответа",
+
+  "apibuilder_history_empty": "История пуста",
+  "apibuilder_items": "элементов",
+
+  "codefmt_title": "Форматировщик кода",
+
+  "codefmt_tab_input": "Ввод",
+  "codefmt_tab_output": "Вывод",
+
+  "codefmt_paste": "Вставить",
+  "codefmt_clear": "Очистить",
+  "codefmt_copy": "Копировать",
+  "codefmt_copied": "Скопировано",
+
+  "codefmt_language": "Язык",
+  "codefmt_options": "Опции",
+  "codefmt_indent_size": "Размер отступа",
+  "codefmt_use_tabs": "Использовать табы",
+  "codefmt_sort_keys": "Сортировать ключи",
+  "codefmt_minify": "Минифицировать",
+
+  "codefmt_input": "Входной код",
+  "codefmt_format": "Форматировать",
+  "codefmt_formatting": "Форматирование...",
+
+  "codefmt_remote_online": "В сети",
+  "codefmt_remote_offline": "Не в сети",
+
+  "codefmt_no_output": "Пока нет результата. Сначала отформатируйте код.",
+  "codefmt_lines": "строк",
+
+  "codefmt_error_empty": "Ввод не может быть пустым",
+
+  "cronbuilder_title": "Конструктор Cron",
+
+  "cronbuilder_tab_builder": "Конструктор",
+  "cronbuilder_tab_presets": "Шаблоны",
+
+  "cronbuilder_reset": "Сбросить",
+  "cronbuilder_copy": "Копировать",
+  "cronbuilder_copied": "Скопировано",
+
+  "cronbuilder_expression": "Cron-выражение",
+  "cronbuilder_error_invalid": "Неверное cron-выражение",
+
+  "cronbuilder_from": "С",
+  "cronbuilder_to": "По",
+  "cronbuilder_every": "Каждый",
+  "cronbuilder_start": "Начиная с",
+
+  "cronbuilder_next_runs": "Ближайшие запуски",
+  "cronbuilder_no_runs": "Нет ближайших запусков или выражение неверно",
+
+  "cronbuilder_mode_any": "Любой (*)",
+  "cronbuilder_mode_specific": "Конкретный",
+  "cronbuilder_mode_range": "Диапазон",
+  "cronbuilder_mode_step": "Шаг",
+  "cronbuilder_mode_list": "Список",
+
+  "cronbuilder_field_minute": "Минута",
+  "cronbuilder_field_hour": "Час",
+  "cronbuilder_field_day": "День месяца",
+  "cronbuilder_field_month": "Месяц",
+  "cronbuilder_field_day_of_week": "День недели",
+
+  "cronbuilder_preset_every_minute": "Каждую минуту",
+  "cronbuilder_preset_hourly": "Каждый час",
+  "cronbuilder_preset_daily": "Ежедневно в полночь",
+  "cronbuilder_preset_weekly": "Еженедельно в воскресенье",
+  "cronbuilder_preset_monthly": "Ежемесячно",
+  "cronbuilder_preset_yearly": "Ежегодно",
+  "cronbuilder_preset_business_days": "По будням (Пн-Пт)",
+  "cronbuilder_preset_weekend": "По выходным (Сб-Вс)",
+
+  "devopsgen_title": "Генератор DevOps",
+
+  "devopsgen_copy": "Копировать",
+  "devopsgen_copied": "Скопировано",
+  "devopsgen_reset": "Сбросить",
+
+  "devopsgen_tab_gitignore": ".gitignore",
+  "devopsgen_tab_dockerfile": "Dockerfile",
+  "devopsgen_tab_compose": "Compose",
+  "devopsgen_tab_cicd": "CI/CD",
+
+  "devopsgen_cat_os": "Операционные системы",
+  "devopsgen_cat_ide": "IDE и редакторы",
+  "devopsgen_cat_language": "Языки программирования",
+  "devopsgen_cat_framework": "Фреймворки",
+  "devopsgen_cat_misc": "Разное",
+
+  "devopsgen_language": "Язык / Фреймворк",
+  "devopsgen_options": "Опции",
+
+  "devopsgen_opt_multistage": "Многоэтапная сборка",
+  "devopsgen_opt_alpine": "Использовать Alpine образ",
+  "devopsgen_opt_nonroot": "Создать не-root пользователя",
+  "devopsgen_opt_healthcheck": "Добавить Healthcheck",
+  "devopsgen_expose_port": "Открыть порт",
+
+  "devopsgen_node_version": "Версия Node.js",
+  "devopsgen_python_version": "Версия Python",
+  "devopsgen_go_version": "Версия Go",
+  "devopsgen_java_version": "Версия Java",
+  "devopsgen_dotnet_version": "Версия .NET",
+
+  "devopsgen_services": "Сервисы",
+  "devopsgen_opt_volumes": "Добавить Volumes",
+  "devopsgen_opt_networks": "Добавить сети",
+  "devopsgen_opt_restart": "Добавить политику рестарта",
+  "devopsgen_project_name": "Название проекта",
+
+  "devopsgen_svc_app": "Основное приложение",
+  "devopsgen_svc_postgres": "PostgreSQL",
+  "devopsgen_svc_redis": "Redis",
+  "devopsgen_svc_mysql": "MySQL",
+  "devopsgen_svc_mongo": "MongoDB",
+  "devopsgen_svc_nginx": "NGINX",
+
+  "devopsgen_provider": "CI/CD Провайдер",
+  "devopsgen_opt_test": "Добавить этап тестов",
+  "devopsgen_opt_build": "Добавить этап сборки",
+  "devopsgen_opt_deploy": "Добавить этап деплоя",
+  "devopsgen_branch": "Целевая ветка",
+
+  "devopsgen_empty": "Нечего генерировать для текущих настроек.",
+
+  "envmanager_title": "Менеджер ENV",
+
+  "envmanager_tab_input": "Ввод",
+  "envmanager_tab_options": "Опции",
+  "envmanager_tab_output": "Вывод",
+
+  "envmanager_paste": "Вставить",
+  "envmanager_clear": "Очистить",
+  "envmanager_copy": "Копировать",
+  "envmanager_copied": "Скопировано",
+
+  "envmanager_input_format": "Формат ввода",
+  "envmanager_input_label": "Входные данные",
+
+  "envmanager_validation": "Проверка",
+  "envmanager_vars": "переменных",
+  "envmanager_no_issues": "Проблем не найдено",
+
+  "envmanager_next": "Далее",
+
+  "envmanager_output_format": "Формат вывода",
+  "envmanager_options": "Настройки конвертации",
+
+  "envmanager_opt_sort": "Сортировать ключи по алфавиту",
+  "envmanager_opt_uppercase": "Ключи в верхнем регистре",
+  "envmanager_opt_comments": "Сохранять комментарии",
+
+  "envmanager_default_quote": "Стиль кавычек по умолчанию",
+
+  "envmanager_convert": "Конвертировать",
+
+  "envmanager_no_output": "Пока нет результата. Введите данные и конвертируйте.",
+
+  "gitgen_title": "Шпаргалка по Git",
+  "gitgen_search_hint": "Поиск команд или сценариев...",
+  "gitgen_copied": "Скопировано",
+
+  "gitgen_cat_all": "Все",
+  "gitgen_cat_undo": "Отмена",
+  "gitgen_cat_branch": "Ветки",
+  "gitgen_cat_remote": "Удаленный репозиторий",
+  "gitgen_cat_stash": "Stash",
+  "gitgen_cat_advanced": "Продвинутые",
+  "gitgen_cat_inspect": "Просмотр и лог",
+
+  "gitgen_danger_safe": "Безопасно",
+  "gitgen_danger_warning": "Осторожно",
+  "gitgen_danger_danger": "Опасно (необратимо)",
+
+  "gitgen_alternatives": "Альтернативы",
+  "gitgen_no_results": "Команд Git по вашему запросу не найдено.",
+
+  "jsoncodegen_title": "Генератор кода из JSON",
+
+  "jsoncodegen_tab_input": "Ввод",
+  "jsoncodegen_tab_output": "Вывод",
+
+  "jsoncodegen_paste": "Вставить",
+  "jsoncodegen_clear": "Очистить",
+  "jsoncodegen_copy": "Копировать",
+  "jsoncodegen_copied": "Скопировано",
+
+  "jsoncodegen_language": "Язык",
+  "jsoncodegen_root_class": "Имя корневого класса",
+  "jsoncodegen_package": "Имя пакета",
+
+  "jsoncodegen_options": "Опции",
+  "jsoncodegen_opt_null_safety": "Null Safety",
+  "jsoncodegen_opt_immutable": "Неизменяемые классы",
+  "jsoncodegen_opt_from_json": "Генерировать fromJson()",
+  "jsoncodegen_opt_to_json": "Генерировать toJson()",
+  "jsoncodegen_opt_copy_with": "Генерировать copyWith()",
+  "jsoncodegen_opt_equatable": "Использовать Equatable",
+
+  "jsoncodegen_json_input": "Входной JSON",
+  "jsoncodegen_generate": "Сгенерировать код",
+
+  "jsoncodegen_error_empty": "Входной JSON не может быть пустым",
+  "jsoncodegen_error_invalid": "Неверный формат JSON",
+  "jsoncodegen_error_empty_result": "JSON привел к пустой структуре",
+  "jsoncodegen_error_unknown": "Произошла неизвестная ошибка при генерации",
+
+  "jsoncodegen_no_output": "Пока нет результата. Вставьте JSON и сгенерируйте код.",
+
+  "jsonschemagen_title": "Генератор JSON-схемы",
+
+  "jsonschemagen_tab_input": "Ввод",
+  "jsonschemagen_tab_output": "Вывод",
+
+  "jsonschemagen_paste": "Вставить",
+  "jsonschemagen_clear": "Очистить",
+  "jsonschemagen_copy": "Копировать",
+  "jsonschemagen_copied": "Скопировано",
+
+  "jsonschemagen_draft": "Версия схемы",
+  "jsonschemagen_root_title": "Заголовок корня",
+
+  "jsonschemagen_options": "Опции",
+  "jsonschemagen_opt_title": "Добавить заголовки",
+  "jsonschemagen_opt_examples": "Добавить примеры",
+  "jsonschemagen_opt_required": "Сделать поля обязательными",
+  "jsonschemagen_opt_additional_props": "Установить additionalProperties: false",
+  "jsonschemagen_opt_formats": "Определять форматы строк (дата, email и т.д.)",
+  "jsonschemagen_opt_definitions": "Использовать Definitions для объектов",
+
+  "jsonschemagen_json_input": "Входной JSON",
+  "jsonschemagen_generate": "Сгенерировать схему",
+
+  "jsonschemagen_no_output": "Пока нет результата. Вставьте JSON и сгенерируйте схему.",
+  "jsonschemagen_lines": "строк",
+
+  "jsonschemagen_error_empty": "Входной JSON не может быть пустым",
+  "jsonschemagen_error_invalid": "Неверный формат JSON",
+  "jsonschemagen_error_unknown": "Произошла неизвестная ошибка при генерации",
+
+  "jsonschemavalidator_title": "Валидатор JSON-схемы",
+
+  "jsonschemavalidator_tab_schema": "Схема",
+  "jsonschemavalidator_tab_json": "JSON",
+  "jsonschemavalidator_tab_result": "Результат",
+
+  "jsonschemavalidator_clear": "Очистить все",
+  "jsonschemavalidator_paste": "Вставить",
+  "jsonschemavalidator_copied": "Скопировано",
+
+  "jsonschemavalidator_schema_label": "Входная JSON-схема",
+  "jsonschemavalidator_options": "Параметры проверки",
+  "jsonschemavalidator_opt_format": "Проверять форматы строк (email, дата, uri и т.д.)",
+  "jsonschemavalidator_opt_strict": "Строгая проверка типов",
+  "jsonschemavalidator_opt_unknown_formats": "Разрешить неизвестные форматы",
+
+  "jsonschemavalidator_next": "Далее",
+
+  "jsonschemavalidator_json_label": "Входные JSON-данные",
+  "jsonschemavalidator_validate": "Проверить JSON",
+
+  "jsonschemavalidator_no_result": "Пока нет результатов. Вставьте схему и JSON для проверки.",
+  "jsonschemavalidator_status_valid": "ВАЛИДЕН",
+  "jsonschemavalidator_status_invalid": "НЕВАЛИДЕН",
+  "jsonschemavalidator_stat_checked": "Проверено узлов",
+  "jsonschemavalidator_stat_errors": "Ошибок",
+  "jsonschemavalidator_stat_warnings": "Предупреждений",
+
+  "jsonschemavalidator_errors_label": "Проблемы валидации",
+  "jsonschemavalidator_valid_message": "JSON-данные полностью соответствуют предоставленной схеме.",
+
+  "jsonschemavalidator_copy_report": "Копировать отчет",
+  "jsonschemavalidator_revalidate": "Проверить снова",
+
+  "jsonschemavalidator_error_schema_empty": "JSON-схема не может быть пустой",
+  "jsonschemavalidator_error_json_empty": "JSON-данные не могут быть пустыми",
+  "jsonschemavalidator_error_schema_invalid": "Неверный формат JSON-схемы",
+  "jsonschemavalidator_error_json_invalid": "Неверный формат JSON-данных",
+  "jsonschemavalidator_error_schema_not_object": "JSON-схема должна быть валидным JSON-объектом",
+
+  "jwtgen_title": "Генератор и декодер JWT",
+
+  "jwtgen_tab_generate": "Создать",
+  "jwtgen_tab_decode": "Декодировать",
+
+  "jwtgen_clear": "Очистить все",
+  "jwtgen_copy": "Копировать",
+  "jwtgen_copied": "Скопировано",
+
+  "jwtgen_algorithm": "Алгоритм",
+  "jwtgen_secret_hint": "Секретный ключ",
+  "jwtgen_header": "Заголовок (дополнительно)",
+  "jwtgen_kid_hint": "ID ключа (kid) - Опционально",
+
+  "jwtgen_registered_claims": "Зарегистрированные клеймы",
+  "jwtgen_claim_hint": "Значение",
+  "jwtgen_claim_time_hint": "Секунды или строка с датой",
+
+  "jwtgen_payload": "Полезная нагрузка (JSON)",
+  "jwtgen_generate": "Создать JWT",
+
+  "jwtgen_result": "Сгенерированный токен",
+
+  "jwtgen_token_input": "JWT токен",
+  "jwtgen_decode": "Декодировать токен",
+  "jwtgen_load_to_editor": "Загрузить в редактор",
+
+  "jwtgen_part_header": "ЗАГОЛОВОК: Алгоритм и тип токена",
+  "jwtgen_part_payload": "ПОЛЕЗНАЯ НАГРУЗКА: Данные",
+  "jwtgen_part_signature": "ПОДПИСЬ",
+
+  "jwtgen_verify": "Проверить подпись",
+  "jwtgen_verify_action": "Проверить",
+  "jwtgen_verify_ok": "Подпись верна",
+  "jwtgen_verify_fail": "Неверная подпись",
+  "jwtgen_warning_none_alg": "Внимание: Токен использует алгоритм 'none'. Проверка подписи пропускается.",
+
+  "jwtgen_error_secret_required": "Для выбранного алгоритма требуется секретный ключ",
+  "jwtgen_error_payload_invalid": "Полезная нагрузка должна быть валидным JSON-объектом",
+  "jwtgen_error_header_invalid": "Дополнительный заголовок должен быть валидным JSON-объектом",
+  "jwtgen_error_unknown": "Произошла ошибка при генерации токена",
+  "jwtgen_error_empty_token": "Поле токена не может быть пустым",
+  "jwtgen_error_decode": "Не удалось декодировать токен. Убедитесь, что это валидный JWT.",
+
+  "jwtgen_claim_desc_iss": "Издатель",
+  "jwtgen_claim_desc_sub": "Субъект",
+  "jwtgen_claim_desc_aud": "Аудитория",
+  "jwtgen_claim_desc_exp": "Время истечения",
+  "jwtgen_claim_desc_nbf": "Не раньше чем",
+  "jwtgen_claim_desc_iat": "Время создания",
+  "jwtgen_claim_desc_jti": "ID токена",
+
+  "regexbuilder_title": "Конструктор RegEx",
+
+  "regexbuilder_tab_builder": "Конструктор",
+  "regexbuilder_tab_matches": "Совпадения",
+  "regexbuilder_tab_explain": "Объяснение",
+
+  "regexbuilder_copy_pattern": "Копировать шаблон",
+  "regexbuilder_clear": "Очистить все",
+  "regexbuilder_copied": "Скопировано",
+
+  "regexbuilder_pattern": "Регулярное выражение",
+  "regexbuilder_pattern_hint": "Введите шаблон RegEx здесь...",
+  "regexbuilder_flags": "Флаги",
+
+  "regexbuilder_test_text": "Тестовый текст",
+  "regexbuilder_test_hint": "Введите текст для проверки RegEx...",
+
+  "regexbuilder_no_matches": "Совпадений не найдено",
+  "regexbuilder_no_matches_hint": "Для текущего шаблона и текста совпадений не найдено.",
+  "regexbuilder_matches": "совпадений",
+
+  "regexbuilder_highlighted": "Подсвеченные совпадения",
+  "regexbuilder_match_list": "Список совпадений",
+  "regexbuilder_match_detail": "Детали совпадения",
+  "regexbuilder_chars": "символов",
+  "regexbuilder_full_match": "Полное совпадение",
+  "regexbuilder_group": "Группа",
+  "regexbuilder_named": "Именованная",
+
+  "regexbuilder_explain_empty": "Введите шаблон RegEx, чтобы увидеть объяснение.",
+  "regexbuilder_explain": "Объяснение шаблона",
+
+  "regexbuilder_error_invalid_pattern": "Неверное регулярное выражение",
+  "regexbuilder_error_unknown": "Произошла неизвестная ошибка при выполнении",
+
+  "regexbuilder_flag_i": "Без учета регистра",
+  "regexbuilder_flag_m": "Многострочный",
+  "regexbuilder_flag_s": "Dot All (однострочный)",
+  "regexbuilder_flag_u": "Unicode",
+  "regexbuilder_flag_g": "Глобальный",
+
+  "regexbuilder_cat_chars": "Классы символов",
+  "regexbuilder_cat_anchors": "Якоря и границы",
+  "regexbuilder_cat_quantifiers": "Квантификаторы",
+  "regexbuilder_cat_groups": "Группы и диапазоны",
+  "regexbuilder_cat_lookarounds": "Просмотр вперед/назад",
+
+  "sqlbuilder_title": "Конструктор SQL",
+
+  "sqlbuilder_tab_ddl": "DDL (Таблица)",
+  "sqlbuilder_tab_query": "Запрос (Select)",
+
+  "sqlbuilder_copy": "Копировать",
+  "sqlbuilder_copied": "Скопировано",
+
+  "sqlbuilder_output": "Сгенерированный SQL",
+  "sqlbuilder_empty": "SQL пока не сгенерирован.",
+
+  "sqlbuilder_dialect": "Диалект SQL",
+
+  "sqlbuilder_table": "Имя таблицы",
+  "sqlbuilder_if_not_exists": "IF NOT EXISTS",
+
+  "sqlbuilder_columns": "Столбцы",
+  "sqlbuilder_col_name": "имя_столбца",
+  "sqlbuilder_precision": "Точность",
+  "sqlbuilder_length": "Длина",
+  "sqlbuilder_scale": "Масштаб",
+
+  "sqlbuilder_pk": "Первичный ключ",
+  "sqlbuilder_not_null": "Not Null",
+  "sqlbuilder_unique": "Уникальный",
+  "sqlbuilder_auto_increment": "Автоинкремент",
+  "sqlbuilder_default_hint": "Значение по умолчанию (напр. CURRENT_TIMESTAMP)",
+
+  "sqlbuilder_indexes": "Индексы",
+  "sqlbuilder_no_indexes": "Индексы не заданы.",
+  "sqlbuilder_index_name": "имя_индекса",
+  "sqlbuilder_index_columns": "Столбцы индекса",
+  "sqlbuilder_no_columns": "Нет доступных столбцов.",
+
+  "sqlbuilder_from_table": "FROM Таблица",
+  "sqlbuilder_distinct": "DISTINCT",
+
+  "sqlbuilder_select_columns": "Столбцы SELECT",
+  "sqlbuilder_select_all_hint": "Столбцы не выбраны (по умолчанию SELECT *)",
+
+  "sqlbuilder_where": "Условия WHERE",
+  "sqlbuilder_no_where": "Условия не заданы.",
+  "sqlbuilder_value_hint": "значение",
+  "sqlbuilder_values_list_hint": "знач1, знач2, ...",
+
+  "sqlbuilder_group_by": "GROUP BY",
+
+  "sqlbuilder_order_by": "ORDER BY",
+  "sqlbuilder_no_order": "Сортировка не задана.",
+
+  "sqlbuilder_limit_offset": "LIMIT и OFFSET",
+  "sqlbuilder_limit": "LIMIT",
+  "sqlbuilder_offset": "OFFSET",
+
+  "tableviewer_title": "Просмотр таблиц",
+
+  "tableviewer_tab_input": "Ввод",
+  "tableviewer_tab_table": "Таблица",
+  "tableviewer_tab_output": "Вывод",
+
+  "tableviewer_paste": "Вставить",
+  "tableviewer_clear": "Очистить все",
+  "tableviewer_copy": "Копировать",
+  "tableviewer_copied": "Скопировано",
+
+  "tableviewer_input_format": "Формат ввода",
+  "tableviewer_options": "Опции",
+  "tableviewer_opt_auto_types": "Автоопределение типов данных",
+  "tableviewer_opt_flatten": "Разворачивать вложенные JSON-объекты",
+
+  "tableviewer_input_label": "Входные данные",
+  "tableviewer_parse": "Разобрать",
+
+  "tableviewer_no_data": "Нет данных для отображения. Вставьте данные и разберите их.",
+  "tableviewer_filtered": "отфильтровано",
+  "tableviewer_filter_hint": "Поиск / фильтрация строк...",
+
+  "tableviewer_add_row": "Добавить строку",
+  "tableviewer_add_col": "Добавить столбец",
+  "tableviewer_add_column": "Добавить столбец",
+
+  "tableviewer_sort_asc": "Сортировать по возрастанию",
+  "tableviewer_sort_desc": "Сортировать по убыванию",
+  "tableviewer_rename": "Переименовать столбец",
+  "tableviewer_resize": "Изменить размер столбца",
+  "tableviewer_delete_column": "Удалить столбец",
+  "tableviewer_column_name": "Имя столбца",
+
+  "tableviewer_edit_cell": "Редактировать ячейку",
+  "tableviewer_value": "Значение",
+  "tableviewer_cancel": "Отмена",
+  "tableviewer_confirm": "Подтвердить",
+
+  "tableviewer_no_output": "Пока нет результата. Сначала разберите данные.",
+  "tableviewer_output_format": "Формат вывода",
+
+  "tableviewer_type_string": "Строка",
+  "tableviewer_type_integer": "Целое число",
+  "tableviewer_type_double": "Дробное число",
+  "tableviewer_type_boolean": "Логический",
+  "tableviewer_type_null": "Null",
+  "tableviewer_type_object": "Объект",
+  "tableviewer_type_array": "Массив",
+
+  "tableviewer_error_invalid_format": "Неверный формат или пустые данные",
+
+  "timezoneplanner_title": "Планировщик часовых поясов",
+
+  "timezoneplanner_tab_planner": "Планировщик",
+  "timezoneplanner_tab_settings": "Настройки",
+
+  "timezoneplanner_jump_best": "Перейти к лучшему времени",
+  "timezoneplanner_copy": "Копировать сводку",
+  "timezoneplanner_copied": "Сводка скопирована",
+
+  "timezoneplanner_selected_utc": "Выбранное время (UTC)",
+  "timezoneplanner_working": "доступно",
+  "timezoneplanner_best": "Лучшее время",
+
+  "timezoneplanner_zones": "Часовые пояса",
+  "timezoneplanner_status_work": "РАБОЧЕЕ",
+  "timezoneplanner_status_off": "НЕРАБОЧЕЕ",
+
+  "timezoneplanner_no_overlap": "Пересекающихся рабочих часов не найдено.",
+  "timezoneplanner_no_overlap_hint": "Попробуйте расширить диапазон рабочих часов в настройках или выберите лучшее частичное совпадение.",
+  "timezoneplanner_partial": "Лучшее частичное совпадение",
+  "timezoneplanner_common_window": "Общее рабочее окно",
+  "timezoneplanner_hours": "ч пересечения",
+
+  "timezoneplanner_heatmap": "Карта доступности",
+  "timezoneplanner_legend_work": "Рабочие часы",
+  "timezoneplanner_legend_off": "Нерабочее время",
+  "timezoneplanner_legend_hint": "Контур показывает выбранный час",
+
+  "timezoneplanner_work_hours": "Диапазон рабочего времени",
+  "timezoneplanner_start": "Начало",
+  "timezoneplanner_end": "Конец",
+  "timezoneplanner_range": "Диапазон",
+
+  "timezoneplanner_empty": "Часовые пояса не выбраны.",
+  "timezoneplanner_add": "Добавить часовой пояс",
+  "timezoneplanner_already_added": "Этот часовой пояс уже в списке",
+  "timezoneplanner_max_reached": "Можно добавить до 8 часовых поясов",
+
+  "timezoneplanner_search_hint": "Поиск по городу или стране...",
+  "timezoneplanner_no_results": "Часовые пояса не найдены.",
+
+  "totpgen_title": "Генератор TOTP",
+
+  "totpgen_tab_code": "Код",
+  "totpgen_tab_verify": "Проверка",
+  "totpgen_tab_uri": "Формат URI",
+
+  "totpgen_copied": "Скопировано",
+  "totpgen_copy": "Копировать",
+  "totpgen_new_secret": "Сгенерировать случайный секрет",
+
+  "totpgen_current_code": "ТЕКУЩИЙ TOTP-КОД",
+  "totpgen_copy_code": "Копировать код",
+
+  "totpgen_secret": "Секретный ключ",
+  "totpgen_copy_secret": "Копировать секрет",
+  "totpgen_secret_hint": "Введите валидный секрет в Base32. Пробелы и строчные буквы допустимы и будут отформатированы автоматически.",
+
+  "totpgen_config": "Конфигурация",
+  "totpgen_algorithm": "Алгоритм",
+  "totpgen_digits": "Количество цифр",
+  "totpgen_period": "Период (секунды)",
+
+  "totpgen_verify_label": "Проверить код",
+  "totpgen_verify_action": "Проверить",
+  "totpgen_verify_empty": "Введите код для проверки",
+  "totpgen_verify_ok": "Код действителен!",
+  "totpgen_verify_fail": "Неверный или просроченный код",
+
+  "totpgen_verify_info_title": "Как работает проверка",
+  "totpgen_verify_info_body": "Инструмент проверяет код по вашему текущему секретному ключу и настройкам. Проверяется текущий временной шаг, а также предыдущий и следующий (±1 окно) для учета небольшой рассинхронизации времени.",
+
+  "totpgen_uri_generate": "Сгенерировать OTP Auth URI",
+  "totpgen_issuer_hint": "Издатель (напр. Google, GitHub)",
+  "totpgen_account_hint": "Имя аккаунта (напр. user@example.com)",
+  "totpgen_generate_uri": "Сгенерировать URI",
+
+  "totpgen_uri_import": "Импорт из URI",
+  "totpgen_import_uri": "Импортировать URI",
+  "totpgen_uri_imported": "Конфигурация успешно импортирована",
+
+  "totpgen_error_secret_empty": "Секретный ключ не может быть пустым",
+  "totpgen_error_uri_empty": "URI не может быть пустым",
+  "totpgen_error_uri_invalid": "Неверный формат OTP Auth URI",
+  "totpgen_error_base32_invalid": "Неверная строка секрета Base32",
+
+  "asciiart_title": "ASCII Art",
+  "asciiart_copied": "Скопировано",
+
+  "asciiart_input_hint": "Входной текст",
+
+  "asciiart_char": "Символ",
+  "asciiart_custom": "Кастомный",
+  "asciiart_resolution": "Разрешение",
+  "asciiart_spacing": "Межбуквенный интервал",
+  "asciiart_bold": "Жирный",
+  "asciiart_invert": "Инверсия",
+
+  "asciiart_output_hint": "Вывод",
+  "asciiart_empty": "Пока нет результата. Введите текст.",
+
+  "asciiart_copy": "Копировать",
+  "asciiart_clear": "Очистить",
+
+  "b64img_title": "Инструмент Base64-изображений",
+
+  "b64img_tab_encode": "Кодировать",
+  "b64img_tab_decode": "Декодировать",
+
+  "b64img_copied": "Скопировано",
+  "b64img_pick": "Выбрать изображение",
+  "b64img_auto_prefix": "Авто-префикс Data-URI",
+
+  "b64img_input_hint": "Ввод Base64",
+  "b64img_output_hint": "Вывод Base64",
+
+  "b64img_decode": "Декодировать изображение",
+  "b64img_preview": "Предпросмотр изображения",
+  "b64img_no_image": "Изображение не выбрано",
+  "b64img_history": "История",
+
+  "b64img_error_pick": "Не удалось выбрать изображение",
+  "b64img_error_empty": "Ввод Base64 не может быть пустым",
+  "b64img_error_invalid": "Неверный формат Base64",
+
+  "b64url_title": "Base64 и URL-кодировщик",
+
+  "b64url_tab_base64": "Base64",
+  "b64url_tab_url": "URL",
+
+  "b64url_copied": "Скопировано",
+
+  "b64url_urlsafe": "URL-безопасный режим",
+  "b64url_live": "Live-режим (Автообработка)",
+
+  "b64url_input_hint": "Входной текст",
+  "b64url_output_hint": "Результат",
+
+  "b64url_encode": "Кодировать",
+  "b64url_decode": "Декодировать",
+  "b64url_clear": "Очистить",
+
+  "b64url_history": "История",
+
+  "b64url_error": "Неверный формат ввода для декодирования",
+  "baseconv_title": "Конвертер систем счисления",
+  "baseconv_copied": "Скопировано",
+
+  "baseconv_bits": "Биты",
+  "baseconv_bytes": "Байты",
+  "baseconv_group": "Группировать цифры",
+
+  "baseconv_binary": "Двоичная",
+  "baseconv_octal": "Восьмеричная",
+  "baseconv_decimal": "Десятичная",
+  "baseconv_hex": "Шестнадцатеричная",
+
+  "baseconv_custom_base": "Своя система",
+  "baseconv_base": "Основание",
+
+  "baseconv_clear": "Очистить все",
+  "baseconv_history": "История",
+
+  "baseconv_error_invalid": "Неверный ввод для выбранной системы",
+  "baseconv_error_negative": "Отрицательные числа не поддерживаются в этом режиме",
+
+  "bcryptgen_title": "Генератор Bcrypt",
+
+  "bcryptgen_tab_generate": "Генерация",
+  "bcryptgen_tab_verify": "Проверка",
+
+  "bcryptgen_password": "Пароль",
+  "bcryptgen_cost": "Фактор сложности (раунды)",
+
+  "bcryptgen_cost_fast": "Быстро (не рекомендуется)",
+  "bcryptgen_cost_medium": "Средне",
+  "bcryptgen_cost_default": "Стандарт / Хорошо",
+  "bcryptgen_cost_slow": "Медленно / Безопасно",
+  "bcryptgen_cost_veryslow": "Очень медленно / Очень безопасно",
+
+  "bcryptgen_strength_weak": "Слабый",
+  "bcryptgen_strength_medium": "Средний",
+  "bcryptgen_strength_strong": "Сильный",
+
+  "bcryptgen_generate": "Сгенерировать хеш",
+  "bcryptgen_generating": "Генерация...",
+
+  "bcryptgen_hash_output": "Результат Bcrypt-хеша",
+  "bcryptgen_copied": "Скопировано",
+
+  "bcryptgen_info_title": "Что такое Bcrypt?",
+  "bcryptgen_info_body": "Bcrypt — это функция хеширования паролей, специально созданная медленной и вычислительно дорогой, что делает ее очень устойчивой к брутфорс-атакам. Фактор 'cost' определяет время вычисления.",
+
+  "bcryptgen_hash_input": "Хеш для проверки",
+  "bcryptgen_verify": "Проверить пароль",
+  "bcryptgen_verifying": "Проверка...",
+
+  "bcryptgen_match": "Совпадение!",
+  "bcryptgen_no_match": "Не совпадает",
+  "bcryptgen_match_hint": "Пароль успешно совпадает с указанным хешем.",
+  "bcryptgen_no_match_hint": "Пароль не совпадает с указанным хешем.",
+
+  "bcryptgen_history": "История",
+
+  "bcryptgen_error_empty_password": "Пароль не может быть пустым",
+  "bcryptgen_error_empty_hash": "Хеш не может быть пустым",
+
+  "binview_title": "Просмотр бинарных данных",
+
+  "binview_tab_t2b": "Текст в бинарный",
+  "binview_tab_b2t": "Бинарный в текст",
+
+  "binview_input_text": "Ввод текста",
+  "binview_input_binary": "Ввод бинарных данных",
+  "binview_input_text_hint": "Введите или вставьте текст…",
+  "binview_input_binary_hint": "01001000 01101001 …",
+
+  "binview_paste": "Вставить",
+  "binview_clear": "Очистить",
+
+  "binview_bytes": "байт",
+  "binview_bytes_est": "байт (прибл.)",
+  "binview_spaces": "Добавлять пробелы между байтами",
+
+  "binview_convert": "Конвертировать",
+  "binview_swap": "Поменять местами ввод/вывод",
+
+  "binview_output_text": "Текстовый вывод",
+  "binview_output_binary": "Бинарный вывод",
+  "binview_output_hint": "Результат появится здесь",
+
+  "binview_copy": "Копировать",
+  "binview_copied": "Скопировано",
+
+  "binview_error_length": "Длина бинарных данных должна быть кратна 8 битам.",
+  "binview_error_invalid": "Ввод содержит символы, отличные от 0 и 1.",
+
+  "caseconv_title": "Конвертер регистра",
+
+  "caseconv_input_hint": "Введите или вставьте текст…",
+  "caseconv_paste": "Вставить",
+  "caseconv_clear": "Очистить",
+
+  "caseconv_chars": "символов",
+  "caseconv_words": "слов",
+
+  "caseconv_mode_upper": "ВЕРХНИЙ РЕГИСТР",
+  "caseconv_mode_lower": "нижний регистр",
+  "caseconv_mode_title": "Каждое Слово С Заглавной",
+  "caseconv_mode_sentence": "Предложение как в тексте",
+  "caseconv_mode_camel": "camelCase",
+  "caseconv_mode_pascal": "PascalCase",
+  "caseconv_mode_snake": "snake_case",
+  "caseconv_mode_kebab": "kebab-case",
+  "caseconv_mode_constant": "CONSTANT_CASE",
+
+  "caseconv_convert": "Конвертировать",
+
+  "caseconv_output_hint": "Результат появится здесь",
+  "caseconv_copy": "Копировать",
+  "caseconv_copied": "Скопировано"
+}

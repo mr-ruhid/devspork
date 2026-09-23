@@ -1,0 +1,989 @@
+{
+  "home_title": "Home",
+  "home_settings": "Settings",
+  "home_search_hint": "Search tools...",
+  "home_no_results": "No tools found",
+
+  "home_cat_all": "All",
+  "home_cat_text": "Text",
+  "home_cat_data": "Data",
+  "home_cat_security": "Security",
+  "home_cat_web": "Web",
+  "home_cat_convert": "Convert",
+  "home_cat_media": "Media",
+  "home_cat_dev": "Dev",
+  "home_cat_other": "Other",
+
+  "home_tool_caseconv_title": "Case Converter",
+  "home_tool_caseconv_desc": "Convert text between uppercase, lowercase, camelCase, etc.",
+
+  "home_tool_textstats_title": "Text Statistics",
+  "home_tool_textstats_desc": "Count characters, words, and lines in your text.",
+
+  "home_tool_textools_title": "Text Tools",
+  "home_tool_textools_desc": "Various utility tools for text manipulation and formatting.",
+
+  "home_tool_textmasker_title": "Text Masker",
+  "home_tool_textmasker_desc": "Mask or redact sensitive information in your text.",
+
+  "home_tool_loremgen_title": "Lorem Ipsum Generator",
+  "home_tool_loremgen_desc": "Generate dummy text placeholders for your designs.",
+
+  "home_tool_sluggen_title": "Slug Generator",
+  "home_tool_sluggen_desc": "Convert regular strings into URL-friendly slugs.",
+
+  "home_tool_diffcheck_title": "Diff Checker",
+  "home_tool_diffcheck_desc": "Compare two text blocks and highlight the differences.",
+
+  "home_tool_mdpreview_title": "Markdown Preview",
+  "home_tool_mdpreview_desc": "Preview how your Markdown text will render.",
+
+  "home_tool_mdhtml_title": "Markdown to HTML",
+  "home_tool_mdhtml_desc": "Convert Markdown syntax into raw HTML code.",
+
+  "home_tool_excel2table_title": "Excel to Table",
+  "home_tool_excel2table_desc": "Convert Excel or CSV data into HTML/Markdown tables.",
+
+  "home_tool_codefmt_title": "Code Formatter",
+  "home_tool_codefmt_desc": "Beautify and format your source code.",
+
+  "home_tool_jsonfmt_title": "JSON Formatter",
+  "home_tool_jsonfmt_desc": "Format, beautify, and validate JSON data.",
+
+  "home_tool_jsonsuite_title": "JSON Suite",
+  "home_tool_jsonsuite_desc": "A comprehensive set of tools for handling JSON.",
+
+  "home_tool_jsonschemagen_title": "JSON Schema Generator",
+  "home_tool_jsonschemagen_desc": "Generate a JSON schema directly from a JSON object.",
+
+  "home_tool_jsonschemavalidator_title": "JSON Schema Validator",
+  "home_tool_jsonschemavalidator_desc": "Validate JSON payloads against your predefined schemas.",
+
+  "home_tool_jsoncodegen_title": "JSON to Code",
+  "home_tool_jsoncodegen_desc": "Generate programming language models from JSON.",
+
+  "home_tool_sqlfmt_title": "SQL Formatter",
+  "home_tool_sqlfmt_desc": "Beautify and format complex SQL queries.",
+
+  "home_tool_sqlbuilder_title": "SQL Builder",
+  "home_tool_sqlbuilder_desc": "Visually build and structure SQL queries.",
+
+  "home_tool_mockgen_title": "Mock Data Generator",
+  "home_tool_mockgen_desc": "Generate realistic dummy data for testing.",
+
+  "home_tool_loccompare_title": "Localization Comparer",
+  "home_tool_loccompare_desc": "Compare and manage localization files easily.",
+
+  "home_tool_binview_title": "Binary Viewer",
+  "home_tool_binview_desc": "Inspect files in binary and hex formats.",
+
+  "home_tool_cronparse_title": "Cron Parser",
+  "home_tool_cronparse_desc": "Translate cron expressions into human-readable text.",
+
+  "home_tool_cronbuilder_title": "Cron Builder",
+  "home_tool_cronbuilder_desc": "Generate cron expressions using a visual interface.",
+
+  "home_tool_regextest_title": "Regex Tester",
+  "home_tool_regextest_desc": "Test and evaluate regular expressions.",
+
+  "home_tool_regexbuilder_title": "Regex Builder",
+  "home_tool_regexbuilder_desc": "Construct complex regular expressions visually.",
+
+  "home_tool_tableviewer_title": "Table Viewer",
+  "home_tool_tableviewer_desc": "View, edit, and analyze tabular data.",
+
+  "home_tool_hashgen_title": "Hash Generator",
+  "home_tool_hashgen_desc": "Generate MD5, SHA-1, SHA-256, and other secure hashes.",
+
+  "home_tool_bcryptgen_title": "Bcrypt Generator",
+  "home_tool_bcryptgen_desc": "Generate and verify Bcrypt password hashes.",
+
+  "home_tool_jwtdec_title": "JWT Decoder",
+  "home_tool_jwtdec_desc": "Decode and inspect JSON Web Tokens.",
+
+  "home_tool_jwtgen_title": "JWT Generator",
+  "home_tool_jwtgen_desc": "Create JSON Web Tokens for testing purposes.",
+
+  "home_tool_rsagen_title": "RSA Key Generator",
+  "home_tool_rsagen_desc": "Generate secure public and private RSA key pairs.",
+
+  "home_tool_uuidgen_title": "UUID Generator",
+  "home_tool_uuidgen_desc": "Generate random version 4 UUIDs/GUIDs.",
+
+  "home_tool_passgen_title": "Password Generator",
+  "home_tool_passgen_desc": "Create highly secure random passwords.",
+
+  "home_tool_totpgen_title": "TOTP Generator",
+  "home_tool_totpgen_desc": "Generate Time-based One-Time Passwords for 2FA.",
+
+  "home_tool_b64urlend_title": "Base64 URL Encode",
+  "home_tool_b64urlend_desc": "Safely encode or decode Base64 strings for URLs.",
+
+  "home_tool_htmlent_title": "HTML Entities",
+  "home_tool_htmlent_desc": "Encode and decode special characters to HTML entities.",
+
+  "home_tool_urlparse_title": "URL Parser",
+  "home_tool_urlparse_desc": "Break down URLs into their core components.",
+
+  "home_tool_apibuilder_title": "API Builder",
+  "home_tool_apibuilder_desc": "Structure and test API endpoints and requests.",
+
+  "home_tool_sociallinks_title": "Social Links",
+  "home_tool_sociallinks_desc": "Generate shareable links for social media platforms.",
+
+  "home_tool_seotools_title": "SEO Tools",
+  "home_tool_seotools_desc": "Analyze and optimize meta tags for better SEO.",
+
+  "home_tool_uaparse_title": "User-Agent Parser",
+  "home_tool_uaparse_desc": "Extract device and browser info from User-Agent strings.",
+
+  "home_tool_mimelist_title": "MIME Types",
+  "home_tool_mimelist_desc": "Search and find proper MIME types for file extensions.",
+
+  "home_tool_csstools_title": "CSS Tools",
+  "home_tool_csstools_desc": "Various utility tools for styling and CSS formatting.",
+
+  "home_tool_codefilecon_title": "File Converter",
+  "home_tool_codefilecon_desc": "Convert syntax formats between different configurations.",
+
+  "home_tool_yamljson_title": "YAML to JSON",
+  "home_tool_yamljson_desc": "Easily convert between YAML and JSON formats.",
+
+  "home_tool_listconv_title": "List Converter",
+  "home_tool_listconv_desc": "Convert text lists into different string formats.",
+
+  "home_tool_baseconv_title": "Base Converter",
+  "home_tool_baseconv_desc": "Convert numbers between hex, decimal, binary, etc.",
+
+  "home_tool_colorconv_title": "Color Converter",
+  "home_tool_colorconv_desc": "Convert colors between HEX, RGB, HSL, and more.",
+
+  "home_tool_tsconv_title": "Timestamp Converter",
+  "home_tool_tsconv_desc": "Convert Unix timestamps to human-readable dates.",
+
+  "home_tool_devcalc_title": "Developer Calculator",
+  "home_tool_devcalc_desc": "A calculator tailored for developers (bitwise, hex).",
+
+  "home_tool_envmanager_title": "ENV Manager",
+  "home_tool_envmanager_desc": "Manage and format your .env configuration files.",
+
+  "home_tool_b64img_title": "Base64 to Image",
+  "home_tool_b64img_desc": "Convert Base64 strings to images and vice versa.",
+
+  "home_tool_qrgen_title": "QR Generator",
+  "home_tool_qrgen_desc": "Generate custom QR codes from text or URLs.",
+
+  "home_tool_asciiart_title": "ASCII Art",
+  "home_tool_asciiart_desc": "Generate ASCII art from standard text inputs.",
+
+  "home_tool_colorpalette_title": "Color Palette",
+  "home_tool_colorpalette_desc": "Generate and extract beautiful color palettes.",
+
+  "home_tool_gitgen_title": "Git Cheat Sheet",
+  "home_tool_gitgen_desc": "Quick reference and generator for common Git commands.",
+
+  "home_tool_devopsgen_title": "DevOps Generator",
+  "home_tool_devopsgen_desc": "Generate basic CI/CD pipeline configurations.",
+
+  "home_tool_timezoneplanner_title": "Timezone Planner",
+  "home_tool_timezoneplanner_desc": "Plan and coordinate meetings across different time zones.",
+
+  "apibuilder_title": "API Builder",
+
+  "apibuilder_tab_request": "Request",
+  "apibuilder_tab_response": "Response",
+  "apibuilder_tab_history": "History",
+  "apibuilder_tab_saved": "Saved",
+
+  "apibuilder_url_hint": "Enter request URL...",
+  "apibuilder_url_required": "URL is required",
+
+  "apibuilder_headers": "Headers",
+  "apibuilder_header_key": "Key",
+  "apibuilder_header_value": "Value",
+
+  "apibuilder_body": "Body",
+  "apibuilder_body_hint": "Enter raw body content here...",
+  "apibuilder_body_json": "JSON Body",
+  "apibuilder_body_text": "Text Body",
+
+  "apibuilder_send": "Send",
+  "apibuilder_sending": "Sending...",
+
+  "apibuilder_save": "Save",
+  "apibuilder_save_request": "Save Request",
+  "apibuilder_name_hint": "Enter request name...",
+  "apibuilder_saved": "Request saved successfully",
+  "apibuilder_saved_empty": "No saved requests yet",
+
+  "apibuilder_import": "Import",
+  "apibuilder_export": "Export",
+  "apibuilder_curl_import": "Import cURL",
+  "apibuilder_curl_export": "Export cURL",
+  "apibuilder_curl_paste": "Paste your cURL command here",
+  "apibuilder_curl_invalid": "Invalid cURL command",
+  "apibuilder_curl_loaded": "cURL loaded successfully",
+
+  "apibuilder_clear": "Clear",
+  "apibuilder_clear_all": "Clear All",
+
+  "apibuilder_copy": "Copy",
+  "apibuilder_copied": "Copied to clipboard",
+  "apibuilder_cancel": "Cancel",
+
+  "apibuilder_no_response": "No response yet. Send a request.",
+  "apibuilder_response_headers": "Response Headers",
+
+  "apibuilder_history_empty": "History is empty",
+  "apibuilder_items": "items",
+
+  "codefmt_title": "Code Formatter",
+
+  "codefmt_tab_input": "Input",
+  "codefmt_tab_output": "Output",
+
+  "codefmt_paste": "Paste",
+  "codefmt_clear": "Clear",
+  "codefmt_copy": "Copy",
+  "codefmt_copied": "Copied to clipboard",
+
+  "codefmt_language": "Language",
+  "codefmt_options": "Options",
+  "codefmt_indent_size": "Indent Size",
+  "codefmt_use_tabs": "Use Tabs",
+  "codefmt_sort_keys": "Sort Keys",
+  "codefmt_minify": "Minify",
+
+  "codefmt_input": "Input Code",
+  "codefmt_format": "Format",
+  "codefmt_formatting": "Formatting...",
+
+  "codefmt_remote_online": "Online",
+  "codefmt_remote_offline": "Offline",
+
+  "codefmt_no_output": "No output yet. Format some code first.",
+  "codefmt_lines": "lines",
+
+  "codefmt_error_empty": "Input cannot be empty",
+
+
+  "cronbuilder_title": "Cron Builder",
+
+  "cronbuilder_tab_builder": "Builder",
+  "cronbuilder_tab_presets": "Presets",
+
+  "cronbuilder_reset": "Reset",
+  "cronbuilder_copy": "Copy",
+  "cronbuilder_copied": "Copied to clipboard",
+
+  "cronbuilder_expression": "Cron Expression",
+  "cronbuilder_error_invalid": "Invalid cron expression",
+
+  "cronbuilder_from": "From",
+  "cronbuilder_to": "To",
+  "cronbuilder_every": "Every",
+  "cronbuilder_start": "Starting at",
+
+  "cronbuilder_next_runs": "Next Upcoming Runs",
+  "cronbuilder_no_runs": "No upcoming runs available or invalid expression",
+
+  "cronbuilder_mode_any": "Any (*)",
+  "cronbuilder_mode_specific": "Specific",
+  "cronbuilder_mode_range": "Range",
+  "cronbuilder_mode_step": "Step",
+  "cronbuilder_mode_list": "List",
+
+  "cronbuilder_field_minute": "Minute",
+  "cronbuilder_field_hour": "Hour",
+  "cronbuilder_field_day": "Day of Month",
+  "cronbuilder_field_month": "Month",
+  "cronbuilder_field_day_of_week": "Day of Week",
+
+  "cronbuilder_preset_every_minute": "Every Minute",
+  "cronbuilder_preset_hourly": "Hourly",
+  "cronbuilder_preset_daily": "Daily at Midnight",
+  "cronbuilder_preset_weekly": "Weekly on Sunday",
+  "cronbuilder_preset_monthly": "Monthly",
+  "cronbuilder_preset_yearly": "Yearly",
+  "cronbuilder_preset_business_days": "Business Days (Mon-Fri)",
+  "cronbuilder_preset_weekend": "Weekends (Sat-Sun)",
+
+  "devopsgen_title": "DevOps Generator",
+
+  "devopsgen_copy": "Copy",
+  "devopsgen_copied": "Copied to clipboard",
+  "devopsgen_reset": "Reset",
+
+  "devopsgen_tab_gitignore": ".gitignore",
+  "devopsgen_tab_dockerfile": "Dockerfile",
+  "devopsgen_tab_compose": "Compose",
+  "devopsgen_tab_cicd": "CI/CD",
+
+  "devopsgen_cat_os": "Operating Systems",
+  "devopsgen_cat_ide": "IDEs & Editors",
+  "devopsgen_cat_language": "Programming Languages",
+  "devopsgen_cat_framework": "Frameworks",
+  "devopsgen_cat_misc": "Miscellaneous",
+
+  "devopsgen_language": "Language / Framework",
+  "devopsgen_options": "Options",
+
+  "devopsgen_opt_multistage": "Multi-stage Build",
+  "devopsgen_opt_alpine": "Use Alpine Image",
+  "devopsgen_opt_nonroot": "Create Non-root User",
+  "devopsgen_opt_healthcheck": "Include Healthcheck",
+  "devopsgen_expose_port": "Expose Port",
+
+  "devopsgen_node_version": "Node.js Version",
+  "devopsgen_python_version": "Python Version",
+  "devopsgen_go_version": "Go Version",
+  "devopsgen_java_version": "Java Version",
+  "devopsgen_dotnet_version": ".NET Version",
+
+  "devopsgen_services": "Services",
+  "devopsgen_opt_volumes": "Include Volumes",
+  "devopsgen_opt_networks": "Include Custom Networks",
+  "devopsgen_opt_restart": "Add Restart Policy",
+  "devopsgen_project_name": "Project Name",
+
+  "devopsgen_svc_app": "Main Application",
+  "devopsgen_svc_postgres": "PostgreSQL",
+  "devopsgen_svc_redis": "Redis",
+  "devopsgen_svc_mysql": "MySQL",
+  "devopsgen_svc_mongo": "MongoDB",
+  "devopsgen_svc_nginx": "NGINX",
+
+  "devopsgen_provider": "CI/CD Provider",
+  "devopsgen_opt_test": "Include Test Stage",
+  "devopsgen_opt_build": "Include Build Stage",
+  "devopsgen_opt_deploy": "Include Deploy Stage",
+  "devopsgen_branch": "Target Branch",
+
+  "devopsgen_empty": "Nothing to generate based on current selections.",
+
+  "envmanager_title": "ENV Manager",
+
+  "envmanager_tab_input": "Input",
+  "envmanager_tab_options": "Options",
+  "envmanager_tab_output": "Output",
+
+  "envmanager_paste": "Paste",
+  "envmanager_clear": "Clear",
+  "envmanager_copy": "Copy",
+  "envmanager_copied": "Copied to clipboard",
+
+  "envmanager_input_format": "Input Format",
+  "envmanager_input_label": "Input Data",
+
+  "envmanager_validation": "Validation",
+  "envmanager_vars": "variables",
+  "envmanager_no_issues": "No issues found",
+
+  "envmanager_next": "Next",
+
+  "envmanager_output_format": "Output Format",
+  "envmanager_options": "Conversion Options",
+
+  "envmanager_opt_sort": "Sort Keys Alphabetically",
+  "envmanager_opt_uppercase": "Force Uppercase Keys",
+  "envmanager_opt_comments": "Include Comments",
+
+  "envmanager_default_quote": "Default Quote Style",
+
+  "envmanager_convert": "Convert",
+
+  "envmanager_no_output": "No output yet. Enter input and convert.",
+
+  "gitgen_title": "Git Cheat Sheet",
+  "gitgen_search_hint": "Search commands or scenarios...",
+  "gitgen_copied": "Copied to clipboard",
+
+  "gitgen_cat_all": "All",
+  "gitgen_cat_undo": "Undo",
+  "gitgen_cat_branch": "Branching",
+  "gitgen_cat_remote": "Remote",
+  "gitgen_cat_stash": "Stashing",
+  "gitgen_cat_advanced": "Advanced",
+  "gitgen_cat_inspect": "Inspect & Log",
+
+  "gitgen_danger_safe": "Safe",
+  "gitgen_danger_warning": "Warning",
+  "gitgen_danger_danger": "Danger (Destructive)",
+
+  "gitgen_alternatives": "Alternatives",
+  "gitgen_no_results": "No Git commands found matching your search.",
+
+
+  "jsoncodegen_title": "JSON Code Generator",
+
+  "jsoncodegen_tab_input": "Input",
+  "jsoncodegen_tab_output": "Output",
+
+  "jsoncodegen_paste": "Paste",
+  "jsoncodegen_clear": "Clear",
+  "jsoncodegen_copy": "Copy",
+  "jsoncodegen_copied": "Copied to clipboard",
+
+  "jsoncodegen_language": "Language",
+  "jsoncodegen_root_class": "Root Class Name",
+  "jsoncodegen_package": "Package Name",
+
+  "jsoncodegen_options": "Options",
+  "jsoncodegen_opt_null_safety": "Null Safety",
+  "jsoncodegen_opt_immutable": "Immutable Classes",
+  "jsoncodegen_opt_from_json": "Generate fromJson()",
+  "jsoncodegen_opt_to_json": "Generate toJson()",
+  "jsoncodegen_opt_copy_with": "Generate copyWith()",
+  "jsoncodegen_opt_equatable": "Use Equatable",
+
+  "jsoncodegen_json_input": "JSON Input",
+  "jsoncodegen_generate": "Generate Code",
+
+  "jsoncodegen_error_empty": "JSON input cannot be empty",
+  "jsoncodegen_error_invalid": "Invalid JSON format",
+  "jsoncodegen_error_empty_result": "JSON resulted in an empty structure",
+  "jsoncodegen_error_unknown": "An unknown error occurred during generation",
+
+  "jsoncodegen_no_output": "No output yet. Paste JSON and generate code.",
+
+  "jsonschemagen_title": "JSON Schema Generator",
+
+  "jsonschemagen_tab_input": "Input",
+  "jsonschemagen_tab_output": "Output",
+
+  "jsonschemagen_paste": "Paste",
+  "jsonschemagen_clear": "Clear",
+  "jsonschemagen_copy": "Copy",
+  "jsonschemagen_copied": "Copied to clipboard",
+
+  "jsonschemagen_draft": "Schema Draft Version",
+  "jsonschemagen_root_title": "Root Title",
+
+  "jsonschemagen_options": "Options",
+  "jsonschemagen_opt_title": "Add Titles",
+  "jsonschemagen_opt_examples": "Add Examples",
+  "jsonschemagen_opt_required": "Make Fields Required",
+  "jsonschemagen_opt_additional_props": "Set additionalProperties: false",
+  "jsonschemagen_opt_formats": "Detect String Formats (e.g., date, email)",
+  "jsonschemagen_opt_definitions": "Use Definitions for Objects",
+
+  "jsonschemagen_json_input": "JSON Input",
+  "jsonschemagen_generate": "Generate Schema",
+
+  "jsonschemagen_no_output": "No output yet. Paste JSON and generate schema.",
+  "jsonschemagen_lines": "lines",
+
+  "jsonschemagen_error_empty": "JSON input cannot be empty",
+  "jsonschemagen_error_invalid": "Invalid JSON format",
+  "jsonschemagen_error_unknown": "An unknown error occurred during generation",
+
+
+  "jsonschemavalidator_title": "JSON Schema Validator",
+
+  "jsonschemavalidator_tab_schema": "Schema",
+  "jsonschemavalidator_tab_json": "JSON",
+  "jsonschemavalidator_tab_result": "Result",
+
+  "jsonschemavalidator_clear": "Clear All",
+  "jsonschemavalidator_paste": "Paste",
+  "jsonschemavalidator_copied": "Copied to clipboard",
+
+  "jsonschemavalidator_schema_label": "JSON Schema Input",
+  "jsonschemavalidator_options": "Validation Options",
+  "jsonschemavalidator_opt_format": "Check String Formats (email, date, uri, etc.)",
+  "jsonschemavalidator_opt_strict": "Strict Type Checking",
+  "jsonschemavalidator_opt_unknown_formats": "Allow Unknown Formats",
+
+  "jsonschemavalidator_next": "Next",
+
+  "jsonschemavalidator_json_label": "JSON Data Input",
+  "jsonschemavalidator_validate": "Validate JSON",
+
+  "jsonschemavalidator_no_result": "No results yet. Paste your Schema and JSON to validate.",
+  "jsonschemavalidator_status_valid": "VALID",
+  "jsonschemavalidator_status_invalid": "INVALID",
+  "jsonschemavalidator_stat_checked": "Nodes Checked",
+  "jsonschemavalidator_stat_errors": "Errors",
+  "jsonschemavalidator_stat_warnings": "Warnings",
+
+  "jsonschemavalidator_errors_label": "Validation Issues",
+  "jsonschemavalidator_valid_message": "The JSON data is perfectly valid against the provided schema.",
+
+  "jsonschemavalidator_copy_report": "Copy Report",
+  "jsonschemavalidator_revalidate": "Re-validate",
+
+  "jsonschemavalidator_error_schema_empty": "JSON Schema cannot be empty",
+  "jsonschemavalidator_error_json_empty": "JSON data cannot be empty",
+  "jsonschemavalidator_error_schema_invalid": "Invalid JSON Schema format",
+  "jsonschemavalidator_error_json_invalid": "Invalid JSON data format",
+  "jsonschemavalidator_error_schema_not_object": "JSON Schema must be a valid JSON object",
+
+  "jwtgen_title": "JWT Generator & Decoder",
+
+  "jwtgen_tab_generate": "Generate",
+  "jwtgen_tab_decode": "Decode",
+
+  "jwtgen_clear": "Clear All",
+  "jwtgen_copy": "Copy",
+  "jwtgen_copied": "Copied to clipboard",
+
+  "jwtgen_algorithm": "Algorithm",
+  "jwtgen_secret_hint": "Secret Key",
+  "jwtgen_header": "Header (Extra)",
+  "jwtgen_kid_hint": "Key ID (kid) - Optional",
+
+  "jwtgen_registered_claims": "Registered Claims",
+  "jwtgen_claim_hint": "Value",
+  "jwtgen_claim_time_hint": "Seconds or Date string",
+
+  "jwtgen_payload": "Payload (JSON)",
+  "jwtgen_generate": "Generate JWT",
+
+  "jwtgen_result": "Generated Token",
+
+  "jwtgen_token_input": "JWT Token",
+  "jwtgen_decode": "Decode Token",
+  "jwtgen_load_to_editor": "Load into Generator",
+
+  "jwtgen_part_header": "HEADER: Algorithm & Token Type",
+  "jwtgen_part_payload": "PAYLOAD: Data",
+  "jwtgen_part_signature": "SIGNATURE",
+
+  "jwtgen_verify": "Verify Signature",
+  "jwtgen_verify_action": "Verify",
+  "jwtgen_verify_ok": "Signature Verified",
+  "jwtgen_verify_fail": "Invalid Signature",
+  "jwtgen_warning_none_alg": "Warning: Token is using the 'none' algorithm. Signature verification is bypassed.",
+
+  "jwtgen_error_secret_required": "A secret key is required for the selected algorithm",
+  "jwtgen_error_payload_invalid": "Payload must be a valid JSON object",
+  "jwtgen_error_header_invalid": "Extra header must be a valid JSON object",
+  "jwtgen_error_unknown": "An error occurred while generating the token",
+  "jwtgen_error_empty_token": "Token input cannot be empty",
+  "jwtgen_error_decode": "Failed to decode the token. Please ensure it is a valid JWT format.",
+
+  "jwtgen_claim_desc_iss": "Issuer",
+  "jwtgen_claim_desc_sub": "Subject",
+  "jwtgen_claim_desc_aud": "Audience",
+  "jwtgen_claim_desc_exp": "Expiration Time",
+  "jwtgen_claim_desc_nbf": "Not Before",
+  "jwtgen_claim_desc_iat": "Issued At",
+  "jwtgen_claim_desc_jti": "JWT ID",
+
+  "regexbuilder_title": "Regex Builder",
+
+  "regexbuilder_tab_builder": "Builder",
+  "regexbuilder_tab_matches": "Matches",
+  "regexbuilder_tab_explain": "Explain",
+
+  "regexbuilder_copy_pattern": "Copy Pattern",
+  "regexbuilder_clear": "Clear All",
+  "regexbuilder_copied": "Copied to clipboard",
+
+  "regexbuilder_pattern": "Regular Expression",
+  "regexbuilder_pattern_hint": "Enter regex pattern here...",
+  "regexbuilder_flags": "Flags",
+
+  "regexbuilder_test_text": "Test String",
+  "regexbuilder_test_hint": "Enter text to test your regex against...",
+
+  "regexbuilder_no_matches": "No matches found",
+  "regexbuilder_no_matches_hint": "No matches found for the current pattern and input.",
+  "regexbuilder_matches": "matches",
+
+  "regexbuilder_highlighted": "Highlighted Matches",
+  "regexbuilder_match_list": "Match List",
+  "regexbuilder_match_detail": "Match Details",
+  "regexbuilder_chars": "chars",
+  "regexbuilder_full_match": "Full Match",
+  "regexbuilder_group": "Group",
+  "regexbuilder_named": "Named",
+
+  "regexbuilder_explain_empty": "Enter a regex pattern to see its explanation.",
+  "regexbuilder_explain": "Pattern Explanation",
+
+  "regexbuilder_error_invalid_pattern": "Invalid Regular Expression",
+  "regexbuilder_error_unknown": "An unknown error occurred during execution",
+
+  "regexbuilder_flag_i": "Case Insensitive",
+  "regexbuilder_flag_m": "Multiline",
+  "regexbuilder_flag_s": "Dot All (Single Line)",
+  "regexbuilder_flag_u": "Unicode",
+  "regexbuilder_flag_g": "Global",
+
+  "regexbuilder_cat_chars": "Character Classes",
+  "regexbuilder_cat_anchors": "Anchors & Boundaries",
+  "regexbuilder_cat_quantifiers": "Quantifiers",
+  "regexbuilder_cat_groups": "Groups & Ranges",
+  "regexbuilder_cat_lookarounds": "Lookarounds",
+
+  "sqlbuilder_title": "SQL Builder",
+
+  "sqlbuilder_tab_ddl": "DDL (Table)",
+  "sqlbuilder_tab_query": "Query (Select)",
+
+  "sqlbuilder_copy": "Copy",
+  "sqlbuilder_copied": "Copied to clipboard",
+
+  "sqlbuilder_output": "Generated SQL",
+  "sqlbuilder_empty": "No SQL generated yet.",
+
+  "sqlbuilder_dialect": "SQL Dialect",
+
+  "sqlbuilder_table": "Table Name",
+  "sqlbuilder_if_not_exists": "IF NOT EXISTS",
+
+  "sqlbuilder_columns": "Columns",
+  "sqlbuilder_col_name": "column_name",
+  "sqlbuilder_precision": "Precision",
+  "sqlbuilder_length": "Length",
+  "sqlbuilder_scale": "Scale",
+
+  "sqlbuilder_pk": "Primary Key",
+  "sqlbuilder_not_null": "Not Null",
+  "sqlbuilder_unique": "Unique",
+  "sqlbuilder_auto_increment": "Auto Increment",
+  "sqlbuilder_default_hint": "Default value (e.g. CURRENT_TIMESTAMP)",
+
+  "sqlbuilder_indexes": "Indexes",
+  "sqlbuilder_no_indexes": "No indexes defined.",
+  "sqlbuilder_index_name": "index_name",
+  "sqlbuilder_index_columns": "Index Columns",
+  "sqlbuilder_no_columns": "No columns available.",
+
+  "sqlbuilder_from_table": "FROM Table",
+  "sqlbuilder_distinct": "DISTINCT",
+
+  "sqlbuilder_select_columns": "SELECT Columns",
+  "sqlbuilder_select_all_hint": "No columns selected (defaults to SELECT *)",
+
+  "sqlbuilder_where": "WHERE Conditions",
+  "sqlbuilder_no_where": "No conditions defined.",
+  "sqlbuilder_value_hint": "value",
+  "sqlbuilder_values_list_hint": "val1, val2, ...",
+
+  "sqlbuilder_group_by": "GROUP BY",
+
+  "sqlbuilder_order_by": "ORDER BY",
+  "sqlbuilder_no_order": "No ordering defined.",
+
+  "sqlbuilder_limit_offset": "LIMIT & OFFSET",
+  "sqlbuilder_limit": "LIMIT",
+  "sqlbuilder_offset": "OFFSET",
+
+  "tableviewer_title": "Table Viewer",
+
+  "tableviewer_tab_input": "Input",
+  "tableviewer_tab_table": "Table",
+  "tableviewer_tab_output": "Output",
+
+  "tableviewer_paste": "Paste",
+  "tableviewer_clear": "Clear All",
+  "tableviewer_copy": "Copy",
+  "tableviewer_copied": "Copied to clipboard",
+
+  "tableviewer_input_format": "Input Format",
+  "tableviewer_options": "Options",
+  "tableviewer_opt_auto_types": "Auto-detect Data Types",
+  "tableviewer_opt_flatten": "Flatten Nested JSON Objects",
+
+  "tableviewer_input_label": "Input Data",
+  "tableviewer_parse": "Parse Data",
+
+  "tableviewer_no_data": "No data to display. Please paste input and parse.",
+  "tableviewer_filtered": "filtered",
+  "tableviewer_filter_hint": "Search / Filter rows...",
+
+  "tableviewer_add_row": "Add Row",
+  "tableviewer_add_col": "Add Col",
+  "tableviewer_add_column": "Add Column",
+
+  "tableviewer_sort_asc": "Sort Ascending",
+  "tableviewer_sort_desc": "Sort Descending",
+  "tableviewer_rename": "Rename Column",
+  "tableviewer_resize": "Resize Column",
+  "tableviewer_delete_column": "Delete Column",
+  "tableviewer_column_name": "Column Name",
+
+  "tableviewer_edit_cell": "Edit Cell",
+  "tableviewer_value": "Value",
+  "tableviewer_cancel": "Cancel",
+  "tableviewer_confirm": "Confirm",
+
+  "tableviewer_no_output": "No output yet. Parse some data first.",
+  "tableviewer_output_format": "Output Format",
+
+  "tableviewer_type_string": "String",
+  "tableviewer_type_integer": "Integer",
+  "tableviewer_type_double": "Double",
+  "tableviewer_type_boolean": "Boolean",
+  "tableviewer_type_null": "Null",
+  "tableviewer_type_object": "Object",
+  "tableviewer_type_array": "Array",
+
+  "tableviewer_error_invalid_format": "Invalid format or empty data",
+
+  "timezoneplanner_title": "Timezone Planner",
+
+  "timezoneplanner_tab_planner": "Planner",
+  "timezoneplanner_tab_settings": "Settings",
+
+  "timezoneplanner_jump_best": "Jump to Best Time",
+  "timezoneplanner_copy": "Copy Summary",
+  "timezoneplanner_copied": "Summary copied to clipboard",
+
+  "timezoneplanner_selected_utc": "Selected Time (UTC)",
+  "timezoneplanner_working": "available",
+  "timezoneplanner_best": "Best Time",
+
+  "timezoneplanner_zones": "Timezones",
+  "timezoneplanner_status_work": "WORKING",
+  "timezoneplanner_status_off": "OFF",
+
+  "timezoneplanner_no_overlap": "No overlapping work hours found.",
+  "timezoneplanner_no_overlap_hint": "Try expanding the working hours range in Settings, or select the best partial match.",
+  "timezoneplanner_partial": "Best Partial Match",
+  "timezoneplanner_common_window": "Common Working Window",
+  "timezoneplanner_hours": "overlapping hours",
+
+  "timezoneplanner_heatmap": "Availability Heatmap",
+  "timezoneplanner_legend_work": "Working Hours",
+  "timezoneplanner_legend_off": "Outside Hours",
+  "timezoneplanner_legend_hint": "Outline indicates selected hour",
+
+  "timezoneplanner_work_hours": "Working Hours Range",
+  "timezoneplanner_start": "Start",
+  "timezoneplanner_end": "End",
+  "timezoneplanner_range": "Range",
+
+  "timezoneplanner_empty": "No timezones selected.",
+  "timezoneplanner_add": "Add Timezone",
+  "timezoneplanner_already_added": "Timezone is already in the list",
+  "timezoneplanner_max_reached": "You can add up to 8 timezones",
+
+  "timezoneplanner_search_hint": "Search by city or country...",
+  "timezoneplanner_no_results": "No timezones found.",
+
+  "totpgen_title": "TOTP Generator",
+
+  "totpgen_tab_code": "Code",
+  "totpgen_tab_verify": "Verify",
+  "totpgen_tab_uri": "URI Format",
+
+  "totpgen_copied": "Copied to clipboard",
+  "totpgen_copy": "Copy",
+  "totpgen_new_secret": "Generate Random Secret",
+
+  "totpgen_current_code": "CURRENT TOTP CODE",
+  "totpgen_copy_code": "Copy Code",
+
+  "totpgen_secret": "Secret Key",
+  "totpgen_copy_secret": "Copy Secret",
+  "totpgen_secret_hint": "Enter a valid Base32 encoded secret key. Spaces and lowercase letters are allowed and will be formatted automatically.",
+
+  "totpgen_config": "Configuration",
+  "totpgen_algorithm": "Algorithm",
+  "totpgen_digits": "Digits",
+  "totpgen_period": "Period (seconds)",
+
+  "totpgen_verify_label": "Verify Code",
+  "totpgen_verify_action": "Verify",
+  "totpgen_verify_empty": "Please enter a code to verify",
+  "totpgen_verify_ok": "Code is valid!",
+  "totpgen_verify_fail": "Invalid or expired code",
+
+  "totpgen_verify_info_title": "How Verification Works",
+  "totpgen_verify_info_body": "This tool verifies the code against your current secret key and settings. It checks the current time step as well as the previous and next time steps (±1 window) to account for slight time drift.",
+
+  "totpgen_uri_generate": "Generate OTP Auth URI",
+  "totpgen_issuer_hint": "Issuer (e.g. Google, GitHub)",
+  "totpgen_account_hint": "Account Name (e.g. user@example.com)",
+  "totpgen_generate_uri": "Generate URI",
+
+  "totpgen_uri_import": "Import from URI",
+  "totpgen_import_uri": "Import URI",
+  "totpgen_uri_imported": "Configuration imported successfully",
+
+  "totpgen_error_secret_empty": "Secret key cannot be empty",
+  "totpgen_error_uri_empty": "URI cannot be empty",
+  "totpgen_error_uri_invalid": "Invalid OTP Auth URI format",
+  "totpgen_error_base32_invalid": "Invalid Base32 secret string",
+
+  "asciiart_title": "ASCII Art",
+  "asciiart_copied": "Copied to clipboard",
+
+  "asciiart_input_hint": "Input Text",
+
+  "asciiart_char": "Character",
+  "asciiart_custom": "Custom",
+  "asciiart_resolution": "Resolution",
+  "asciiart_spacing": "Letter Spacing",
+  "asciiart_bold": "Bold",
+  "asciiart_invert": "Invert",
+
+  "asciiart_output_hint": "Output",
+  "asciiart_empty": "No output yet. Enter some text.",
+
+  "asciiart_copy": "Copy",
+  "asciiart_clear": "Clear",
+
+  "b64img_title": "Base64 Image Tool",
+
+  "b64img_tab_encode": "Encode",
+  "b64img_tab_decode": "Decode",
+
+  "b64img_copied": "Copied to clipboard",
+  "b64img_pick": "Pick Image",
+  "b64img_auto_prefix": "Auto Data-URI Prefix",
+
+  "b64img_input_hint": "Base64 Input",
+  "b64img_output_hint": "Base64 Output",
+
+  "b64img_decode": "Decode Image",
+  "b64img_preview": "Image Preview",
+  "b64img_no_image": "No image selected",
+  "b64img_history": "History",
+
+  "b64img_error_pick": "Failed to pick image",
+  "b64img_error_empty": "Base64 input cannot be empty",
+  "b64img_error_invalid": "Invalid Base64 string format",
+
+
+  "b64url_title": "Base64 & URL Encoder",
+
+  "b64url_tab_base64": "Base64",
+  "b64url_tab_url": "URL",
+
+  "b64url_copied": "Copied to clipboard",
+
+  "b64url_urlsafe": "URL Safe Mode",
+  "b64url_live": "Live Mode (Auto-process)",
+
+  "b64url_input_hint": "Input Text",
+  "b64url_output_hint": "Output Result",
+
+  "b64url_encode": "Encode",
+  "b64url_decode": "Decode",
+  "b64url_clear": "Clear",
+
+  "b64url_history": "History",
+
+  "b64url_error": "Invalid input format for decoding",
+  "baseconv_title": "Base Converter",
+  "baseconv_copied": "Copied to clipboard",
+
+  "baseconv_bits": "Bits",
+  "baseconv_bytes": "Bytes",
+  "baseconv_group": "Group Digits",
+
+  "baseconv_binary": "Binary",
+  "baseconv_octal": "Octal",
+  "baseconv_decimal": "Decimal",
+  "baseconv_hex": "Hexadecimal",
+
+  "baseconv_custom_base": "Custom Base",
+  "baseconv_base": "Base",
+
+  "baseconv_clear": "Clear All",
+  "baseconv_history": "History",
+
+  "baseconv_error_invalid": "Invalid input for the active base",
+  "baseconv_error_negative": "Negative numbers are not supported in this mode",
+
+  "bcryptgen_title": "Bcrypt Generator",
+
+  "bcryptgen_tab_generate": "Generate",
+  "bcryptgen_tab_verify": "Verify",
+
+  "bcryptgen_password": "Password",
+  "bcryptgen_cost": "Cost Factor (Rounds)",
+
+  "bcryptgen_cost_fast": "Fast (Not recommended)",
+  "bcryptgen_cost_medium": "Medium",
+  "bcryptgen_cost_default": "Default / Good",
+  "bcryptgen_cost_slow": "Slow / Secure",
+  "bcryptgen_cost_veryslow": "Very Slow / Highly Secure",
+
+  "bcryptgen_strength_weak": "Weak",
+  "bcryptgen_strength_medium": "Medium",
+  "bcryptgen_strength_strong": "Strong",
+
+  "bcryptgen_generate": "Generate Hash",
+  "bcryptgen_generating": "Generating...",
+
+  "bcryptgen_hash_output": "Bcrypt Hash Output",
+  "bcryptgen_copied": "Copied to clipboard",
+
+  "bcryptgen_info_title": "What is Bcrypt?",
+  "bcryptgen_info_body": "Bcrypt is a password-hashing function designed to be slow and computationally expensive, making it highly resistant to brute-force attacks. The 'cost' factor determines the computation time.",
+
+  "bcryptgen_hash_input": "Hash to Verify",
+  "bcryptgen_verify": "Verify Password",
+  "bcryptgen_verifying": "Verifying...",
+
+  "bcryptgen_match": "Match!",
+  "bcryptgen_no_match": "No Match",
+  "bcryptgen_match_hint": "The password successfully matches the provided hash.",
+  "bcryptgen_no_match_hint": "The password does not match the provided hash.",
+
+  "bcryptgen_history": "History",
+
+  "bcryptgen_error_empty_password": "Password cannot be empty",
+  "bcryptgen_error_empty_hash": "Hash cannot be empty",
+
+  "binview_title": "Binary Viewer",
+
+  "binview_tab_t2b": "Text to Binary",
+  "binview_tab_b2t": "Binary to Text",
+
+  "binview_input_text": "Text Input",
+  "binview_input_binary": "Binary Input",
+  "binview_input_text_hint": "Type or paste text…",
+  "binview_input_binary_hint": "01001000 01101001 …",
+
+  "binview_paste": "Paste",
+  "binview_clear": "Clear",
+
+  "binview_bytes": "bytes",
+  "binview_bytes_est": "bytes (est.)",
+  "binview_spaces": "Add spaces between bytes",
+
+  "binview_convert": "Convert",
+  "binview_swap": "Swap input/output",
+
+  "binview_output_text": "Text Output",
+  "binview_output_binary": "Binary Output",
+  "binview_output_hint": "Result appears here",
+
+  "binview_copy": "Copy",
+  "binview_copied": "Copied",
+
+  "binview_error_length": "Binary length must be a multiple of 8 bits.",
+  "binview_error_invalid": "Input contains characters other than 0 and 1.",
+
+  "caseconv_title": "Case Converter",
+
+  "caseconv_input_hint": "Type or paste text…",
+  "caseconv_paste": "Paste",
+  "caseconv_clear": "Clear",
+
+  "caseconv_chars": "chars",
+  "caseconv_words": "words",
+
+  "caseconv_mode_upper": "UPPERCASE",
+  "caseconv_mode_lower": "lowercase",
+  "caseconv_mode_title": "Title Case",
+  "caseconv_mode_sentence": "Sentence case",
+  "caseconv_mode_camel": "camelCase",
+  "caseconv_mode_pascal": "PascalCase",
+  "caseconv_mode_snake": "snake_case",
+  "caseconv_mode_kebab": "kebab-case",
+  "caseconv_mode_constant": "CONSTANT_CASE",
+
+  "caseconv_convert": "Convert",
+
+  "caseconv_output_hint": "Result appears here",
+  "caseconv_copy": "Copy",
+  "caseconv_copied": "Copied"
+}
+
