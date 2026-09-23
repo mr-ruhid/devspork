@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../localization/app_localization.dart';
-import '../theme/app_ui_kit.dart';
 
 class AppSidebar extends StatelessWidget {
   const AppSidebar({
@@ -13,14 +12,14 @@ class AppSidebar extends StatelessWidget {
   final int selectedIndex;
   final ValueChanged<int> onSelect;
 
-  static const double width = 240;
+  static const double width = 72;
 
   @override
   Widget build(BuildContext context) {
     return Container(
       width: width,
       decoration: BoxDecoration(
-        color: Colors.black.withOpacity(0.25),
+        color: const Color(0xFF15102E),
         border: Border(
           right: BorderSide(
             color: Colors.white.withOpacity(0.08),
@@ -29,69 +28,52 @@ class AppSidebar extends StatelessWidget {
       ),
       child: SafeArea(
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
             const SizedBox(height: 16),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Row(
-                children: <Widget>[
-                  Container(
-                    width: 36,
-                    height: 36,
-                    decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: <Color>[Color(0xFF7C4DFF), Color(0xFF00E5FF)],
-                      ),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: const Icon(
-                      Icons.terminal_rounded,
-                      color: Colors.white,
-                      size: 20,
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  const Text(
-                    'DevSpork',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ],
+            Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: <Color>[Color(0xFF7C4DFF), Color(0xFF00E5FF)],
+                ),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: const Icon(
+                Icons.terminal_rounded,
+                color: Colors.white,
+                size: 22,
               ),
             ),
             const SizedBox(height: 24),
-            _SidebarItem(
+            _SidebarIcon(
               icon: Icons.home_rounded,
-              label: context.t('sidebar_home'),
+              tooltip: context.t('sidebar_home'),
               selected: selectedIndex == 0,
               onTap: () => onSelect(0),
             ),
-            _SidebarItem(
+            _SidebarIcon(
               icon: Icons.grid_view_rounded,
-              label: context.t('sidebar_tools'),
+              tooltip: context.t('sidebar_tools'),
               selected: selectedIndex == 1,
               onTap: () => onSelect(1),
             ),
-            _SidebarItem(
+            _SidebarIcon(
               icon: Icons.star_rounded,
-              label: context.t('sidebar_favorites'),
+              tooltip: context.t('sidebar_favorites'),
               selected: selectedIndex == 2,
               onTap: () => onSelect(2),
             ),
-            _SidebarItem(
+            _SidebarIcon(
               icon: Icons.history_rounded,
-              label: context.t('sidebar_history'),
+              tooltip: context.t('sidebar_history'),
               selected: selectedIndex == 3,
               onTap: () => onSelect(3),
             ),
             const Spacer(),
-            _SidebarItem(
+            _SidebarIcon(
               icon: Icons.settings_outlined,
-              label: context.t('sidebar_settings'),
+              tooltip: context.t('sidebar_settings'),
               selected: selectedIndex == 4,
               onTap: () => onSelect(4),
             ),
@@ -103,62 +85,50 @@ class AppSidebar extends StatelessWidget {
   }
 }
 
-class _SidebarItem extends StatelessWidget {
-  const _SidebarItem({
+class _SidebarIcon extends StatelessWidget {
+  const _SidebarIcon({
     required this.icon,
-    required this.label,
+    required this.tooltip,
     required this.selected,
     required this.onTap,
   });
 
   final IconData icon;
-  final String label;
+  final String tooltip;
   final bool selected;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(10),
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 150),
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-            decoration: BoxDecoration(
-              color: selected
-                  ? Colors.white.withOpacity(0.10)
-                  : Colors.transparent,
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Tooltip(
+        message: tooltip,
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: onTap,
+            borderRadius: BorderRadius.circular(12),
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 150),
+              width: 44,
+              height: 44,
+              decoration: BoxDecoration(
                 color: selected
-                    ? Colors.white.withOpacity(0.18)
+                    ? Colors.white.withOpacity(0.12)
                     : Colors.transparent,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: selected
+                      ? Colors.white.withOpacity(0.20)
+                      : Colors.transparent,
+                ),
               ),
-            ),
-            child: Row(
-              children: <Widget>[
-                Icon(
-                  icon,
-                  size: 18,
-                  color: selected ? Colors.white : Colors.white60,
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    label,
-                    style: TextStyle(
-                      color: selected ? Colors.white : Colors.white70,
-                      fontSize: 13.5,
-                      fontWeight:
-                      selected ? FontWeight.w600 : FontWeight.w500,
-                    ),
-                  ),
-                ),
-              ],
+              child: Icon(
+                icon,
+                size: 20,
+                color: selected ? Colors.white : Colors.white60,
+              ),
             ),
           ),
         ),
