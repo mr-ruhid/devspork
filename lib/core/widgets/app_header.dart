@@ -1,52 +1,152 @@
 import 'package:flutter/material.dart';
 import 'package:window_manager/window_manager.dart';
 
-import '../localization/app_localization.dart';
-import '../platform/platform_detector.dart';
-import '../platform/window_controls.dart';
-import '../theme/app_ui_kit.dart';
+import 'platform_detector.dart';
 
-class AppHeader extends StatelessWidget implements PreferredSizeWidget {
-  const AppHeader({
-    super.key,
-    this.onSettingsTap,
-    this.actions = const <Widget>[],
-    this.showBack = false,
-  });
-
-  final VoidCallback? onSettingsTap;
-  final List<Widget> actions;
-  final bool showBack;
+class WindowControls extends StatefulWidget {
+  const WindowControls({super.key});
 
   @override
-  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
+  State<WindowControls> createState() => _WindowControlsState();
+}
+
+class _WindowControlsState extends State<WindowControls> with WindowListener {
+  bool _isMaximized = false;
+
+  @override
+  void initState() {
+    super.initState();
+    if (PlatformDetector.supportsWindowControls) {
+      windowManager.addListener(this);
+      _syncMaximized();
+    }
+  }
+
+  @override
+  void dispose() {
+    if (PlatformDetector.supportsWindowControls) {
+      windowManager.removeListener(this);
+    }
+    super.dispose();
+  }
+
+  Future<void> _syncMaximized() async {
+    final bool value = await windowManager.isMaximized();
+    if (!mounted) return;
+    setState(() => _isMaximized = value);
+  }
+
+  @override
+  void onWindowMaximize() {
+    if (!mounted) return;
+    setState(() => _isMaximized = true);
+  }
+
+  @override
+  void onWindowUnmaximize() {
+    if (!mounted) return;
+    setState(() => _isMaximized = false);
+  }
+
+  Future<void> _minimize() async {
+    await windowManager.minimize();
+  }
+
+  Future<void> _toggleMaximize() async {
+    if (_isMaximized) {
+      await windowManager.unmaximize();
+    } else {
+      await windowManager.maximize();
+    }
+  }
+
+  Future<void> _close() async {
+    await windowManager.close();
+  }
 
   @override
   Widget build(BuildContext context) {
-    final Widget bar = GlassAppBar(
-      leading: showBack
-          ? GlassIconButton(
-        icon: Icons.arrow_back,
-        tooltip: context.t('common_back'),
-        onTap: () => Navigator.of(context).maybePop(),
-      )
-          : null,
-      title: context.t('home_title'),
-      actions: <Widget>[
-        ...actions,
-        GlassIconButton(
-          icon: Icons.settings_outlined,
-          tooltip: context.t('home_settings'),
-          onTap: onSettingsTap ?? () {},
+    if (!PlatformDetector.supportsWindowControls) {
+      return const SizedBox.shrink();
+    }
+
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: <Widget>[
+        _WindowButton(
+          icon: Icons.remove_rounded,
+          hoverColor: const Color(0xFF64B5F6),
+          onTap: _minimize,
+        ),
+        const SizedBox(width: 6),
+        _WindowButton(
+          icon: _isMaximized
+              ? Icons.filter_none_rounded
+              : Icons.crop_square_rounded,
+          hoverColor: const Color(0xFF81C784),
+          onTap: _toggleMaximize,
+        ),
+        const SizedBox(width: 6),
+        _WindowButton(
+          icon: Icons.close_rounded,
+          hoverColor: const Color(0xFFE57373),
+          onTap: _close,
         ),
         const SizedBox(width: 8),
-        const WindowControls(),
       ],
     );
+  }
+}
 
-    if (PlatformDetector.isDesktop) {
-      return DragToMoveArea(child: bar);
-    }
-    return bar;
+class _WindowButton extends StatefulWidget {
+  const _WindowButton({
+    required this.icon,
+    required this.hoverColor,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final Color hoverColor;
+  final VoidCallback onTap;
+
+  @override
+  State<_WindowButton> createState() => _WindowButtonState();
+}
+
+class _WindowButtonState extends State<_WindowButton> {
+  bool _hovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      onEnter: (_) => setState(() => _hovered = true),
+      onExit: (_) => setState(() => _hovered = false),
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: widget.onTap,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 150),
+          width: 34,
+          height: 34,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: _hovered
+                ? widget.hoverColor.withOpacity(0.28)
+                : Colors.white.withOpacity(0.08),
+            border: Border.all(
+              color: _hovered
+                  ? widget.hoverColor.withOpacity(0.55)
+                  : Colors.white.withOpacity(0.15),
+            ),
+          ),
+          child: Icon(
+            widget.icon,
+            size: 16,
+            color: _hovered ? Colors.white : Colors.white70,
+          ),
+        ),
+      ),
+    );
   }
 }
