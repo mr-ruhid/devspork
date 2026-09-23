@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'core/localization/app_localization.dart';
 import 'core/platform/window_initializer.dart';
+import 'core/widgets/main_shell.dart';
 import 'scene/home.dart';
 
 Future<void> main() async {
@@ -25,6 +26,9 @@ class DevSporkApp extends StatelessWidget {
           themeMode: ThemeMode.system,
           theme: _lightTheme(),
           darkTheme: _darkTheme(),
+          builder: (BuildContext context, Widget? child) {
+            return MainShell(child: child ?? const SizedBox.shrink());
+          },
           home: const Home(),
         );
       },
