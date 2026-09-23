@@ -9,14 +9,16 @@ import '../theme/app_ui_kit.dart';
 class AppHeader extends StatelessWidget implements PreferredSizeWidget {
   const AppHeader({
     super.key,
-    this.onSettingsTap,
     this.actions = const <Widget>[],
     this.showBack = false,
+    this.showSearch = true,
+    this.showHelp = true,
   });
 
-  final VoidCallback? onSettingsTap;
   final List<Widget> actions;
   final bool showBack;
+  final bool showSearch;
+  final bool showHelp;
 
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
@@ -31,14 +33,16 @@ class AppHeader extends StatelessWidget implements PreferredSizeWidget {
         onTap: () => Navigator.of(context).maybePop(),
       )
           : null,
-      title: context.t('home_title'),
+      titleWidget:
+      showSearch ? const _FakeSearchBar() : const SizedBox.shrink(),
       actions: <Widget>[
         ...actions,
-        GlassIconButton(
-          icon: Icons.settings_outlined,
-          tooltip: context.t('home_settings'),
-          onTap: onSettingsTap ?? () {},
-        ),
+        if (showHelp)
+          GlassIconButton(
+            icon: Icons.help_outline_rounded,
+            tooltip: context.t('common_help'),
+            onTap: () {},
+          ),
         const SizedBox(width: 8),
         const WindowControls(),
       ],
@@ -48,5 +52,50 @@ class AppHeader extends StatelessWidget implements PreferredSizeWidget {
       return DragToMoveArea(child: bar);
     }
     return bar;
+  }
+}
+
+class _FakeSearchBar extends StatelessWidget {
+  const _FakeSearchBar();
+
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        onTap: () {},
+        child: Container(
+          height: 38,
+          constraints: const BoxConstraints(maxWidth: 480),
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.06),
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(
+              color: Colors.white.withOpacity(0.10),
+            ),
+          ),
+          child: Row(
+            children: <Widget>[
+              const Icon(
+                Icons.search,
+                size: 16,
+                color: Colors.white54,
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  context.t('header_search_hint'),
+                  style: const TextStyle(
+                    color: Colors.white54,
+                    fontSize: 13,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }
