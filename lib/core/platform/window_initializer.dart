@@ -25,13 +25,12 @@ class WindowInitializer {
       backgroundColor: Colors.transparent,
       skipTaskbar: false,
       titleBarStyle: TitleBarStyle.hidden,
-      fullScreen: true,
+      fullScreen: false,
     );
 
     await windowManager.waitUntilReadyToShow(options, () async {
       await windowManager.show();
       await windowManager.focus();
-      await windowManager.setFullScreen(true);
     });
   }
 
