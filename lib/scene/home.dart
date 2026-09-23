@@ -3,12 +3,10 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:window_manager/window_manager.dart';
 
 import '../core/localization/app_localization.dart';
-import '../core/platform/platform_detector.dart';
-import '../core/platform/window_controls.dart';
 import '../core/theme/app_ui_kit.dart';
+import '../core/widgets/app_header.dart';
 
 import '../tools/apibuilder/main.dart';
 import '../tools/asciiart.dart';
@@ -87,9 +85,6 @@ import '../tools/uuidgen.dart';
 import '../tools/wordlistgen/main.dart';
 import '../tools/yamljson.dart';
 
-/// Fixed tile height for every tool card. Because the card now fills the
-/// whole grid tile (see `_ToolCard`), this single value decides the card
-/// height for all of them — no more cards shrinking to fit their text.
 const double _kTileHeight = 168;
 const double _kTileMaxWidth = 220;
 
@@ -106,10 +101,6 @@ class _HomeState extends State<Home> {
   String _category = 'all';
   Timer? _searchDebounce;
 
-  // Cache of localized title/description per tool id. `context.t()` was
-  // previously called twice for *every* tool on *every* rebuild — i.e.
-  // ~160 lookups per keystroke while typing in the search box. We build
-  // it once per locale instead.
   final Map<String, _ToolStrings> _stringsCache = <String, _ToolStrings>{};
   Locale? _cachedLocale;
 
@@ -668,8 +659,6 @@ class _HomeState extends State<Home> {
   }
 
   void _onSearchChanged(String value) {
-    // Debounced: a rebuild of the whole grid on every keystroke was a
-    // large part of the input lag.
     _searchDebounce?.cancel();
     _searchDebounce = Timer(const Duration(milliseconds: 220), () {
       if (!mounted) return;
@@ -699,30 +688,6 @@ class _HomeState extends State<Home> {
     );
   }
 
-  PreferredSizeWidget _buildAppBar(BuildContext context) {
-    return GlassAppBar(
-      title: context.t('home_title'),
-      actions: <Widget>[
-        GlassIconButton(
-          icon: Icons.settings_outlined,
-          tooltip: context.t('home_settings'),
-          onTap: () {},
-        ),
-        const SizedBox(width: 8),
-        const WindowControls(),
-      ],
-    );
-  }
-
-  PreferredSizeWidget _desktopAppBar(BuildContext context) {
-    return PreferredSize(
-      preferredSize: const Size.fromHeight(kToolbarHeight),
-      child: DragToMoveArea(
-        child: _buildAppBar(context),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     _ensureStringsCache();
@@ -745,9 +710,7 @@ class _HomeState extends State<Home> {
     return Scaffold(
       extendBodyBehindAppBar: true,
       backgroundColor: kScaffoldBg,
-      appBar: PlatformDetector.isDesktop
-          ? _desktopAppBar(context)
-          : _buildAppBar(context),
+      appBar: const AppHeader(),
       body: GlassBackground(
         child: SafeArea(
           child: Padding(
@@ -787,9 +750,6 @@ class _HomeState extends State<Home> {
                     padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
                     addAutomaticKeepAlives: false,
                     addRepaintBoundaries: false,
-                    // Keep only a modest offscreen buffer so we
-                    // don't build/paint far more cards than are
-                    // visible.
                     cacheExtent: _kTileHeight * 2,
                     gridDelegate:
                     const SliverGridDelegateWithMaxCrossAxisExtent(
@@ -894,22 +854,6 @@ class _ResolvedTool {
   });
 }
 
-/// A tool tile.
-///
-/// Two things changed here versus the previous version:
-///
-/// 1. **Equal sizing.** The card used to sit inside a `Stack` as a
-///    non-positioned child, so the Stack sized itself to the card's
-///    intrinsic height and each card ended up as tall as its own text —
-///    hence the ragged grid. The card now fills the whole tile.
-///
-/// 2. **No per-card `BackdropFilter`.** `GlassCard` applies a real
-///    backdrop blur; with dozens of tiles on screen that is dozens of
-///    simultaneous GPU blur passes, which is what made scrolling freeze.
-///    The tiles now use a static frosted fill (gradient + border +
-///    shadow) that is visually near-identical over this background but
-///    costs a fraction to paint. Blur is kept where there is only one of
-///    them on screen: the app bar and the search field.
 class _ToolCard extends StatefulWidget {
   const _ToolCard({
     super.key,
