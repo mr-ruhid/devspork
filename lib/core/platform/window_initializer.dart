@@ -31,7 +31,7 @@ class WindowInitializer {
     await windowManager.waitUntilReadyToShow(options, () async {
       await windowManager.show();
       await windowManager.focus();
-      await windowManager.maximize();
+      await windowManager.setFullScreen(true);
     });
   }
 
