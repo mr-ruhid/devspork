@@ -1,10 +1,14 @@
-
 import 'package:flutter/material.dart';
 
 class EdgePanel extends StatefulWidget {
-  const EdgePanel({super.key, required this.child});
+  const EdgePanel({
+    super.key,
+    required this.child,
+    required this.panel,
+  });
 
   final Widget child;
+  final Widget panel;
 
   @override
   State<EdgePanel> createState() => _EdgePanelState();
@@ -55,7 +59,7 @@ class _EdgePanelState extends State<EdgePanel>
               bottom: 0,
               child: SizedBox(
                 width: _panelWidth,
-                child: widget.child,
+                child: widget.panel,
               ),
             );
           },
@@ -91,9 +95,7 @@ class _EdgePanelState extends State<EdgePanel>
                         ),
                       ),
                       child: Icon(
-                        _open
-                            ? Icons.chevron_left
-                            : Icons.chevron_right,
+                        _open ? Icons.chevron_left : Icons.chevron_right,
                         color: Colors.white70,
                         size: 18,
                       ),
