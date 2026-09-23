@@ -11,10 +11,12 @@ class AppHeader extends StatelessWidget implements PreferredSizeWidget {
     super.key,
     this.onSettingsTap,
     this.actions = const <Widget>[],
+    this.showBack = false,
   });
 
   final VoidCallback? onSettingsTap;
   final List<Widget> actions;
+  final bool showBack;
 
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
@@ -22,6 +24,13 @@ class AppHeader extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     final Widget bar = GlassAppBar(
+      leading: showBack
+          ? GlassIconButton(
+        icon: Icons.arrow_back,
+        tooltip: context.t('common_back'),
+        onTap: () => Navigator.of(context).maybePop(),
+      )
+          : null,
       title: context.t('home_title'),
       actions: <Widget>[
         ...actions,
