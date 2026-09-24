@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:window_manager/window_manager.dart';
 
+import '../../scene/help.dart';
 import '../localization/app_localization.dart';
 import '../platform/platform_detector.dart';
 import '../platform/window_controls.dart';
@@ -41,7 +42,11 @@ class AppHeader extends StatelessWidget implements PreferredSizeWidget {
           GlassIconButton(
             icon: Icons.help_outline_rounded,
             tooltip: context.t('common_help'),
-            onTap: () {},
+            onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute<void>(builder: (_) => const Help()),
+              );
+            },
           ),
         const SizedBox(width: 8),
         const WindowControls(),
