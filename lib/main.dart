@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'core/localization/app_localization.dart';
 import 'core/navigation/app_navigator.dart';
 import 'core/platform/window_initializer.dart';
+import 'core/sidebar/sidebar_controller.dart';
 import 'core/widgets/main_shell.dart';
 import 'scene/home.dart';
 
@@ -10,6 +11,7 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await WindowInitializer.initialize();
   await AppLocalization.instance.init();
+  await SidebarController.instance.init();
   runApp(const DevSporkApp());
 }
 
