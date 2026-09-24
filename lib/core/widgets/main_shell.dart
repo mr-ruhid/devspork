@@ -22,10 +22,19 @@ class MainShell extends StatefulWidget {
 
 class _MainShellState extends State<MainShell> {
   SidebarPlugin? _selected;
+  late final OverlayEntry _entry =
+  OverlayEntry(builder: (BuildContext context) => _buildShell(context));
+
+  @override
+  void dispose() {
+    _entry.dispose();
+    super.dispose();
+  }
 
   void _onSelect(SidebarPlugin plugin) {
     if (_selected?.id == plugin.id) return;
     setState(() => _selected = plugin);
+    _entry.markNeedsBuild();
   }
 
   Widget _buildContent() {
@@ -44,22 +53,17 @@ class _MainShellState extends State<MainShell> {
         return const Settings();
       default:
         if (p.url != null) {
-          return PluginWebView(
-            title: p.labelKey,
-            url: p.url!,
-          );
+          return PluginWebView(title: p.labelKey, url: p.url!);
         }
         return widget.child is Home ? widget.child : const Home();
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
+  Widget _buildShell(BuildContext context) {
     final AppSidebar sidebar = AppSidebar(
       selectedId: _selected?.id,
       onSelect: _onSelect,
     );
-
     final Widget content = _buildContent();
 
     if (PlatformDetector.isDesktop) {
@@ -74,6 +78,13 @@ class _MainShellState extends State<MainShell> {
     return EdgePanel(
       panel: sidebar,
       child: content,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Overlay(
+      initialEntries: <OverlayEntry>[_entry],
     );
   }
 }
