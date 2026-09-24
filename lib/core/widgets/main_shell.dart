@@ -2,8 +2,12 @@ import 'package:flutter/material.dart';
 
 import '../../scene/home.dart';
 import '../../scene/settings.dart';
-import '../navigation/app_navigator.dart';
+import '../../scene/sidebar_plugins/cache_cleaner.dart';
+import '../../scene/sidebar_plugins/downloads.dart';
+import '../../scene/sidebar_plugins/plugin_edit.dart';
+import '../../scene/sidebar_plugins/web_view.dart';
 import '../platform/platform_detector.dart';
+import '../sidebar/sidebar_plugin.dart';
 import 'app_sidebar.dart';
 import 'edge_panel.dart';
 
@@ -17,52 +21,59 @@ class MainShell extends StatefulWidget {
 }
 
 class _MainShellState extends State<MainShell> {
-  int _selectedIndex = 0;
+  SidebarPlugin? _selected;
 
-  void _onSelect(int index) {
-    if (index == _selectedIndex) return;
+  void _onSelect(SidebarPlugin plugin) {
+    if (_selected?.id == plugin.id) return;
+    setState(() => _selected = plugin);
+  }
 
-    final NavigatorState? nav = AppNavigator.key.currentState;
-    if (nav == null) return;
-
-    switch (index) {
-      case 0:
-        nav.pushAndRemoveUntil(
-          MaterialPageRoute<void>(builder: (_) => const Home()),
-              (Route<dynamic> route) => false,
-        );
-        break;
-      case 4:
-        nav.push(
-          MaterialPageRoute<void>(builder: (_) => const Settings()),
-        );
-        break;
-      default:
-        setState(() => _selectedIndex = index);
-        return;
+  Widget _buildContent() {
+    final SidebarPlugin? p = _selected;
+    if (p == null) {
+      return widget.child is Home ? widget.child : const Home();
     }
-    setState(() => _selectedIndex = index);
+    switch (p.id) {
+      case 'cache_cleaner':
+        return const CacheCleaner();
+      case 'plugin_edit':
+        return const PluginEdit();
+      case 'downloads':
+        return const Downloads();
+      case 'settings':
+        return const Settings();
+      default:
+        if (p.url != null) {
+          return PluginWebView(
+            title: p.labelKey,
+            url: p.url!,
+          );
+        }
+        return widget.child is Home ? widget.child : const Home();
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     final AppSidebar sidebar = AppSidebar(
-      selectedIndex: _selectedIndex,
+      selectedId: _selected?.id,
       onSelect: _onSelect,
     );
+
+    final Widget content = _buildContent();
 
     if (PlatformDetector.isDesktop) {
       return Row(
         children: <Widget>[
           sidebar,
-          Expanded(child: widget.child),
+          Expanded(child: content),
         ],
       );
     }
 
     return EdgePanel(
       panel: sidebar,
-      child: widget.child,
+      child: content,
     );
   }
 }
