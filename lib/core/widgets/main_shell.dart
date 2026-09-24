@@ -12,79 +12,62 @@ import 'app_sidebar.dart';
 import 'edge_panel.dart';
 
 class MainShell extends StatefulWidget {
-  const MainShell({super.key, required this.child});
-
-  final Widget child;
+  const MainShell({super.key});
 
   @override
   State<MainShell> createState() => _MainShellState();
 }
 
 class _MainShellState extends State<MainShell> {
-  SidebarPlugin? _selected;
-  late final OverlayEntry _entry =
-  OverlayEntry(builder: (BuildContext context) => _buildShell(context));
+  final GlobalKey<NavigatorState> _navKey = GlobalKey<NavigatorState>();
+  String? _selectedId;
 
-  @override
-  void dispose() {
-    _entry.dispose();
-    super.dispose();
-  }
-
-  void _onSelect(SidebarPlugin plugin) {
-    if (_selected?.id == plugin.id) return;
-    setState(() => _selected = plugin);
-    _entry.markNeedsBuild();
-  }
-
-  Widget _buildContent() {
-    final SidebarPlugin? p = _selected;
-    if (p == null) {
-      return widget.child is Home ? widget.child : const Home();
-    }
+  Route<void> _routeFor(SidebarPlugin p) {
     switch (p.id) {
       case 'cache_cleaner':
-        return const CacheCleaner();
+        return MaterialPageRoute<void>(builder: (_) => const CacheCleaner());
       case 'plugin_edit':
-        return const PluginEdit();
+        return MaterialPageRoute<void>(builder: (_) => const PluginEdit());
       case 'downloads':
-        return const Downloads();
+        return MaterialPageRoute<void>(builder: (_) => const Downloads());
       case 'settings':
-        return const Settings();
+        return MaterialPageRoute<void>(builder: (_) => const Settings());
       default:
-        if (p.url != null) {
-          return PluginWebView(title: p.labelKey, url: p.url!);
+        final String? url = p.url;
+        if (url != null) {
+          return MaterialPageRoute<void>(
+            builder: (_) => PluginWebView(title: p.labelKey, url: url),
+          );
         }
-        return widget.child is Home ? widget.child : const Home();
+        return MaterialPageRoute<void>(builder: (_) => const Home());
     }
   }
 
-  Widget _buildShell(BuildContext context) {
-    final AppSidebar sidebar = AppSidebar(
-      selectedId: _selected?.id,
-      onSelect: _onSelect,
-    );
-    final Widget content = _buildContent();
-
-    if (PlatformDetector.isDesktop) {
-      return Row(
-        children: <Widget>[
-          sidebar,
-          Expanded(child: content),
-        ],
-      );
-    }
-
-    return EdgePanel(
-      panel: sidebar,
-      child: content,
-    );
+  void _onSelect(SidebarPlugin p) {
+    final NavigatorState? nav = _navKey.currentState;
+    if (nav == null) return;
+    setState(() => _selectedId = p.id);
+    nav.push(_routeFor(p));
   }
 
   @override
   Widget build(BuildContext context) {
-    return Overlay(
-      initialEntries: <OverlayEntry>[_entry],
+    final AppSidebar sidebar = AppSidebar(
+      selectedId: _selectedId,
+      onSelect: _onSelect,
     );
+
+    final Widget navigator = Navigator(
+      key: _navKey,
+      onGenerateRoute: (RouteSettings settings) => MaterialPageRoute<void>(
+        builder: (_) => const Home(),
+      ),
+    );
+
+    if (PlatformDetector.isDesktop) {
+      return Row(children: <Widget>[sidebar, Expanded(child: navigator)]);
+    }
+
+    return EdgePanel(panel: sidebar, child: navigator);
   }
 }
