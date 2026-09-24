@@ -5,7 +5,6 @@ import 'core/navigation/app_navigator.dart';
 import 'core/platform/window_initializer.dart';
 import 'core/sidebar/sidebar_controller.dart';
 import 'core/widgets/main_shell.dart';
-import 'scene/home.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -30,10 +29,7 @@ class DevSporkApp extends StatelessWidget {
           themeMode: ThemeMode.system,
           theme: _lightTheme(),
           darkTheme: _darkTheme(),
-          builder: (BuildContext context, Widget? child) {
-            return MainShell(child: child ?? const SizedBox.shrink());
-          },
-          home: const Home(),
+          home: const MainShell(),
         );
       },
     );
